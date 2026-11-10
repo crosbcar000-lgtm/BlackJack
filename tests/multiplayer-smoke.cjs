@@ -43,7 +43,7 @@ const server = http.createServer((req, res) => {
     const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju"];
     const tableLooks = new Set();
     for (const theme of themeNames) {
-      const button = host.locator('[data-theme="' + theme + '"]');
+      const button = host.locator('.theme-grid button[data-theme="' + theme + '"]');
       if (await button.count() !== 1) throw new Error("Missing theme option: " + theme);
       await button.click();
       const selected = await button.getAttribute("aria-pressed");
@@ -58,7 +58,11 @@ const server = http.createServer((req, res) => {
       if (saved !== theme) throw new Error("Theme was not saved on this device: " + theme);
     }
     if (tableLooks.size !== themeNames.length) throw new Error("Some themes share the same table appearance; expected 13 unique looks, got " + tableLooks.size);
-    await host.locator('[data-theme="royal"]').click();
+    await host.locator('.theme-grid button[data-theme="royal"]').click();
+    await host.locator("#cardThemeSelect").selectOption("classic");
+    if (await host.locator("body").getAttribute("data-card-theme") !== "classic") throw new Error("Independent card theme did not apply");
+    if (await host.evaluate(() => localStorage.getItem("bj-card-theme")) !== "classic") throw new Error("Card theme was not saved");
+    await host.locator("#cardThemeSelect").selectOption("match");
 
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
@@ -161,8 +165,69 @@ const server = http.createServer((req, res) => {
     const losingHostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
     if (!losingHostBanner.includes("YOU LOST") || !losingGuestBanner.includes("PUSH")) throw new Error("Loss/push banners incorrect; host=" + losingHostBanner + ", guest=" + losingGuestBanner);
     if (!losingHostSeat.includes("Dealer wins")) throw new Error("Player list does not show the host's loss: " + losingHostSeat);
+
+    // Texas Hold'em: private hole cards, shared board, and all four betting streets.
+    await host.locator("#leave").click();
+    await guest.locator("#leave").click();
+    await host.locator("#gameModeSelect").selectOption("holdem");
+    await host.locator("#name").fill("CI Host");
+    await host.locator("#create").click();
+    await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
+    const holdemCode = await host.locator("#roomCode").textContent();
+    await guest.locator("#name").fill("CI Guest");
+    await guest.locator("#joinCode").fill(holdemCode);
+    await guest.locator("#join").click();
+    await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 20000 });
+    await guest.locator("#ready").click();
+    await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
+    await host.locator("#start").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
+    if (await guest.locator("#communityCards .card").count() !== 0) throw new Error("Community cards appeared before the pre-flop betting round");
+    await guest.locator("#holdemCheckCall").click();
+    await host.locator("#holdemCheckCall").click();
+    await host.waitForFunction(() => document.querySelectorAll("#communityCards .card").length === 3, null, { timeout: 10000 });
+    await host.locator("#holdemCheckCall").click();
+    await guest.locator("#holdemCheckCall").click();
+    await host.waitForFunction(() => document.querySelectorAll("#communityCards .card").length === 4, null, { timeout: 10000 });
+    await host.locator("#holdemCheckCall").click();
+    await guest.locator("#holdemCheckCall").click();
+    await host.waitForFunction(() => document.querySelectorAll("#communityCards .card").length === 5, null, { timeout: 10000 });
+    await host.locator("#holdemCheckCall").click();
+    await guest.locator("#holdemCheckCall").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    if (await host.locator("#myHoleCards .card").count() !== 2 || await host.locator("#communityCards .card").count() !== 5) throw new Error("Hold’em showdown did not show two hole cards and five community cards");
+    const holdSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
+    if (!holdSeat.includes("Won") && !holdSeat.includes("Lost")) throw new Error("Hold’em player list did not show a showdown result: " + holdSeat);
+
+    // Roulette: one bet per player, a deterministic red result, and 1:1 payouts.
+    await host.locator("#leave").click();
+    await guest.locator("#leave").click();
+    await host.locator("#gameModeSelect").selectOption("roulette");
+    await host.locator("#name").fill("CI Host");
+    await host.locator("#create").click();
+    await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
+    const rouletteCode = await host.locator("#roomCode").textContent();
+    await guest.locator("#name").fill("CI Guest");
+    await guest.locator("#joinCode").fill(rouletteCode);
+    await guest.locator("#join").click();
+    await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 20000 });
+    await host.locator("#rouletteBetType").selectOption("red");
+    await guest.locator("#rouletteBetType").selectOption("black");
+    await host.locator("#placeRouletteBet").click();
+    await guest.locator("#placeRouletteBet").click();
+    await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
+    await host.evaluate(() => { Math.random = () => 0.05; });
+    await host.locator("#start").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "1", null, { timeout: 10000 });
+    const rouletteHostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
+    const rouletteGuestSeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
+    if (!rouletteHostSeat.includes("Won 20 chips") || !rouletteHostSeat.includes("510")) throw new Error("Roulette red payout incorrect: " + rouletteHostSeat);
+    if (!rouletteGuestSeat.includes("Lost 10 chips") || !rouletteGuestSeat.includes("490")) throw new Error("Roulette black loss incorrect: " + rouletteGuestSeat);
+
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
-    console.log("PASS: Multiplayer join, roster sync, ready state, split/payout rules, personal win/loss/push banners, and per-player results");
+    console.log("PASS: 13 themes, card styles, Blackjack multiplayer, Texas Hold’em betting/showdown, roulette bets/payouts, and personal results");
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
