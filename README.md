@@ -5,7 +5,7 @@ A browser-based, friends-only Blackjack game for up to six players. GitHub Pages
 ## Cost and services
 
 - **Website:** GitHub Pages (free for public repositories under GitHub Free).
-- **Multiplayer signaling/relay:** Cloudflare Workers + Durable Objects. The project is designed for Cloudflare's free usage allowances; usage beyond included limits may require a paid plan.
+- **Multiplayer signaling/relay:** Cloudflare Workers + SQLite-backed Durable Objects. The current Workers Free plan includes 100,000 Worker requests/day; Durable Objects include 100,000 requests/day and 13,000 GB-s/day. Free-plan overages are rejected rather than automatically billed. The Worker uses the Durable Objects WebSocket Hibernation API so idle connections can hibernate.
 - **No Firebase:** no Firebase project, database subscription, or Firebase SDK.
 - **No paid game server is required for low-volume class/friends testing.** Check current Cloudflare limits and your account's billing settings before deploying.
 
@@ -101,7 +101,7 @@ The smoke test serves the static client locally and connects both browser contex
 - The Worker relays messages and enforces room connection limits; it does not validate Blackjack rules.
 - If the host closes the tab, the room ends.
 - A school/work firewall may block the Worker hostname or WebSocket traffic. A different hostname does not guarantee access; have the teacher/network administrator approve the endpoint.
-- Cloudflare free-tier quotas and product terms can change. Check current account limits before use.
+- Cloudflare quotas and product terms can change. Check the current [Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/) and [limits](https://developers.cloudflare.com/workers/platform/limits/) before use. Free-plan quota exhaustion can interrupt new connections or messages.
 - No accounts, persistent identity, moderation, or long-term statistics.
 
 ## Files
