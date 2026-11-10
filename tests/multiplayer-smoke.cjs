@@ -38,6 +38,28 @@ const server = http.createServer((req, res) => {
     }
 
     await host.goto("http://127.0.0.1:4173");
+
+    // Verify every theme selects correctly and changes the actual table texture.
+    const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir"];
+    const tableLooks = new Set();
+    for (const theme of themeNames) {
+      const button = host.locator('[data-theme="' + theme + '"]');
+      if (await button.count() !== 1) throw new Error("Missing theme option: " + theme);
+      await button.click();
+      const selected = await button.getAttribute("aria-pressed");
+      const look = await host.locator(".table").evaluate(el => {
+        const style = getComputedStyle(el);
+        return style.backgroundImage + "|" + style.borderTopColor + "|" + style.backgroundColor;
+      });
+      if (selected !== "true") throw new Error("Theme button did not become selected: " + theme);
+      if (!look || look.includes("none")) throw new Error("Table texture did not render for theme: " + theme);
+      tableLooks.add(look);
+      const saved = await host.evaluate(() => localStorage.getItem("bj-theme"));
+      if (saved !== theme) throw new Error("Theme was not saved on this device: " + theme);
+    }
+    if (tableLooks.size !== themeNames.length) throw new Error("Some themes share the same table appearance; expected 8 unique looks, got " + tableLooks.size);
+    await host.locator('[data-theme="royal"]').click();
+
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
     await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
