@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101b18"><title>Blackjack — Friends Table</title>
+<meta name="theme-color" content="#101b18"><title>Friends Table — Multiplayer Casino Games</title>
 <style>
 :root{color-scheme:dark;--bg:#101b18;--panel:#172722;--felt:#14533d;--felt2:#0d3d2e;--ink:#f6f0df;--muted:#b8c6bb;--gold:#e4bd67;--line:#ffffff24;--red:#d95b58;--table-frame:#68472c;--table-inset:#e4bd6755;--ambient:#244538;--felt-pattern:repeating-linear-gradient(0deg,#f4e6c510 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,#00000009 0 1px,transparent 1px 5px)}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,var(--ambient),var(--bg) 70%);color:var(--ink);font:15px/1.45 system-ui,sans-serif;min-height:100vh}button,input{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:10px 15px;color:var(--ink);background:#ffffff12;font-weight:700}button:disabled{opacity:.38;cursor:not-allowed}.primary{background:var(--gold);color:#181713;border-color:transparent}.danger{background:#7f302e}.wrap{max-width:1150px;margin:auto;padding:18px}.top,.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.brand{font-weight:950;letter-spacing:.08em;font-size:19px}.mark{display:inline-grid;place-items:center;background:var(--gold);color:#171713;width:38px;height:38px;border-radius:12px;margin-right:9px}.pill{border:1px solid var(--line);border-radius:99px;padding:5px 10px;color:var(--muted);font-size:12px}.hero{margin:18px 0;padding:24px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(130deg,#ffffff0c,transparent)}h1{font-size:clamp(28px,5vw,43px);line-height:1.05;margin:9px 0}h2,h3{margin-top:0}.gold{color:var(--gold)}.muted,.rules{color:var(--muted)}.small,.rules{font-size:12px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:16px}.stack{display:grid;gap:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:17px;box-shadow:0 12px 32px #0002}label{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;margin-bottom:5px}input{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#08130f;color:var(--ink)}.field{flex:1;min-width:150px}.code{font:900 24px ui-monospace,monospace;letter-spacing:.2em;color:var(--gold)}.hidden{display:none!important}.table{background-color:var(--felt2);background-image:var(--felt-pattern),radial-gradient(ellipse,var(--felt),var(--felt2));background-size:auto,auto;border:7px solid var(--table-frame);border-radius:35px;padding:18px;min-height:400px;display:flex;flex-direction:column;justify-content:space-between;gap:15px;box-shadow:inset 0 0 0 2px var(--table-inset),0 18px 40px #0003}.zone{text-align:center}.zone-title{text-transform:uppercase;letter-spacing:.2em;font-size:11px;color:#ffffffa8}.cards{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;min-height:86px;margin:8px}.card{width:55px;height:79px;background:#fffdf4;color:#171717;border-radius:8px;box-shadow:0 3px 8px #0006;padding:5px;display:flex;flex-direction:column;justify-content:space-between;font-weight:900;text-align:left}.card.red{color:#c22e35}.card .suit{font-size:24px;align-self:center}.card.back{background:repeating-linear-gradient(45deg,#253c78,#253c78 5px,#e8eafa 5px,#e8eafa 7px);border:4px solid white}.total{font-weight:800}.status{color:var(--gold);min-height:24px;text-align:center;font-weight:700}.result-banner{max-width:520px;margin:0 auto;padding:15px 26px;border:2px solid transparent;border-radius:16px;text-align:center;font-size:clamp(24px,4vw,34px);font-weight:950;letter-spacing:.1em;box-shadow:0 10px 30px #0003}.result-banner.show{display:block}.result-banner.win{background:linear-gradient(135deg,#145c3f,#1d8057);border-color:#7ce0ad;color:#f2fff7}.result-banner.loss{background:linear-gradient(135deg,#702d2d,#9b3737);border-color:#f29b9b;color:#fff5f5}.result-banner.push{background:linear-gradient(135deg,#5a4b2c,#8a7134);border-color:var(--gold);color:#fff9e9}.result-detail{display:block;margin-top:3px;font-size:12px;font-weight:650;letter-spacing:.04em;opacity:.9}.round-outcome{display:block;margin-top:5px;color:var(--gold);font-weight:750}.actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.seats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.seat{border:1px dashed var(--line);border-radius:12px;padding:10px;min-height:65px}.seat.active{border:1px solid var(--gold);background:#e4bd6715}.seat strong{display:block}.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.theme-grid button{padding:9px}.theme-grid button[aria-pressed=true]{outline:2px solid var(--gold)}.divider{height:1px;background:var(--line);margin:13px 0}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#080f0d;border:1px solid var(--line);border-radius:12px;padding:11px 16px;z-index:9;max-width:92vw}.redtxt{color:#ef8989}body[data-theme=neon]{--bg:#090b1b;--panel:#15172d;--felt:#24215b;--felt2:#141239;--gold:#3cf4dc;--ambient:#242052;--table-frame:#38528f;--table-inset:#3cf4dc66;--felt-pattern:repeating-linear-gradient(0deg,rgba(60,244,220,.12) 0 1px,transparent 1px 24px),repeating-linear-gradient(90deg,rgba(60,244,220,.12) 0 1px,transparent 1px 24px)}
@@ -69,7 +69,7 @@ body[data-card-theme=gold] .card.back{background:repeating-linear-gradient(45deg
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style></head>
 <body data-theme="royal"><div class="wrap">
-<header class="top"><div class="brand"><span class="mark">♠</span>BLACKJACK <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
+<header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
 <section class="hero"><span class="pill">PRIVATE FRIENDS GAME · UP TO 6 PLAYERS</span><h1>Your table.<br><span class="gold">Your rules.</span></h1><div class="muted">Create a room, share the code, and play Blackjack together. Virtual chips only.</div></section>
 <div class="layout"><main class="stack">
 <section class="panel" id="lobby"><h2>Join the table</h2><p class="muted small">Pick a name. Create a room or join a friend's room code.</p><div class="stack"><div><label for="gameModeSelect">GAME MODE</label><select id="gameModeSelect"><option value="blackjack">Blackjack</option><option value="holdem">Texas Hold’em</option><option value="roulette">Roulette</option></select></div><div><label for="name">DISPLAY NAME</label><input id="name" maxlength="18" placeholder="Your name" autocomplete="nickname"></div><div class="row"><button class="primary" id="create">Create room</button><div class="field"><label for="joinCode">ROOM CODE</label><input id="joinCode" maxlength="6" placeholder="ABC123" style="text-transform:uppercase"></div><button id="join">Join room</button></div><div class="status" id="lobbyStatus" role="status"></div></div></section>
@@ -99,7 +99,7 @@ body[data-card-theme=gold] .card.back{background:repeating-linear-gradient(45deg
 </main><aside class="stack">
 <section class="panel"><h3>Table style</h3><p class="rules">Choose a world for your table. Each style changes the felt texture, rail, lighting, and colors.</p><div class="theme-grid"><button data-theme="royal" aria-pressed="true">♛ Royal</button><button data-theme="neon" aria-pressed="false">✦ Neon Grid</button><button data-theme="midnight" aria-pressed="false">☾ Deep Sea</button><button data-theme="purple" aria-pressed="false">✧ Arcane</button><button data-theme="arcade" aria-pressed="false">▦ Pixel Arcade</button><button data-theme="starship" aria-pressed="false">✧ Starship</button><button data-theme="dungeon" aria-pressed="false">⚒ Dungeon</button><button data-theme="noir" aria-pressed="false">◈ Film Noir</button><button data-theme="pixel" aria-pressed="false">▧ Pixel Kingdom</button><button data-theme="circuit" aria-pressed="false">⌁ Cyber City</button><button data-theme="spellbook" aria-pressed="false">✧ Arcane Academy</button><button data-theme="wasteland" aria-pressed="false">⌁ Wasteland</button><button data-theme="kaiju" aria-pressed="false">◉ Kaiju Cinema</button></div><p class="rules">Your choice is saved on this device.</p></section>
 <section class="panel"><h3>Card style</h3><p class="rules">Match the current table, or pick a separate deck design. Your choice is saved on this device.</p><label for="cardThemeSelect">CARD BACK DESIGN</label><select id="cardThemeSelect"><option value="match">Match table theme</option><option value="classic">Classic ivory</option><option value="midnight">Midnight blue</option><option value="neon">Neon prism</option><option value="pixel">Pixel mosaic</option><option value="gold">Antique gold</option></select></section>
-<section class="panel"><h3>Rules</h3><p class="rules">Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.</p><p class="rules">No real money, cash value, or prizes.</p></section>
+<section class="panel"><h3>Rules</h3><p class="rules" id="rulesText">Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.</p><p class="rules">No real money, cash value, or prizes.</p></section>
 <section class="panel"><h3>How multiplayer works</h3><p class="rules">Players connect to a Cloudflare Worker over WebSockets. The Worker relays game messages; the host's browser deals and validates actions. No Firebase is used. Cloudflare's free plan has daily usage limits.</p><p class="rules">Friends-only trust model: the host can see and control the game state. Do not use this for valuable stakes.</p></section>
 </aside></div></div><div class="toast hidden" id="toast"></div>
 <script src="./config.js"></script>
@@ -256,8 +256,282 @@ function startNext(){if(!host||phase!=="ROUND_OVER")return;players=players.filte
 function leave(){if(peer)peer.destroy();peer=null;hostConn=null;connections.clear();roomCode="";host=false;players=[];dealer=[];shoe=[];phase="LOBBY";localUid="";setNet("Peer connection ready");render()}
 $("create").onclick=createRoom;$("join").onclick=joinRoom;$("ready").onclick=ready;$("start").onclick=beginRound;$("next").onclick=startNext;$("hit").onclick=()=>sendAction("HIT");$("stand").onclick=()=>sendAction("STAND");$("double").onclick=()=>sendAction("DOUBLE");$("split").onclick=()=>sendAction("SPLIT");$("leave").onclick=leave;
 $("copyInvite").onclick=async()=>{const url=location.origin+location.pathname+"?room="+roomCode;try{await navigator.clipboard.writeText("Join my Blackjack room: "+url+" — Code: "+roomCode);toast("Invite link and code copied")}catch{toast("Room code: "+roomCode)}};
-document.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>{document.body.dataset.theme=b.dataset.theme;localStorage.setItem("bj-theme",b.dataset.theme);document.querySelectorAll("[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
-document.body.dataset.theme=localStorage.getItem("bj-theme")||"royal";document.querySelectorAll("[data-theme]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===document.body.dataset.theme)));
+document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.onclick=()=>{document.body.dataset.theme=b.dataset.theme;localStorage.setItem("bj-theme",b.dataset.theme);document.querySelectorAll(".theme-grid button[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
+document.body.dataset.theme=localStorage.getItem("bj-theme")||"royal";document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===document.body.dataset.theme)));
+
+let gameMode="blackjack",holdem=null,rouletteNumber=null,holdemButtonIndex=0,lastRouletteNumber=null;
+const cardCounts={my:0,dealer:0,community:0,hole:0};
+const renderBlackjack=render,createBlackjackRoom=createRoom,beginBlackjackRound=beginRound,nextBlackjackRound=startNext,handleBlackjackAction=handleAction;
+function cardList(id,cards,backs){
+ const el=$(id),old=cardCounts[id]||0;
+ el.innerHTML=(cards||[]).map((c,i)=>cardHtml(c,backs?backs[i]:!c)).join("");
+ const nodes=el.querySelectorAll(".card"),start=nodes.length<old?0:old;
+ for(let i=start;i<nodes.length;i++)nodes[i].classList.add("deal-in");
+ cardCounts[id]=nodes.length;
+}
+function setBanner(net,detail){
+ const b=$("resultBanner"),kind=net>0?"win":net<0?"loss":"push";
+ b.className="result-banner show "+kind;
+ b.innerHTML="<strong>"+(net>0?"YOU WON!":net<0?"YOU LOST":"PUSH")+"</strong><span class=\"result-detail\">"+escape(detail||"")+"</span>";
+}
+publicState=function(forId){
+ return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,gameMode,
+ players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,ready:p.ready,done:p.done,
+ hands:(p.hands||[]).map(h=>({cards:h.cards,bet:h.bet,done:h.done,result:h.result})),activeHand:p.activeHand,
+ holeCards:p.holeCards?(gameMode==="holdem"&&phase!=="ROUND_OVER"&&p.id!==forId?p.holeCards.map(()=>null):p.holeCards):null,
+ streetBet:p.streetBet||0,committed:p.committed||0,folded:!!p.folded,allIn:!!p.allIn,acted:!!p.acted,
+ holdemResult:p.holdemResult||"",holdemHandName:p.holdemHandName||"",roundNet:p.roundNet||0,
+ rouletteBet:p.rouletteBet||null,rouletteResult:p.rouletteResult||""})),
+ dealer:(dealer||[]).map((c,i)=>phase==="PLAYING"&&i===1?null:c),dealerHidden:phase==="PLAYING",
+ turnPlayer,turnHand,message:roundMessage,roundNumber,forId,
+ holdem:holdem?{board:holdem.board.slice(),pot:holdem.pot,currentBet:holdem.currentBet,lastRaise:holdem.lastRaise,street:holdem.street,buttonIndex:holdem.buttonIndex,turnIndex:holdem.turnIndex}:null,
+ rouletteNumber};
+};
+broadcast=function(){render();if(host)for(const [id,c] of connections)sendTo(c,publicState(id));};
+receiveState=function(s){
+ if(s.type!=="STATE")return;
+ roomCode=s.code;phase=s.phase;gameMode=s.gameMode||"blackjack";players=s.players||[];
+ dealer=(s.dealer||[]).map(c=>c||{hidden:true});turnPlayer=s.turnPlayer||0;turnHand=s.turnHand||0;
+ roundMessage=s.message||"";roundNumber=s.roundNumber||0;holdem=s.holdem||null;rouletteNumber=s.rouletteNumber??null;
+ if($("gameModeSelect"))$("gameModeSelect").value=gameMode;render();
+};
+render=function(){
+ const inRoom=!!roomCode;
+ $("lobby").classList.toggle("hidden",inRoom);$("roomPanel").classList.toggle("hidden",!inRoom);
+ $("copyInvite").disabled=!inRoom;if(!inRoom)return;
+ $("roomCode").textContent=roomCode;$("phase").textContent=phase.replace("_"," ");
+ $("start").classList.toggle("hidden",!host||phase!=="LOBBY");
+ $("next").classList.toggle("hidden",!host||phase!=="ROUND_OVER");
+ $("ready").classList.toggle("hidden",gameMode==="roulette"||phase!=="LOBBY");
+ $("start").textContent=gameMode==="holdem"?"Deal Hold’em":gameMode==="roulette"?"Spin roulette":"Start round";
+ $("next").textContent=gameMode==="holdem"?"Next hand":gameMode==="roulette"?"New spin":"Next round";
+ $("ready").disabled=!myPlayer()||myPlayer().ready||phase!=="LOBBY";
+ $("start").disabled=gameMode==="roulette"?players.length<1||!players.every(p=>p.rouletteBet):
+  players.length<(gameMode==="holdem"?2:1)||!players.every(p=>p.ready);
+ $("blackjackBoard").classList.toggle("hidden",gameMode!=="blackjack");
+ $("holdemBoard").classList.toggle("hidden",gameMode!=="holdem");
+ $("rouletteBoard").classList.toggle("hidden",gameMode!=="roulette");
+ $("rulesText").textContent=gameMode==="holdem"
+ ? "Texas Hold’em · Each player gets two private cards. Make the best five-card hand with the five shared cards. Blinds are 5/10 chips; fold, check, call, or raise. Best hand wins the pot."
+ : gameMode==="roulette"
+ ? "European roulette · Choose red, black, odd/even, low/high, a dozen, or one number. Outside bets pay 1:1; a single number pays 35:1. Zero wins only a straight-up zero bet."
+ : "Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.";
+ if(gameMode==="blackjack"){
+  renderBlackjack();
+  const m=$("myCards").querySelectorAll(".card"),d=$("dealerCards").querySelectorAll(".card");
+  if(m.length<cardCounts.my)cardCounts.my=0;if(d.length<cardCounts.dealer)cardCounts.dealer=0;
+  for(let i=cardCounts.my;i<m.length;i++)m[i].classList.add("deal-in");
+  for(let i=cardCounts.dealer;i<d.length;i++)d[i].classList.add("deal-in");
+  cardCounts.my=m.length;cardCounts.dealer=d.length;return;
+ }
+ $("gameStatus").textContent=roundMessage;
+ $("hit").disabled=$("stand").disabled=$("double").disabled=$("split").disabled=true;
+ $("resultBanner").className="result-banner hidden";$("resultBanner").textContent="";
+ const me=myPlayer();
+ if(gameMode==="holdem"){
+  const board=holdem?.board||[];cardList("communityCards",board);cardList("myHoleCards",me?.holeCards||[]);
+  $("holdemStreet").textContent=holdem?.street||"Waiting for deal";
+  $("holdemPot").textContent=String(holdem?.pot||0);
+  const owe=Math.max(0,(holdem?.currentBet||0)-(me?.streetBet||0));
+  $("holdemToCall").textContent=String(owe);$("holdemYourBet").textContent=String(me?.streetBet||0);
+  const myTurn=phase==="PLAYING"&&holdem&&players[holdem.turnIndex]?.id===localUid&&!me?.folded&&!me?.allIn;
+  $("holdemActions").classList.toggle("hidden",phase!=="PLAYING");
+  $("holdemFold").disabled=!myTurn;$("holdemCheckCall").disabled=!myTurn;
+  $("holdemCheckCall").textContent=owe>0?"Call "+Math.min(owe,me?.chips||0):"Check";
+  $("holdemRaise").disabled=!myTurn||!(me?.chips>owe);
+  $("holdemRaise").textContent="Raise +"+Math.max(10,holdem?.lastRaise||10);
+  $("holdemHint").textContent=phase==="ROUND_OVER"?(me?.holdemResult||"Hand complete")+(me?.holdemHandName?" · "+me.holdemHandName:""):
+   myTurn?"Your turn. Fold, check/call, or raise.":me?.folded?"You folded. Waiting for the hand to finish.":"Waiting for the other players.";
+  if(phase==="ROUND_OVER"&&me)setBanner(me.roundNet||0,(me.roundNet||0)>0?"+"+me.roundNet+" chips":(me.roundNet||0)<0?"−"+Math.abs(me.roundNet)+" chips":"No net change");
+ }else{
+  $("rouletteNumber").parentElement.classList.toggle("hidden",$("rouletteBetType").value!=="number");
+  $("placeRouletteBet").disabled=phase!=="LOBBY"||!me||Number($("rouletteAmount").value)>me.chips;
+  $("placeRouletteBet").textContent=me?.rouletteBet?"Update bet":"Place bet";
+  $("rouletteOutcome").textContent=phase==="ROUND_OVER"?roundMessage:me?.rouletteBet?
+   "Your bet: "+me.rouletteBet.type+(me.rouletteBet.type==="number"?" "+me.rouletteBet.number:"")+" · "+me.rouletteBet.amount+" chips":
+   "Place one bet, then the host can spin when everyone is in.";
+  $("rouletteResult").textContent=rouletteNumber==null?"?":String(rouletteNumber);
+  const wheel=$("rouletteWheel");
+  if(rouletteNumber!=null&&rouletteNumber!==lastRouletteNumber){
+   wheel.classList.remove("spinning");void wheel.offsetWidth;wheel.classList.add("spinning");lastRouletteNumber=rouletteNumber;
+  }
+  if(phase==="ROUND_OVER"&&me)setBanner(me.roundNet||0,(me.roundNet||0)>0?"+"+me.roundNet+" chips":(me.roundNet||0)<0?"−"+Math.abs(me.roundNet)+" chips":"No net change");
+ }
+ $("seats").innerHTML=Array.from({length:6},(_,i)=>{
+  const p=players[i],active=gameMode==="holdem"&&phase==="PLAYING"&&holdem&&players[holdem.turnIndex]?.id===p?.id;
+  let meta=p?"🪙 "+p.chips+" · "+(p.id===localUid?"You":p.ready?"Ready":"Not ready"):"Waiting for friend",outcome="";
+  if(p&&gameMode==="holdem"){
+   if(phase==="PLAYING")meta+=" · "+(p.folded?"Folded":p.allIn?"All-in":"Bet "+(p.streetBet||0));
+   if(phase==="ROUND_OVER")outcome='<span class="small round-outcome">'+escape(p.holdemResult||"Hand complete")+(p.holdemHandName?" · "+escape(p.holdemHandName):"")+'</span>';
+  }else if(p&&gameMode==="roulette"){
+   if(phase==="LOBBY"&&p.rouletteBet)meta+=" · Bet "+p.rouletteBet.amount;
+   if(phase==="ROUND_OVER")outcome='<span class="small round-outcome">'+escape(p.rouletteResult||"No result")+'</span>';
+  }
+  return '<div class="seat '+(active?"active":"")+'"><strong>'+(p?escape(p.name):"Open seat")+'</strong><span class="small muted">'+meta+'</span>'+outcome+'</div>';
+ }).join("");
+};
+createRoom=async function(){
+ gameMode=$("gameModeSelect").value||"blackjack";holdem=null;rouletteNumber=null;lastRouletteNumber=null;holdemButtonIndex=0;
+ await createBlackjackRoom();if(gameMode==="roulette"&&players[0])players[0].ready=false;render();
+};
+beginRound=function(){
+ if(gameMode==="blackjack"){beginBlackjackRound();return}
+ if(!host||phase!=="LOBBY")return;
+ if(gameMode==="holdem")beginHoldemRound();else spinRouletteRound();
+};
+startNext=function(){
+ if(gameMode==="blackjack"){nextBlackjackRound();return}
+ if(!host||phase!=="ROUND_OVER")return;
+ players=players.filter(p=>!p.disconnected);dealer=[];shoe=[];turnPlayer=0;turnHand=0;
+ rouletteNumber=null;lastRouletteNumber=null;holdem=null;
+ players.forEach(p=>{
+  p.hands=[];p.holeCards=null;p.streetBet=0;p.committed=0;p.folded=false;p.allIn=false;p.acted=false;
+  p.holdemResult="";p.holdemHandName="";p.roundNet=0;p.rouletteBet=null;p.rouletteResult="";
+  p.ready=gameMode==="holdem";
+ });
+ phase="LOBBY";roundMessage=gameMode==="holdem"?"Ready for the next hand.":"Place your bets for the next spin.";broadcast();
+};
+handleAction=function(playerId,action){
+ if(gameMode==="blackjack"){handleBlackjackAction(playerId,action);return}
+ const p=players.find(x=>x.id===playerId);if(!p)return;
+ if(gameMode==="roulette"){
+  if(!action||action.kind!=="ROULETTE_BET"||phase!=="LOBBY")return;
+  const amount=Number(action.amount),type=String(action.betType||"");
+  if(!["red","black","odd","even","low","high","dozen1","dozen2","dozen3","number"].includes(type)||![10,25,50].includes(amount))return;
+  const number=Number(action.number);if(type==="number"&&(!Number.isInteger(number)||number<0||number>36))return;
+  if(p.rouletteBet)p.chips+=p.rouletteBet.amount;if(p.chips<amount){broadcast();return}
+  p.chips-=amount;p.rouletteBet={type,number:type==="number"?number:null,amount};p.ready=true;p.rouletteResult="";
+  roundMessage=p.name+" placed a roulette bet.";broadcast();return;
+ }
+ if(gameMode==="holdem")handleHoldemAction(playerId,action);
+};
+function holdemPost(p,amount){
+ const paid=Math.min(Math.max(0,amount),p.chips);p.chips-=paid;p.streetBet=(p.streetBet||0)+paid;
+ p.committed=(p.committed||0)+paid;holdem.pot+=paid;if(p.chips===0)p.allIn=true;return paid;
+}
+function nextHoldemPlayer(index){
+ for(let s=1;s<=players.length;s++){const i=(index+s)%players.length,p=players[i];if(p&&!p.folded&&!p.allIn)return i}return -1;
+}
+function pokerValue(r){return r==="A"?14:r==="K"?13:r==="Q"?12:r==="J"?11:Number(r)}
+function evaluateFive(cards){
+ const values=cards.map(c=>pokerValue(c.r)).sort((a,b)=>b-a),counts=new Map();
+ values.forEach(v=>counts.set(v,(counts.get(v)||0)+1));
+ const groups=Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]||b[0]-a[0]);
+ const flush=cards.every(c=>c.s===cards[0].s),unique=Array.from(new Set(values));
+ if(unique.includes(14))unique.push(1);
+ let straight=0;for(const hi of unique){if([0,1,2,3,4].every(i=>unique.includes(hi-i))){straight=hi;break}}
+ if(flush&&straight)return [8,straight];
+ if(groups[0][1]===4)return [7,groups[0][0],groups[1][0]];
+ const trip=groups.find(g=>g[1]===3),pair=groups.find((g,i)=>i>0&&g[1]>=2);
+ if(trip&&pair)return [6,trip[0],pair[0]];
+ if(flush)return [5,...values];if(straight)return [4,straight];
+ if(trip)return [3,trip[0],...groups.filter(g=>g[1]===1).map(g=>g[0]).sort((a,b)=>b-a)];
+ const pairs=groups.filter(g=>g[1]===2).map(g=>g[0]).sort((a,b)=>b-a);
+ if(pairs.length>1)return [2,pairs[0],pairs[1],...groups.filter(g=>g[1]===1).map(g=>g[0])];
+ if(pairs.length===1)return [1,pairs[0],...groups.filter(g=>g[1]===1).map(g=>g[0]).sort((a,b)=>b-a)];
+ return [0,...values];
+}
+function pokerCompare(a,b){for(let i=0;i<Math.max(a.length,b.length);i++){const d=(a[i]||0)-(b[i]||0);if(d)return d}return 0}
+function bestHoldem(cards){
+ let best=null;
+ function choose(start,pick){if(pick.length===5){const score=evaluateFive(pick);if(!best||pokerCompare(score,best)>0)best=score;return}
+  for(let i=start;i<=cards.length-(5-pick.length);i++)choose(i+1,pick.concat(cards[i]));}
+ choose(0,[]);return best;
+}
+function pokerName(score){return ["High card","One pair","Two pair","Three of a kind","Straight","Flush","Full house","Four of a kind","Straight flush"][score[0]]}
+function dealBoard(n){if(shoe.length)shoe.pop();for(let i=0;i<n&&shoe.length;i++)holdem.board.push(shoe.pop())}
+function finishHoldem(){
+ const active=players.filter(p=>!p.folded),scores=new Map();
+ active.forEach(p=>scores.set(p.id,bestHoldem(p.holeCards.concat(holdem.board))));
+ players.forEach(p=>{p.roundNet=-(p.committed||0);p.holdemResult=p.folded?"Folded":"Lost";p.holdemHandName=p.folded?"":pokerName(scores.get(p.id))});
+ if(active.length===1){const w=active[0];w.chips+=holdem.pot;w.roundNet+=holdem.pot;w.holdemResult="Won "+holdem.pot+" (everyone folded)"}
+ else{
+  const levels=Array.from(new Set(players.map(p=>p.committed||0).filter(n=>n>0))).sort((a,b)=>a-b);let prev=0;
+  for(const level of levels){
+   const contributors=players.filter(p=>(p.committed||0)>=level),amount=(level-prev)*contributors.length,eligible=contributors.filter(p=>!p.folded);
+   if(eligible.length){
+    let best=scores.get(eligible[0].id),wins=[eligible[0]];
+    for(const p of eligible.slice(1)){const cmp=pokerCompare(scores.get(p.id),best);if(cmp>0){best=scores.get(p.id);wins=[p]}else if(cmp===0)wins.push(p)}
+    const share=Math.floor(amount/wins.length),extra=amount-share*wins.length;
+    wins.forEach((p,i)=>{const won=share+(i<extra?1:0);p.chips+=won;p.roundNet+=won;p.holdemResult="Won "+won});
+   }
+   prev=level;
+  }
+ }
+ phase="ROUND_OVER";roundMessage="Showdown complete. Check the player list for each result.";broadcast();
+}
+function advanceHoldemStreet(){
+ if(players.filter(p=>!p.folded&&!p.allIn).length<=1){
+  while(holdem.board.length<5)dealBoard(holdem.board.length===0?3:1);
+  finishHoldem();return;
+ }
+ if(holdem.street==="PRE-FLOP"){dealBoard(3);holdem.street="FLOP"}
+ else if(holdem.street==="FLOP"){dealBoard(1);holdem.street="TURN"}
+ else if(holdem.street==="TURN"){dealBoard(1);holdem.street="RIVER"}
+ else{finishHoldem();return}
+ holdem.currentBet=0;holdem.lastRaise=10;
+ players.forEach(p=>{p.streetBet=0;p.acted=!!p.folded||!!p.allIn});
+ holdem.turnIndex=nextHoldemPlayer(holdem.buttonIndex);
+ if(holdem.turnIndex<0){advanceHoldemStreet();return}
+ roundMessage=holdem.street+" · "+players[holdem.turnIndex].name+" to act.";
+}
+function holdemAfter(index){
+ if(players.filter(p=>!p.folded).length===1){finishHoldem();return}
+ const can=players.filter(p=>!p.folded&&!p.allIn),complete=!can.length||can.every(p=>p.acted&&p.streetBet>=holdem.currentBet);
+ if(complete){advanceHoldemStreet();return}
+ holdem.turnIndex=nextHoldemPlayer(index);
+ if(holdem.turnIndex<0){advanceHoldemStreet();return}
+ roundMessage=players[holdem.turnIndex].name+" to act.";
+}
+function handleHoldemAction(id,action){
+ if(!host||phase!=="PLAYING"||!holdem)return;
+ const index=players.findIndex(p=>p.id===id),p=players[index];
+ if(index!==holdem.turnIndex||!p||p.folded||p.allIn)return;
+ if(action==="FOLD"){p.folded=true;p.acted=true}
+ else if(action==="CHECK_CALL"){const owe=Math.max(0,holdem.currentBet-p.streetBet);if(owe>0)holdemPost(p,owe);p.acted=true}
+ else if(action==="RAISE"){
+  const owe=Math.max(0,holdem.currentBet-p.streetBet),target=holdem.currentBet+Math.max(10,holdem.lastRaise);
+  if(p.chips<=owe)return;holdemPost(p,target-p.streetBet);
+  if(p.streetBet>holdem.currentBet){holdem.lastRaise=p.streetBet-holdem.currentBet;holdem.currentBet=p.streetBet;players.forEach(q=>{if(q!==p&&!q.folded&&!q.allIn)q.acted=false})}
+  p.acted=true;
+ }else return;
+ holdemAfter(index);broadcast();
+}
+function beginHoldemRound(){
+ if(!host||phase!=="LOBBY"||players.length<2||!players.every(p=>p.ready))return;
+ shoe=deck();dealer=[];holdemButtonIndex=(holdemButtonIndex+1)%players.length;
+ players.forEach(p=>{p.holeCards=[shoe.pop(),shoe.pop()];p.streetBet=0;p.committed=0;p.folded=false;p.allIn=false;p.acted=false;p.holdemResult="";p.holdemHandName="";p.roundNet=0});
+ const n=players.length,b=holdemButtonIndex,sb=n===2?b:(b+1)%n,bb=n===2?(b+1)%n:(b+2)%n;
+ holdem={board:[],pot:0,currentBet:10,lastRaise:10,street:"PRE-FLOP",buttonIndex:b,turnIndex:-1};
+ holdemPost(players[sb],5);holdemPost(players[bb],10);phase="PLAYING";roundNumber++;
+ holdem.turnIndex=nextHoldemPlayer(bb);roundMessage="Pre-flop · "+players[holdem.turnIndex].name+" to act.";broadcast();
+}
+const redNumbers=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+function betWins(b,n){
+ if(b.type==="number")return b.number===n;if(n===0)return false;
+ if(b.type==="red")return redNumbers.includes(n);if(b.type==="black")return !redNumbers.includes(n);
+ if(b.type==="odd")return n%2===1;if(b.type==="even")return n%2===0;
+ if(b.type==="low")return n<=18;if(b.type==="high")return n>=19;
+ if(b.type==="dozen1")return n<=12;if(b.type==="dozen2")return n>=13&&n<=24;if(b.type==="dozen3")return n>=25;
+ return false;
+}
+function spinRouletteRound(){
+ if(!host||phase!=="LOBBY"||!players.length||!players.every(p=>p.rouletteBet))return;
+ rouletteNumber=Math.floor(Math.random()*37);roundNumber++;
+ players.forEach(p=>{const b=p.rouletteBet,won=betWins(b,rouletteNumber),payout=won?b.amount*(b.type==="number"?36:2):0;p.chips+=payout;p.roundNet=payout-b.amount;p.rouletteResult=won?"Won "+payout+" chips":"Lost "+b.amount+" chips"});
+ const color=rouletteNumber===0?"green":redNumbers.includes(rouletteNumber)?"red":"black";
+ phase="ROUND_OVER";roundMessage="Wheel landed on "+rouletteNumber+" ("+color+"). Check the player list for results.";broadcast();
+}
+$("create").onclick=createRoom;$("start").onclick=beginRound;$("next").onclick=startNext;
+$("holdemFold").onclick=()=>sendAction("FOLD");
+$("holdemCheckCall").onclick=()=>sendAction("CHECK_CALL");
+$("holdemRaise").onclick=()=>sendAction("RAISE");
+$("placeRouletteBet").onclick=()=>sendAction({kind:"ROULETTE_BET",betType:$("rouletteBetType").value,amount:Number($("rouletteAmount").value),number:Number($("rouletteNumber").value)});
+$("rouletteBetType").onchange=()=>{$("rouletteNumber").parentElement.classList.toggle("hidden",$("rouletteBetType").value!=="number")};
+$("cardThemeSelect").onchange=()=>{document.body.dataset.cardTheme=$("cardThemeSelect").value;localStorage.setItem("bj-card-theme",$("cardThemeSelect").value)};
+document.body.dataset.cardTheme=localStorage.getItem("bj-card-theme")||"match";
+$("cardThemeSelect").value=document.body.dataset.cardTheme;$("rouletteNumber").parentElement.classList.add("hidden");
+
 const invited=new URLSearchParams(location.search).get("room");if(invited)$("joinCode").value=invited.toUpperCase();render();
 })();
 </script></body></html>
