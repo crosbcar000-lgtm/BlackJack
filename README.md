@@ -15,7 +15,7 @@ This is a relay architecture, not browser-to-browser PeerJS. The Worker forwards
 
 You need a free Cloudflare account and permission to deploy Workers and Durable Objects.
 
-1. Install Node.js 20 or newer.
+1. Install Node.js 22.12 or newer. This is required by the current Wrangler version.
 2. From the repository directory, install dependencies:
    ```sh
    npm install
@@ -57,14 +57,14 @@ Do not include `/health` or a trailing path. Commit and push the updated `config
 4. Select branch `main` and folder `/(root)`, then save.
 5. Wait for the Pages deployment to finish.
 
-The website remains static; multiplayer is handled by the separately deployed Worker.
+The website remains static; multiplayer is handled by the separately deployed Worker. After changing `worker.js`, run `npx wrangler deploy` from your Mac to publish the Worker update; GitHub Pages does not deploy Worker code.
 
 ## Play with friends
 
 1. Open the GitHub Pages URL.
 2. Enter a display name and select **Create room**.
 3. Share the six-character room code or invite link.
-4. Friends open the same site, enter their names and room code, then select **Join room**.
+4. Friends open the same site, enter their names and room code, then select **Join room**. They are added automatically when the host connection is established; no host approval is required.
 5. Everyone selects **Ready**. The host selects **Start round**.
 
 ## Local development and tests
