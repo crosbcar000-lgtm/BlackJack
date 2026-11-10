@@ -88,7 +88,7 @@ The smoke test serves the static client locally and connects both browser contex
 ## Game features
 
 - Up to six players; private six-character room codes and shareable invite links.
-- Four themes: Royal, Neon, Midnight, and Purple.
+- Eight table themes: Royal velvet, Neon Grid, Deep Sea, Arcane, Pixel Arcade, Starship, Dungeon, and Film Noir. Each changes the table felt pattern, rail, lighting, and palette; the selected theme is saved locally on each device.
 - Hit, Stand, Double, and Split.
 - Aces count as 1 or 11; face cards count as 10.
 - Dealer stands on 17; Blackjack pays 3:2.
