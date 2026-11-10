@@ -3,13 +3,27 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { chromium } = require("playwright");
 
-const html = fs.readFileSync(path.join(__dirname, "..", "index.html"));
+const root = path.join(__dirname, "..");
+const signalOrigin = process.env.BLACKJACK_SIGNALING_URL || "http://127.0.0.1:8787";
+const mime = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8" };
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-  res.end(html);
+  const pathname = new URL(req.url, "http://localhost").pathname;
+  if (pathname === "/config.js") {
+    res.writeHead(200, { "content-type": mime[".js"] });
+    res.end("window.BLACKJACK_SIGNALING_URL = " + JSON.stringify(signalOrigin) + ";");
+    return;
+  }
+  const name = pathname === "/" ? "index.html" : pathname.slice(1);
+  if (!["index.html", "relay-client.js"].includes(name)) {
+    res.writeHead(404); res.end("Not found"); return;
+  }
+  res.writeHead(200, { "content-type": mime[path.extname(name)] });
+  res.end(fs.readFileSync(path.join(root, name)));
 });
 
 (async () => {
+  const health = await fetch(signalOrigin.replace(/\/$/, "") + "/health");
+  if (!health.ok) throw new Error("Signaling Worker health check failed: HTTP " + health.status);
   await new Promise(resolve => server.listen(4173, "127.0.0.1", resolve));
   const browser = await chromium.launch({ headless: true });
   const errors = [];
@@ -26,7 +40,7 @@ const server = http.createServer((req, res) => {
     await host.goto("http://127.0.0.1:4173");
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
-    await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 30000 });
+    await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
     const code = await host.locator("#roomCode").textContent();
     if (!code || !/^[A-HJ-NP-Z2-9]{6}$/.test(code)) throw new Error("Host did not publish a valid room code");
 
@@ -34,9 +48,9 @@ const server = http.createServer((req, res) => {
     await guest.locator("#name").fill("CI Guest");
     await guest.locator("#joinCode").fill(code);
     await guest.locator("#join").click();
-    await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 45000 });
-    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 15000 });
-    await guest.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Host")), null, { timeout: 15000 });
+    await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 20000 });
+    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 10000 });
+    await guest.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Host")), null, { timeout: 10000 });
 
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
@@ -45,7 +59,7 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelectorAll("#myCards .card").length >= 2, null, { timeout: 10000 });
 
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
-    console.log("PASS: host registration, guest join, two-way roster sync, ready state, and round start");
+    console.log("PASS: Cloudflare Worker health, host room, guest join, roster sync, ready state, and round start");
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
