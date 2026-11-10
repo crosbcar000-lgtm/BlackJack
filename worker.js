@@ -58,8 +58,13 @@ export class Room {
     try { packet = JSON.parse(message); } catch { return; }
     const sockets = this.state.getWebSockets();
     if (meta.role === "guest") {
+      if (packet?._relay !== "send") return;
       const host = sockets.find(s => s.deserializeAttachment()?.role === "host" && s.readyState === WebSocket.OPEN);
-      if (host) host.send(JSON.stringify({ _relay: "data", peer: meta.peer, data: packet }));
+      if (host) {
+        host.send(JSON.stringify({ _relay: "data", peer: meta.peer, data: packet.data }));
+      } else {
+        try { ws.send(JSON.stringify({ _relay: "host-closed" })); } catch {}
+      }
       return;
     }
     if (meta.role !== "host" || packet?._relay !== "send") return;
