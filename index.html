@@ -8,7 +8,7 @@
 @media(max-width:820px){.layout{grid-template-columns:1fr}.seats{grid-template-columns:repeat(2,1fr)}.wrap{padding:12px}.table{padding:14px;min-height:370px}}
 </style></head>
 <body data-theme="royal"><div class="wrap">
-<header class="top"><div class="brand"><span class="mark">♠</span>BLACKJACK <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Peer connection ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
+<header class="top"><div class="brand"><span class="mark">♠</span>BLACKJACK <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
 <section class="hero"><span class="pill">PRIVATE FRIENDS GAME · UP TO 6 PLAYERS</span><h1>Your table.<br><span class="gold">Your rules.</span></h1><div class="muted">Create a room, share the code, and play Blackjack together. Virtual chips only.</div></section>
 <div class="layout"><main class="stack">
 <section class="panel" id="lobby"><h2>Join the table</h2><p class="muted small">Pick a name. Create a room or join a friend's room code.</p><div class="stack"><div><label for="name">DISPLAY NAME</label><input id="name" maxlength="18" placeholder="Your name" autocomplete="nickname"></div><div class="row"><button class="primary" id="create">Create room</button><div class="field"><label for="joinCode">ROOM CODE</label><input id="joinCode" maxlength="6" placeholder="ABC123" style="text-transform:uppercase"></div><button id="join">Join room</button></div><div class="status" id="lobbyStatus" role="status"></div></div></section>
@@ -18,7 +18,7 @@
 </main><aside class="stack">
 <section class="panel"><h3>Table style</h3><div class="theme-grid"><button data-theme="royal" aria-pressed="true">♛ Royal</button><button data-theme="neon" aria-pressed="false">✦ Neon</button><button data-theme="midnight" aria-pressed="false">☾ Midnight</button><button data-theme="purple" aria-pressed="false">✧ Purple</button></div><p class="rules">Theme is saved on this device.</p></section>
 <section class="panel"><h3>Rules</h3><p class="rules">Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.</p><p class="rules">No real money, cash value, or prizes.</p></section>
-<section class="panel"><h3>How multiplayer works</h3><p class="rules">Players connect directly through WebRTC. The host's browser deals and validates actions. No Firebase, database subscription, or paid game server is used. PeerJS's public signaling service is an external free service and may have limits.</p><p class="rules">Friends-only trust model: the host can see and control the game state. Do not use this for valuable stakes.</p></section>
+<section class="panel"><h3>How multiplayer works</h3><p class="rules">Players connect to a Cloudflare Worker over WebSockets. The Worker relays game messages; the host's browser deals and validates actions. No Firebase is used. Cloudflare's free plan has daily usage limits.</p><p class="rules">Friends-only trust model: the host can see and control the game state. Do not use this for valuable stakes.</p></section>
 </aside></div></div><div class="toast hidden" id="toast"></div>
 <script src="./config.js"></script>
 <script src="./relay-client.js"></script>
