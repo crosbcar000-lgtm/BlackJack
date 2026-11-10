@@ -1,79 +1,68 @@
 # Blackjack — Friends Table
 
-A static browser Blackjack table designed for private games with friends. Six seats, room codes, four themes, anonymous Firebase sign-in, and virtual chips only.
+A browser-based, friends-only Blackjack game for up to six players. It uses GitHub Pages for static hosting and direct browser-to-browser WebRTC connections via PeerJS.
 
-## Important status
+## No Firebase and no paid hosting
 
-This is an **early friends-only prototype**, not a secure or cheat-proof multiplayer casino. The current browser client stores game state in a shared Firestore room document. A player with browser developer tools could manipulate state, inspect the shoe, or alter chips. Never use real money, prizes, or anything of value.
+This project does **not** use Firebase, Cloud Functions, a database subscription, or a paid game server.
 
-The UI includes Hit, Stand, Double and a preliminary Split control. Split-hand turn sequencing and settlement are not complete in this prototype. Treat it as a build-in-progress, not a finished rules-complete game.
+- **Website:** GitHub Pages (free for public repositories under GitHub Free).
+- **Multiplayer:** WebRTC peer-to-peer through the public PeerJS signaling service.
+- **Game authority:** the room creator's browser hosts the game and validates turns.
+- **Chips:** fictional only. No deposits, cash value, prizes, or real-money play.
 
-## Zero-cost hosting target
+The public PeerJS signaling service is an external dependency. It is offered for testing and small projects, can have limits or outages, and is not a guaranteed service-level offering. Direct WebRTC connections may also fail on some restrictive networks.
 
-- GitHub Pages for static files (free for public repositories).
-- Firebase Spark plan for Authentication and Firestore within free quotas.
-- No Cloud Functions, Cloud Run, paid hosting, or real-money features.
+## Publish with GitHub Pages
 
-Firebase quotas and product terms can change. Do not upgrade to Blaze or enable billing if your requirement is strictly $0.
+1. Make sure the repository is **public**.
+2. Open **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**.
+4. Select branch `main` and folder `/(root)`, then save.
+5. Wait for the Pages deployment to finish. GitHub will show the public website URL on the Pages settings screen.
 
-## 1. Create Firebase project
+No build step, Node.js, secrets, environment variables, or Firebase setup are required.
 
-1. Open https://console.firebase.google.com/ and create a project.
-2. Add a Web app (</> icon).
-3. Copy the Firebase web config.
-4. In **Authentication → Sign-in method**, enable **Anonymous**.
-5. Create a **Cloud Firestore** database.
-6. Choose a region near your players. Firestore's location cannot be changed after creation.
+## Play with friends
 
-## 2. Add Firebase config
+1. Open the GitHub Pages URL.
+2. Enter a display name and select **Create room**.
+3. Share the six-character room code or **Copy invite** link.
+4. Friends open the same site, enter their display names and room code, then select **Join room**.
+5. Everyone selects **Ready**. The host selects **Start round**.
+6. The host's browser handles dealing, turn order, dealer play, and chip settlement.
 
-Open `index.html` and replace the placeholder values in `firebaseConfig`:
+Up to six players can sit at one table. If a player disconnects mid-round, their remaining hands are stood automatically. The host can start the next round after settlement.
 
-```js
-const firebaseConfig = {
-  apiKey: "YOUR_WEB_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_WEB_APP_ID"
-};
-```
+## Game features
 
-These web-app config values are identifiers, not service-account private keys. Never put service-account JSON, private keys, or Admin SDK credentials in this repository.
+- Four themes: Royal, Neon, Midnight, and Purple.
+- Private six-character room codes and shareable invite links.
+- Anonymous display names; no account or sign-in required.
+- Hit, Stand, Double, and Split.
+- Aces count as 1 or 11; face cards count as 10.
+- Dealer stands on 17.
+- Blackjack pays 3:2.
+- Virtual chips only.
 
-## 3. Firestore rules — prototype warning
+## Friends-only trust model and limitations
 
-The current prototype performs direct client writes to the room document. To make that prototype sync between friends, Firestore rules must permit authenticated clients to read and update room documents. That permission model is **not secure**: a room member can tamper with game state, and rules cannot safely validate a complete Blackjack engine.
+This is a **casual trust-based implementation**, not a secure public multiplayer platform.
 
-Do not deploy permissive rules for a public game. For a truly secure design, game mutations must go through a trusted server that keeps the shoe, dealer hole card, balances, and settlement private. That requires a backend service; this repository intentionally does not deploy one because the target budget is $0.
+- The host's browser is authoritative and can see the full deck and dealer hole card. A technically skilled host could manipulate the game.
+- PeerJS's public signaling service helps peers discover each other; it does not host the game state.
+- PeerJS cloud service limits, browser support, NAT/firewall restrictions, and network quality may affect connections.
+- If the host closes the tab or loses connection, the room ends.
+- No persistent accounts, cross-device identity recovery, moderation, or long-term stats.
+- Do not use real money, prizes, or anything of value.
 
-If keeping strict $0 is non-negotiable, accept that this is a casual, trust-based game among friends. Use a private invite code and do not share it publicly.
+## Troubleshooting
 
-## 4. Enable GitHub Pages
+- **PeerJS failed to load:** refresh the page; check whether your browser/network blocks the unpkg CDN.
+- **Room not found:** make sure the host created the room and still has the page open; re-check the six-character code.
+- **Unable to connect:** try another network or disable restrictive VPN/firewall settings. Some networks block WebRTC.
+- **Invite opens but doesn't join:** entering the code and pressing Join is still required.
 
-1. In the GitHub repository, open **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select branch `main` and folder `/ (root)`; save.
-4. GitHub will show the published URL when the Pages deployment completes.
+## Files
 
-For free GitHub Pages on GitHub Free, the repository generally needs to be public. This repository is currently private; change it under **Settings → General → Danger Zone → Change repository visibility → Public** before enabling free Pages. Review the repository contents first.
-
-## 5. Play
-
-1. Open the published page.
-2. Enter a display name and create a private room.
-3. Share the invite link or six-character room code with friends.
-4. Friends open the same site, enter their names and join the code.
-5. Host starts a round. Chips are fictional.
-
-## Known limitations in this build
-
-- Browser-side game authority; not cheat-proof.
-- Anonymous identities are tied to browser storage and are not recoverable across devices.
-- Split is not fully implemented.
-- Reconnection and room cleanup are basic.
-- No moderation, server-side rate limiting, or authoritative anti-cheat.
-- Offline demo mode only works in the same browser; cross-device play requires Firebase config and Firestore permissions.
-
-## Project files
-
-- `index.html` — single-page game.
+- `index.html` — complete static game client.
