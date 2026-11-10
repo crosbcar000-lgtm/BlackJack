@@ -33,7 +33,7 @@ export class Room {
       return new Response("Invalid guest id", { status: 400 });
     }
     const sockets = this.state.getWebSockets();
-    const host = sockets.find(ws => ws.deserializeAttachment()?.role === "host");
+    const host = sockets.find(ws => ws.deserializeAttachment()?.role === "host" && ws.readyState === WebSocket.OPEN);
     if (role === "host" && host && host.readyState === WebSocket.OPEN) {
       return new Response("Room already has a host", { status: 409 });
     }
