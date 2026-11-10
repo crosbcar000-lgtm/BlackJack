@@ -167,8 +167,8 @@ const server = http.createServer((req, res) => {
     if (!losingHostSeat.includes("Dealer wins")) throw new Error("Player list does not show the host's loss: " + losingHostSeat);
 
     // Texas Hold'em: private hole cards, shared board, and all four betting streets.
-    await host.locator("#leave").click();
     await guest.locator("#leave").click();
+    await host.locator("#leave").click();
     await host.locator("#gameModeSelect").selectOption("holdem");
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
@@ -202,8 +202,8 @@ const server = http.createServer((req, res) => {
     if (!holdSeat.includes("Won") && !holdSeat.includes("Lost")) throw new Error("Hold’em player list did not show a showdown result: " + holdSeat);
 
     // Roulette: one bet per player, a deterministic red result, and 1:1 payouts.
-    await host.locator("#leave").click();
     await guest.locator("#leave").click();
+    await host.locator("#leave").click();
     await host.locator("#gameModeSelect").selectOption("roulette");
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
