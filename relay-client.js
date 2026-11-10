@@ -62,6 +62,7 @@
         ws.addEventListener("error", () => this.emit("error", { type: "network", message: "Could not connect to the Cloudflare signaling Worker. Check the configured URL and network permissions." }));
         ws.addEventListener("close", event => {
           if (role === "guest") this._activeConnection?._close();
+          if (role === "host") { for (const conn of this.connections.values()) conn._close(); this.connections.clear(); }
           if (!this.destroyed && event.code !== 1000) this.emit("error", { type: "socket-closed", message: event.reason || "Signaling socket closed (" + event.code + ")." });
         });
       } catch (error) { this.emit("error", { type: "network", message: error.message }); }
