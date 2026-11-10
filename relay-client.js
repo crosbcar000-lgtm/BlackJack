@@ -11,6 +11,7 @@
     constructor(peer, id, socket, incoming) {
       handlers(this); this.peer = id; this._peer = peer; this._socket = socket;
       this.open = !!incoming; this._incoming = !!incoming;
+      if (incoming) queueMicrotask(() => this.emit("open"));
     }
     send(data) {
       if (!this.open) throw new Error("Connection is not open");
