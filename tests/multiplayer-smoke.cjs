@@ -95,10 +95,52 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
     const hostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
     const guestSeat = await guest.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
-    if (!hostSeat.includes("520")) throw new Error("Split aces paid incorrectly; expected host to finish with 520 chips, got: " + hostSeat);
-    if (!guestSeat.includes("500")) throw new Error("Guest push payout was incorrect; expected 500 chips, got: " + guestSeat);
+    const hostBanner = await host.locator("#resultBanner").textContent();
+    const guestBanner = await guest.locator("#resultBanner").textContent();
+    const roundStatus = await host.locator("#gameStatus").textContent();
+    if (!hostSeat.includes("520") || !hostSeat.includes("Hand 1: Win") || !hostSeat.includes("Hand 2: Win")) throw new Error("Host split-hand outcomes or payout incorrect: " + hostSeat);
+    if (!guestSeat.includes("500") || !guestSeat.includes("Push")) throw new Error("Guest push result or payout incorrect: " + guestSeat);
+    if (!hostBanner.includes("YOU WON") || !guestBanner.includes("PUSH")) throw new Error("Personal result banners incorrect; host=" + hostBanner + ", guest=" + guestBanner);
+    if (roundStatus.includes("CI Host") || roundStatus.includes("CI Guest")) throw new Error("Round status still lists other players' outcomes: " + roundStatus);
+
+    // Start another round in which the host loses, verifying the loss banner.
+    await host.locator("#next").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "LOBBY" && !document.querySelector("#start").disabled, null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "LOBBY", null, { timeout: 10000 });
+    const lossTopCards = [
+      card(0, "10"), card(1, "K"),  // dealer: 20
+      card(2, "10"), card(1, "6"), // host: 16
+      card(2, "Q"), card(3, "K")   // guest: 20
+    ];
+    const lossDesiredDeck = Array.from({ length: 52 }, (_, i) => i)
+      .filter(i => !lossTopCards.includes(i))
+      .concat(lossTopCards.slice().reverse());
+    const lossWorkingDeck = Array.from({ length: 52 }, (_, i) => i);
+    const lossRandomValues = [];
+    for (let i = 51; i > 0; i--) {
+      const j = lossWorkingDeck.slice(0, i + 1).indexOf(lossDesiredDeck[i]);
+      if (j < 0) throw new Error("Could not build losing-round test deck");
+      lossRandomValues.push((j + 0.25) / (i + 1));
+      [lossWorkingDeck[i], lossWorkingDeck[j]] = [lossWorkingDeck[j], lossWorkingDeck[i]];
+    }
+    await host.evaluate(values => {
+      let index = 0;
+      Math.random = () => values[index++] ?? 0;
+    }, lossRandomValues);
+    await host.locator("#start").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && !document.querySelector("#stand").disabled, null, { timeout: 10000 });
+    await host.locator("#stand").click();
+    await guest.waitForFunction(() => !document.querySelector("#stand").disabled, null, { timeout: 10000 });
+    await guest.locator("#stand").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    const losingHostBanner = await host.locator("#resultBanner").textContent();
+    const losingGuestBanner = await guest.locator("#resultBanner").textContent();
+    const losingHostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
+    if (!losingHostBanner.includes("YOU LOST") || !losingGuestBanner.includes("PUSH")) throw new Error("Loss/push banners incorrect; host=" + losingHostBanner + ", guest=" + losingGuestBanner);
+    if (!losingHostSeat.includes("Dealer wins")) throw new Error("Player list does not show the host's loss: " + losingHostSeat);
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
-    console.log("PASS: Worker health, host/guest join, roster sync, ready state, split aces, split payout, push payout, and synchronized round completion");
+    console.log("PASS: Multiplayer join, roster sync, ready state, split/payout rules, personal win/loss/push banners, and per-player results");
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
