@@ -1,4 +1,4 @@
-name: Multiplayer browser smoke test
+name: Cloudflare multiplayer browser smoke test
 
 on:
   push:
@@ -8,12 +8,22 @@ on:
 jobs:
   multiplayer:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install --no-save playwright
+          cache: npm
+      - run: npm install
       - run: npx playwright install --with-deps chromium
-      - run: node tests/multiplayer-smoke.cjs
+      - name: Start local Cloudflare Worker
+        run: |
+          npx wrangler dev --local --ip 127.0.0.1 --port 8787 > /tmp/wrangler.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl --fail http://127.0.0.1:8787/health; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/wrangler.log
+          exit 1
+      - run: npm run test:browser
