@@ -54,12 +54,51 @@ const server = http.createServer((req, res) => {
 
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
-    await host.locator("#start").click();
-    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" || document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
-    await guest.waitForFunction(() => document.querySelectorAll("#myCards .card").length >= 2, null, { timeout: 10000 });
 
+    // Make the shuffle deterministic: dealer 10+7, host A+A, guest 10+7,
+    // then split cards 10+10. This verifies split-ace 21 pays as a normal win.
+    const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+    const card = (suit, rank) => suit * 13 + ranks.indexOf(rank);
+    const topCards = [
+      card(0, "10"), card(3, "7"),   // dealer
+      card(0, "A"), card(1, "A"),    // host pair
+      card(2, "10"), card(1, "7"),   // guest hand
+      card(3, "10"), card(1, "10")   // split aces
+    ];
+    const desiredDeck = Array.from({ length: 52 }, (_, i) => i)
+      .filter(i => !topCards.includes(i))
+      .concat(topCards.slice().reverse());
+    const workingDeck = Array.from({ length: 52 }, (_, i) => i);
+    const randomValues = [];
+    for (let i = 51; i > 0; i--) {
+      const j = workingDeck.slice(0, i + 1).indexOf(desiredDeck[i]);
+      if (j < 0) throw new Error("Could not build deterministic deck shuffle");
+      randomValues.push((j + 0.25) / (i + 1));
+      [workingDeck[i], workingDeck[j]] = [workingDeck[j], workingDeck[i]];
+    }
+    await host.evaluate(values => {
+      let index = 0;
+      Math.random = () => values[index++] ?? 0;
+    }, randomValues);
+
+    await host.locator("#start").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && !document.querySelector("#split").disabled, null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelectorAll("#myCards .card").length === 2, null, { timeout: 10000 });
+
+    await host.locator("#split").click();
+    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Host") && el.textContent.includes("480")), null, { timeout: 10000 });
+    await guest.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Host") && el.textContent.includes("480")), null, { timeout: 10000 });
+    await guest.waitForFunction(() => !document.querySelector("#stand").disabled, null, { timeout: 10000 });
+    await guest.locator("#stand").click();
+
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    const hostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
+    const guestSeat = await guest.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
+    if (!hostSeat.includes("520")) throw new Error("Split aces paid incorrectly; expected host to finish with 520 chips, got: " + hostSeat);
+    if (!guestSeat.includes("500")) throw new Error("Guest push payout was incorrect; expected 500 chips, got: " + guestSeat);
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
-    console.log("PASS: Cloudflare Worker health, host room, guest join, roster sync, ready state, and round start");
+    console.log("PASS: Worker health, host/guest join, roster sync, ready state, split aces, split payout, push payout, and synchronized round completion");
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
