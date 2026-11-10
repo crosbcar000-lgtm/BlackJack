@@ -454,10 +454,13 @@ function finishHoldem(){
     for(const p of eligible.slice(1)){const cmp=pokerCompare(scores.get(p.id),best);if(cmp>0){best=scores.get(p.id);wins=[p]}else if(cmp===0)wins.push(p)}
     const share=Math.floor(amount/wins.length),extra=amount-share*wins.length;
     wins.forEach((p,i)=>{const won=share+(i<extra?1:0);p.chips+=won;p.roundNet+=won;p.holdemResult="Won "+won});
+   }else{
+    contributors.forEach(p=>{p.chips+=level-prev;p.roundNet+=level-prev});
    }
    prev=level;
   }
  }
+ players.forEach(p=>{if(!p.folded)p.holdemResult=p.roundNet>0?"Won "+(p.roundNet+(p.committed||0))+" chips":p.roundNet<0?"Lost "+Math.abs(p.roundNet)+" chips":"Break even"});
  phase="ROUND_OVER";roundMessage="Showdown complete. Check the player list for each result.";broadcast();
 }
 function advanceHoldemStreet(){
