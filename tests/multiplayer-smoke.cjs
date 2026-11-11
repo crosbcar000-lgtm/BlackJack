@@ -428,6 +428,20 @@ const server = http.createServer((req, res) => {
     await guest.locator("#joinCode").fill(holdemCode);
     await guest.locator("#join").click();
     await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 20000 });
+    for (const page of [host, guest]) {
+      const guide = page.locator("#holdemHandGuide");
+      if (!(await guide.isVisible()) || await guide.evaluate(el => el.open)) throw new Error("Hold’em hand guide should be visible and collapsed by default");
+    }
+    await host.locator("#holdemHandGuide summary").click();
+    const guideRows = host.locator("#holdemHandGuide li");
+    if (await guideRows.count() !== 10) throw new Error("Hold’em hand guide should list all ten poker hand rankings");
+    const guideText = await host.locator("#holdemHandGuide").innerText();
+    for (const name of ["Royal Flush","Straight Flush","Four of a Kind","Full House","Flush","Straight","Three of a Kind","Two Pair","One Pair","High Card"]) {
+      if (!guideText.includes(name)) throw new Error("Hold’em hand guide is missing "+name);
+    }
+    if (!guideText.includes("A-2-3-4-5")) throw new Error("Hold’em guide should explain the ace-low straight");
+    await host.locator("#holdemHandGuide summary").click();
+    if (await host.locator("#holdemHandGuide").evaluate(el => el.open)) throw new Error("Hold’em hand guide should collapse when clicked again");
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
     await host.locator("#start").click();
