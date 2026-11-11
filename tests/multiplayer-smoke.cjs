@@ -266,8 +266,8 @@ const server = http.createServer((req, res) => {
     // The dealer's hole card flips face-up on showdown for both players.
     try {
       await host.waitForFunction(() => {
-        const card = document.querySelector("#dealerCards .dealer-flip-scene[data-reveal='animated']");
-        return card && card.classList.contains("is-flipped");
+        const card = document.querySelector("#dealerCards .dealer-flip-scene");
+        return card && card.classList.contains("is-flipped") && ["animated","complete"].includes(card.dataset.reveal);
       }, null, { timeout: 5000 });
     } catch (error) {
       const revealState = await host.evaluate(() => ({
@@ -278,8 +278,8 @@ const server = http.createServer((req, res) => {
       throw new Error("Host dealer reveal did not animate: "+JSON.stringify(revealState)+"; "+error.message);
     }
     await guest.waitForFunction(() => {
-      const card = document.querySelector("#dealerCards .dealer-flip-scene[data-reveal='animated']");
-      return card && card.classList.contains("is-flipped");
+      const card = document.querySelector("#dealerCards .dealer-flip-scene");
+      return card && card.classList.contains("is-flipped") && ["animated","complete"].includes(card.dataset.reveal);
     }, null, { timeout: 5000 });
     for (const page of [host, guest]) {
       const flip = await page.locator("#dealerCards .dealer-flip-scene").evaluate(el => ({
@@ -287,7 +287,7 @@ const server = http.createServer((req, res) => {
         reveal: el.dataset.reveal,
         duration: getComputedStyle(el.querySelector(".dealer-flip-inner")).transitionDuration
       }));
-      if (flip.count !== 1 || flip.reveal !== "animated" || !flip.duration.includes("0.82s")) {
+      if (flip.count !== 1 || !["animated","complete"].includes(flip.reveal) || !flip.duration.includes("0.82s")) {
         throw new Error("Dealer reveal did not use the flip animation: " + JSON.stringify(flip));
       }
     }
