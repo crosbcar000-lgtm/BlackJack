@@ -937,7 +937,7 @@ function render(){
   $("ready").disabled=!me||me.ready||phase!=="LOBBY";
   $("start").disabled=players.length<1||!players.every(p=>p.ready);
   $("playerListSection").classList.toggle("hidden",gameMode==="holdem");
- $("seats").innerHTML=Array.from({length:6},(_,i)=>{
+ $("seats").innerHTML=gameMode==="holdem"?"":Array.from({length:6},(_,i)=>{
     const p=players[i];
     const playing=phase==="PLAYING"&&players[turnPlayer]?.id===p?.id;
     const outcomes=p&&phase==="ROUND_OVER"&&p.hands?.length
