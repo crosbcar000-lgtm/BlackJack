@@ -468,12 +468,16 @@ const server = http.createServer((req, res) => {
       const handsTab = page.locator("#holdemHandsToggle");
       if (!(await handsTab.isVisible()) || !(await handsTab.textContent()).includes("Hands")) throw new Error("Hold’em Table hands control is missing");
       if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Table hands should be visible by default");
-      if (await page.locator("#holdemHandsPanel .holdem-hand-row").count() !== 2) throw new Error("Table hands should list both players");
+      if (await page.locator("#holdemHandsPanel .holdem-hand-row").count() !== 2) throw new Error("Table hands should show both players around the table");
+      const sideSeats = page.locator("#holdemSeatsLeft .seat, #holdemSeatsRight .seat");
+      const sideNames = (await sideSeats.allTextContents()).join(" ");
+      if (!sideNames.includes("CI Host") || !sideNames.includes("CI Guest")) throw new Error("Both actual player names should appear in the side seats: " + sideNames);
+      if (await page.locator("#playerListSection").isVisible()) throw new Error("Hold’em should not duplicate the side seats in a separate player list");
       if (await page.locator("#holdemHandsPanel .card.back").count() !== 2 || await page.locator("#holdemHandsPanel .card:not(.back)").count() !== 2) throw new Error("Opponent hole cards must stay hidden before showdown");
       await handsTab.click();
-      if (await page.locator("#holdemHandsPanel").isVisible()) throw new Error("Table hands toggle should collapse the list");
+      if (await page.locator("#holdemHandsPanel").isVisible()) throw new Error("Table hands toggle should collapse the side seats");
       await handsTab.click();
-      if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Table hands toggle should reopen the list");
+      if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Table hands toggle should reopen the side seats");
     }
     if (await guest.locator("#communityCards .card").count() !== 0) throw new Error("Community cards appeared before the pre-flop betting round");
     await guest.locator("#holdemCheckCall").click();
