@@ -1433,7 +1433,10 @@ render=function(){
 const SLOT_SYMBOLS=["🍒","🍋","🔔","⭐","💎","7️⃣"];
 function slotsRender(){
  const dock=$("slotsDock"),me=myPlayer();if(!dock)return;
- document.body.classList.toggle("has-room",!!roomCode);
+ const inRoom=!!roomCode;
+ document.body.classList.toggle("has-room",inRoom);
+ dock.classList.toggle("hidden",!inRoom);
+ dock.style.display=inRoom?"block":"none";
  $("slotsTokenCount").textContent=(me?.tokens??0)+" tokens";
  $("slotsCashBalance").textContent="Game cash: "+(me?.chips??0)+" chips";
  $("slotsExchangeAmount").max=Math.max(0,Math.floor((me?.chips??0)/100)*100);
@@ -1487,7 +1490,12 @@ document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("cl
  const stop=()=>{drag=null};head.addEventListener("pointerup",stop);head.addEventListener("pointercancel",stop);
 })();
 const renderBeforeSlots=render;
-render=function(){renderBeforeSlots();slotsRender()};
+render=function(){
+ const inRoom=!!roomCode,dock=$("slotsDock");
+ document.body.classList.toggle("has-room",inRoom);
+ if(dock){dock.classList.toggle("hidden",!inRoom);dock.style.display=inRoom?"block":"none"}
+ renderBeforeSlots();slotsRender();
+};
 
 const invited=new URLSearchParams(location.search).get("room");if(invited)$("joinCode").value=invited.toUpperCase();render();
 })();
