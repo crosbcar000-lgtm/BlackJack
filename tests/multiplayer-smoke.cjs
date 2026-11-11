@@ -597,16 +597,18 @@ const server = http.createServer((req, res) => {
     const debtCard = host.locator(".seat.in-debt").filter({ hasText: "big fat loser" });
     if (await debtCard.count() !== 1) throw new Error("Negative-balance player did not get the debt styling");
 
-    // Reaching exactly -10,000 chips removes a player from the room.
-    await host.evaluate(() => {
-      const bankrupt = players.find(p => p.id !== localUid);
-      if (!bankrupt) throw new Error("Expected a guest before the bankruptcy threshold test");
-      bankrupt.chips = -9950;
-      broadcast();
-    });
-    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest") && el.textContent.includes("-9950")), null, { timeout: 10000 });
+    // Continue losing roulette spins until the guest is at -9,950, then verify removal at -10,000.
+    for (let spin = 0; spin < 189; spin++) {
+      await host.evaluate(() => { Math.random = () => 0; });
+      await host.locator("#next").click();
+      await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
+      await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
+    }
+    const preBankruptcySeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
+    if (!preBankruptcySeat.includes("-9950")) throw new Error("Guest should still be in the game at -9,950 chips: " + preBankruptcySeat);
+    await host.evaluate(() => { Math.random = () => 0; });
     await host.locator("#next").click();
-    await host.waitForFunction(() => ![...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 10000 });
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && ![...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelector("#lobbyStatus").textContent.includes("You hit -10,000 chips and were removed"), null, { timeout: 10000 });
     if (await guest.locator("#roomPanel").isVisible()) throw new Error("Bankrupt guest remained in the room after reaching -10,000 chips");
 
