@@ -700,8 +700,8 @@ function render(){
   $("phase").textContent=phase.replace("_"," ");
   $("start").classList.toggle("hidden",!host||phase!=="LOBBY");
   $("next").classList.toggle("hidden",!host||phase!=="ROUND_OVER");
- $("roundControls").classList.toggle("hidden",!["ready","start","next"].some(id=>!$(id).classList.contains("hidden")));
   $("ready").classList.toggle("hidden",phase!=="LOBBY");
+  $("roundControls").classList.toggle("hidden",!["ready","start","next"].some(id=>!$(id).classList.contains("hidden")));
   const me=myPlayer();
   $("ready").disabled=!me||me.ready||phase!=="LOBBY";
   $("start").disabled=players.length<1||!players.every(p=>p.ready);
@@ -884,6 +884,7 @@ render=function(){
  $("start").classList.toggle("hidden",!host||phase!=="LOBBY");
  $("next").classList.toggle("hidden",!host||phase!=="ROUND_OVER");
  $("ready").classList.toggle("hidden",gameMode==="roulette"||phase!=="LOBBY");
+ $("roundControls").classList.toggle("hidden",!["ready","start","next"].some(id=>!$(id).classList.contains("hidden")));
  $("start").textContent=gameMode==="holdem"?"Deal Hold’em":gameMode==="roulette"?"Spin roulette":"Start round";
  $("next").textContent=gameMode==="holdem"?"Next hand":gameMode==="roulette"?"New spin":"Next round";
  $("ready").disabled=!myPlayer()||myPlayer().ready||phase!=="LOBBY";
