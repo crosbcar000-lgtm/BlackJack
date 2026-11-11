@@ -264,10 +264,19 @@ const server = http.createServer((req, res) => {
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
     // The dealer's hole card flips face-up on showdown for both players.
-    await host.waitForFunction(() => {
-      const card = document.querySelector("#dealerCards .dealer-flip-scene[data-reveal='animated']");
-      return card && card.classList.contains("is-flipped");
-    }, null, { timeout: 5000 });
+    try {
+      await host.waitForFunction(() => {
+        const card = document.querySelector("#dealerCards .dealer-flip-scene[data-reveal='animated']");
+        return card && card.classList.contains("is-flipped");
+      }, null, { timeout: 5000 });
+    } catch (error) {
+      const revealState = await host.evaluate(() => ({
+        phase:document.querySelector("#phase")?.textContent,
+        round:document.querySelector("#gameStatus")?.textContent,
+        dealerCards:[...document.querySelector("#dealerCards").children].map(el=>({className:el.className,reveal:el.dataset.reveal,flipped:el.classList.contains("is-flipped"),html:el.outerHTML.slice(0,300)}))
+      }));
+      throw new Error("Host dealer reveal did not animate: "+JSON.stringify(revealState)+"; "+error.message);
+    }
     await guest.waitForFunction(() => {
       const card = document.querySelector("#dealerCards .dealer-flip-scene[data-reveal='animated']");
       return card && card.classList.contains("is-flipped");
