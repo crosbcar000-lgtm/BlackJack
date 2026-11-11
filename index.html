@@ -1471,7 +1471,7 @@ handleAction=function(playerId,action){
   p.chips-=amount;p.tokens=(p.tokens??0)+(amount/10);p.slotMessage="Exchanged "+amount+" chips for "+(amount/10)+" tokens.";broadcast();return;
  }
  if(action&&action.kind==="SHOP_BUY"){
-  if(!host)return;const p=players.find(x=>x.id===playerId),items={"✦":25,"♛":50,"⚡":75,"👑":100};
+  if(!host)return;const p=players.find(x=>x.id===playerId),items={"✦":250,"♛":500,"⚡":750,"👑":1000};
   if(!p||!Object.prototype.hasOwnProperty.call(items,action.flair)||p.flair===action.flair||(p.tokens??0)<items[action.flair])return;
   p.tokens-=items[action.flair];p.flair=action.flair;p.slotMessage=action.flair+" name flair equipped!";broadcast();return;
  }
