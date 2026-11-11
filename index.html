@@ -1352,7 +1352,7 @@ function syncCelebration(){
  if(!celebration||celebration.id===lastCelebrationId)return;lastCelebrationId=celebration.id;playFanfare(celebration.kind);
  const el=$("toast");if(el){el.textContent="🎉 "+celebration.message;el.classList.add("fanfare-toast");el.classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>{el.classList.add("hidden");el.classList.remove("fanfare-toast")},4300);}
 }
-document.addEventListener("pointerdown",()=>{if(fanFareAudio?.state==="suspended")fanFareAudio.resume().catch(()=>{});},{passive:true});
+document.addEventListener("pointerdown",()=>{try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){fanFareAudio=fanFareAudio||new AC();if(fanFareAudio.state==="suspended")fanFareAudio.resume().catch(()=>{});}}catch(error){}},{passive:true});
 const leaveBeforeFanfare=leave;
 leave=function(){celebration=null;lastCelebrationId="";leaveBeforeFanfare()};
 const originalBeginBlackjackRound=beginBlackjackRound;
