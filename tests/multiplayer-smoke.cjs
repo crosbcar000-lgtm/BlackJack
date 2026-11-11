@@ -351,6 +351,18 @@ const server = http.createServer((req, res) => {
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2 && document.querySelectorAll("#communityCards .card").length === 0, null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
     if (await host.locator("#holdemPot").textContent() !== "15") throw new Error("Next Hold’em hand did not deal immediately with fresh blinds");
+    if (await host.locator("#holdemAllIn").count() !== 1 || await guest.locator("#holdemAllIn").count() !== 1) throw new Error("All In action is missing from Hold'em controls");
+    await host.waitForFunction(() => document.querySelector("#holdemHint").textContent.includes("Your turn.") || document.querySelector("#holdemHint").textContent.includes("Waiting for the other players."), null, { timeout: 10000 });
+    await host.waitForFunction(() => document.querySelector("#holdemHint").textContent.includes("Your turn.") || document.querySelector("#holdemHint").textContent.includes("Waiting for the other players."), null, { timeout: 10000 });
+    const hostActsFirst = (await host.locator("#holdemAllIn").isEnabled());
+    const allInPlayer = hostActsFirst ? host : guest;
+    const callingPlayer = hostActsFirst ? guest : host;
+    await allInPlayer.locator("#holdemAllIn").click();
+    await callingPlayer.waitForFunction(() => document.querySelector("#holdemHint").textContent.includes("Your turn."), null, { timeout: 10000 });
+    await callingPlayer.locator("#holdemCheckCall").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    if (await host.locator("#communityCards .card").count() !== 5) throw new Error("All-in showdown did not run the board to the river");
 
     // Roulette: one bet per player, a deterministic red result, and 1:1 payouts.
     await guest.locator("#leave").click();
