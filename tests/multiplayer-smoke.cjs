@@ -198,8 +198,17 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "290 tokens", null, { timeout: 10000 });
     const starshine = guest.locator('#slotsShop button[data-flair="✦"]');
     if (!(await starshine.isEnabled())) throw new Error("Starshine should unlock at 250 tokens");
+    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest") && el.textContent.includes("290 tokens")), null, { timeout: 10000 });
     await starshine.click();
-    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "40 tokens" && [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("✦ CI Guest")), null, { timeout: 10000 });
+    try {
+      await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "40 tokens" && [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("✦ CI Guest")), null, { timeout: 10000 });
+    } catch (error) {
+      const [hostState,guestState] = await Promise.all([
+        host.evaluate(() => ({seats:[...document.querySelectorAll(".seat")].map(el=>el.textContent),tokens:document.querySelector("#slotsTokenCount").textContent,message:document.querySelector("#slotsMessage").textContent})),
+        guest.evaluate(() => ({seats:[...document.querySelectorAll(".seat")].map(el=>el.textContent),tokens:document.querySelector("#slotsTokenCount").textContent,message:document.querySelector("#slotsMessage").textContent,hostReady:document.querySelector("#netState").textContent}))
+      ]);
+      throw new Error("Flair purchase failed to apply/sync. Host="+JSON.stringify(hostState)+" Guest="+JSON.stringify(guestState)+" "+error.message);
+    }
     const crown = guest.locator('#slotsShop button[data-flair="👑"]');
     await crown.evaluate(el => { el.disabled = false; el.click(); });
     await guest.waitForTimeout(250);
