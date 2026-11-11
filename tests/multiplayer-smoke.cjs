@@ -187,6 +187,31 @@ const server = http.createServer((req, res) => {
     if (!losingHostBanner.includes("YOU LOST") || !losingGuestBanner.includes("PUSH")) throw new Error("Loss/push banners incorrect; host=" + losingHostBanner + ", guest=" + losingGuestBanner);
     if (!losingHostSeat.includes("Dealer wins")) throw new Error("Player list does not show the host's loss: " + losingHostSeat);
 
+    // Face cards use original theme-specific court artwork and re-render live when themes change.
+    const initialCourts = guest.locator(".court-card");
+    if (await initialCourts.count() < 3) throw new Error("Expected illustrated K/Q/K court cards in the deterministic round");
+    const firstCourt = initialCourts.first();
+    const initialSvg = await firstCourt.locator("svg.court-art").count();
+    if (initialSvg !== 1) throw new Error("Face card is missing its inline vector portrait");
+    const courtThemes = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju"];
+    const courtArtwork = new Set();
+    for (const theme of courtThemes) {
+      await guest.locator('.theme-grid button[data-theme="' + theme + '"]').click();
+      const faceTheme = await firstCourt.getAttribute("data-face-theme");
+      if (faceTheme !== theme) throw new Error("Court artwork did not refresh for board theme: " + theme + " (got " + faceTheme + ")");
+      const artwork = await firstCourt.locator("svg.court-art").evaluate(el => el.outerHTML);
+      courtArtwork.add(artwork);
+    }
+    if (courtArtwork.size !== courtThemes.length) throw new Error("Some board themes reused the same court-card artwork");
+    for (const style of ["classic", "midnight", "neon", "pixel", "gold"]) {
+      await guest.locator("#cardThemeSelect").selectOption(style);
+      const faceTheme = await firstCourt.getAttribute("data-face-theme");
+      if (faceTheme !== style) throw new Error("Independent card theme did not restyle face cards: " + style);
+    }
+    await guest.locator("#cardThemeSelect").selectOption("match");
+    await guest.locator('.theme-grid button[data-theme="kaiju"]').click();
+    if (await firstCourt.getAttribute("data-face-theme") !== "kaiju") throw new Error("Match card style did not follow the selected board theme");
+
     // Texas Hold'em: private hole cards, shared board, and all four betting streets.
     await guest.locator("#leave").click();
     await host.locator("#leave").click();
