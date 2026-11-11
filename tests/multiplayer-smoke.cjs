@@ -445,7 +445,6 @@ const server = http.createServer((req, res) => {
       const guide = page.locator("#holdemHandGuide");
       if (!(await guide.isVisible()) || !(await guide.evaluate(el => el.open))) throw new Error("Hold’em hand guide should be open by default");
     }
-    await host.locator("#holdemHandGuide summary").click();
     const guideRows = host.locator("#holdemHandGuide li");
     if (await guideRows.count() !== 10) throw new Error("Hold’em hand guide should list all ten poker hand rankings");
     const guideText = await host.locator("#holdemHandGuide").innerText();
@@ -459,6 +458,7 @@ const server = http.createServer((req, res) => {
     await host.locator("#holdemHandGuide summary").click();
     if (await host.locator("#holdemHandGuide").evaluate(el => el.open)) throw new Error("Hold’em hand guide should collapse when clicked");
     await host.locator("#holdemHandGuide summary").click();
+    if (!(await host.locator("#holdemHandGuide").evaluate(el => el.open))) throw new Error("Hold’em hand guide should reopen when clicked");
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
     await host.locator("#start").click();
