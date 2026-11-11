@@ -397,7 +397,7 @@ body[data-theme=kaiju]{
  --table-center-light:radial-gradient(ellipse at 50% 46%,#a2ca8b19,transparent 68%);
  --page-ambience:radial-gradient(ellipse at 80% 0%,#493039 0,transparent 48%),linear-gradient(145deg,#1b1520,#0e1b1e);
 }
-.court-card::before{background-image:var(--court-frame-texture,none);background-size:100% 100%;opacity:.88}
+.court-card::before{background-image:var(--court-frame-texture,none);background-size:var(--court-frame-texture-size,100% 100%);opacity:.88}
 .court-card[data-face-theme=royal]{border:3px double #b78a3b;border-radius:9px;--court-frame-texture:repeating-linear-gradient(45deg,#b78a3b0d 0 2px,transparent 2px 7px)}
 .court-card[data-face-theme=neon]{border:2px solid #e348b6;border-radius:4px;--court-frame-texture:repeating-linear-gradient(0deg,#3cf4dc18 0 1px,transparent 1px 5px),repeating-linear-gradient(90deg,#e348b618 0 1px,transparent 1px 5px)}
 .court-card[data-face-theme=midnight]{border:3px double #6a9bd1;border-radius:12px;--court-frame-texture:radial-gradient(circle at 50% 50%,#6a9bd11c 0 1px,transparent 2px)}
