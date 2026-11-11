@@ -157,6 +157,14 @@ const server = http.createServer((req, res) => {
     if (await host.locator("#slotsPanel").isVisible() || !(await host.locator("#slotsToggle").isVisible())) throw new Error("Slots hide/reopen control did not work");
     await host.locator("#slotsToggle").click();
     if (!(await host.locator("#slotsPanel").isVisible())) throw new Error("Slots mini-tab did not reopen");
+    const dockBeforeDrag = await host.locator("#slotsDock").boundingBox();
+    await host.mouse.move(dockBeforeDrag.x + 90, dockBeforeDrag.y + 18);
+    await host.mouse.down();
+    await host.mouse.move(dockBeforeDrag.x + 20, dockBeforeDrag.y - 45, { steps: 5 });
+    await host.mouse.up();
+    const dockAfterDrag = await host.locator("#slotsDock").boundingBox();
+    if (!dockAfterDrag || dockAfterDrag.x >= dockBeforeDrag.x - 20 || dockAfterDrag.y >= dockBeforeDrag.y - 20) throw new Error("Slots dock did not move when dragging its header: before=" + JSON.stringify(dockBeforeDrag) + ", after=" + JSON.stringify(dockAfterDrag));
+    if (dockAfterDrag.x < 0 || dockAfterDrag.y < 0 || dockAfterDrag.x + dockAfterDrag.width > 1280 || dockAfterDrag.y + dockAfterDrag.height > 900) throw new Error("Dragged slots dock moved outside the viewport: " + JSON.stringify(dockAfterDrag));
     await guest.locator("#slotsExchangeAmount").fill("550");
     if (await guest.locator("#slotsExchangeButton").isEnabled()) throw new Error("Chip exchange should disable an amount larger than the player's balance");
     await guest.locator("#slotsExchangeAmount").fill("101");
