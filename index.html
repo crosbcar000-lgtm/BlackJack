@@ -734,7 +734,7 @@ body.has-room #slotsDock{display:block}
   <header id="slotsHead"><strong>🎰 MINI SLOTS ARCADE</strong><span class="small" id="slotsTokenCount">0 tokens</span><button id="slotsMinimize" type="button" aria-label="Minimize slots" aria-expanded="true">−</button><button id="slotsClose" type="button" aria-label="Hide slots">×</button></header>
   <div id="slotsBody">
    <div id="slotsReels" aria-label="Slot machine reels"><span class="slot-reel">🍒</span><span class="slot-reel">⭐</span><span class="slot-reel">💎</span></div>
-   <div class="small muted">5 tokens per spin · 3 matching = 100 · 2 matching = 15</div>
+   <div class="small muted">5 tokens per spin · 3 matching = 100 · 2 matching = 5</div>
    <button id="slotsSpin" class="primary" type="button">Spin · 5 tokens</button>
    <div id="slotsMessage" role="status" aria-live="polite">Play slots while your friends take their turns.</div>
    <div id="slotsExchange"><h4>CHIP EXCHANGE</h4><div class="small muted">Trade 100 game chips for 10 tokens. Tokens are separate from your betting balance.</div><div class="row"><input id="slotsExchangeAmount" type="number" min="100" step="100" value="100" aria-label="Chips to exchange"><button id="slotsExchangeButton" type="button">Exchange</button></div><div class="small muted" id="slotsCashBalance">Game cash: 500 chips</div></div>
@@ -1465,8 +1465,8 @@ handleAction=function(playerId,action){
   if(!host)return;const p=players.find(x=>x.id===playerId);if(!p||(p.tokens??0)<5)return;
   p.tokens-=5;const reels=Array.from({length:3},()=>SLOT_SYMBOLS[Math.floor(Math.random()*SLOT_SYMBOLS.length)]);
   const counts=reels.reduce((m,x)=>(m[x]=(m[x]||0)+1,m),{}),best=Math.max(...Object.values(counts));
-  const prize=best===3?100:best===2?15:0;p.tokens+=prize;p.slotReels=reels;
-  p.slotMessage=best===3?"JACKPOT! +100 tokens":best===2?"Nice match! +15 tokens":"No match — try again!";
+  const prize=best===3?100:best===2?5:0;p.tokens+=prize;p.slotReels=reels;
+  p.slotMessage=best===3?"JACKPOT! +100 tokens":best===2?"Nice match! +5 tokens":"No match — try again!";
   broadcast();return;
  }
  if(action&&action.kind==="TOKEN_EXCHANGE"){
