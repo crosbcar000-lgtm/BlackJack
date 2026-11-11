@@ -936,8 +936,7 @@ function render(){
   const me=myPlayer();
   $("ready").disabled=!me||me.ready||phase!=="LOBBY";
   $("start").disabled=players.length<1||!players.every(p=>p.ready);
-  $("playerListSection").classList.toggle("hidden",gameMode==="holdem");
- $("seats").innerHTML=gameMode==="holdem"?"":Array.from({length:6},(_,i)=>{
+  $("seats").innerHTML=Array.from({length:6},(_,i)=>{
     const p=players[i];
     const playing=phase==="PLAYING"&&players[turnPlayer]?.id===p?.id;
     const outcomes=p&&phase==="ROUND_OVER"&&p.hands?.length
@@ -1286,7 +1285,8 @@ render=function(){
   }
   if(phase==="ROUND_OVER"&&me)setBanner(me.roundNet||0,(me.roundNet||0)>0?"+"+me.roundNet+" chips":(me.roundNet||0)<0?"−"+Math.abs(me.roundNet)+" chips":"No net change");
  }
- $("seats").innerHTML=Array.from({length:6},(_,i)=>{
+ $("playerListSection").classList.toggle("hidden",gameMode==="holdem");
+ $("seats").innerHTML=gameMode==="holdem"?"":Array.from({length:6},(_,i)=>{
   const p=players[i],active=gameMode==="holdem"&&phase==="PLAYING"&&holdem&&players[holdem.turnIndex]?.id===p?.id;
   let meta=p?"🪙 "+p.chips+" · "+(p.id===localUid?"You":p.ready?"Ready":"Not ready"):"Waiting for friend",outcome="";
   const debt=p&&p.chips<0?'<span class="debt-callout">🚨 BROKE ALERT · IOU '+escape(Math.abs(p.chips))+' chips</span>':"";
