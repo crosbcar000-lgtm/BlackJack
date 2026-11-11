@@ -60,6 +60,20 @@ const server = http.createServer((req, res) => {
     await host.emulateMedia({ reducedMotion: "no-preference" });
     await host.setViewportSize({ width: 1280, height: 900 });
 
+    // Game and Settings are separate tabs; rules stay compact until expanded.
+    if (await host.locator("#gameTab").getAttribute("aria-selected") !== "true") throw new Error("Game tab should be active by default");
+    if (await host.locator("#rulesDropdown").evaluate(el => el.open)) throw new Error("Rules dropdown should start collapsed");
+    await host.locator("#rulesDropdown summary").click();
+    if (!(await host.locator("#rulesText").isVisible())) throw new Error("Rules dropdown did not reveal the current rules");
+    await host.locator("#gameModeSelect").selectOption("holdem");
+    if (!(await host.locator("#rulesText").textContent()).includes("Texas Hold’em")) throw new Error("Rules did not update for Texas Hold’em");
+    await host.locator("#gameModeSelect").selectOption("roulette");
+    if (!(await host.locator("#rulesText").textContent()).includes("European roulette")) throw new Error("Rules did not update for roulette");
+    await host.locator("#gameModeSelect").selectOption("blackjack");
+    await host.locator("#rulesDropdown summary").click();
+    await host.locator("#settingsTab").click();
+    if (!(await host.locator("#settingsView").isVisible()) || await host.locator("#gameView").isVisible()) throw new Error("Settings tab did not replace the Game view");
+
     // Verify every theme selects correctly and changes the actual table texture.
     const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju"];
     const tableLooks = new Set();
@@ -87,12 +101,19 @@ const server = http.createServer((req, res) => {
     if (await host.locator("body").getAttribute("data-card-theme") !== "classic") throw new Error("Independent card theme did not apply");
     if (await host.evaluate(() => localStorage.getItem("bj-card-theme")) !== "classic") throw new Error("Card theme was not saved");
     await host.locator("#cardThemeSelect").selectOption("match");
+    await host.locator("#gameTab").click();
 
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
     await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
     const code = await host.locator("#roomCode").textContent();
     if (!code || !/^[A-HJ-NP-Z2-9]{6}$/.test(code)) throw new Error("Host did not publish a valid room code");
+    const gameFootprint = await host.locator("#gameTable").evaluate(el => ({
+      width: el.getBoundingClientRect().width,
+      parentWidth: el.parentElement.getBoundingClientRect().width,
+      height: el.getBoundingClientRect().height
+    }));
+    if (gameFootprint.width < gameFootprint.parentWidth * 0.92 || gameFootprint.height < 490) throw new Error("Game table is not using the expanded play area: " + JSON.stringify(gameFootprint));
 
     await guest.goto("http://127.0.0.1:4173");
     await guest.locator("#name").fill("CI Guest");
@@ -195,6 +216,8 @@ const server = http.createServer((req, res) => {
     if (await initialCourts.count() < 3) throw new Error("Expected illustrated K/Q/K court cards in the deterministic round");
     const firstCourt = initialCourts.first();
     const initialSvg = await firstCourt.locator("svg.court-art").count();
+    await guest.locator("#settingsTab").click();
+    if (!(await guest.locator("#settingsView").isVisible())) throw new Error("Guest could not open Settings while in a room");
     if (initialSvg !== 1) throw new Error("Face card is missing its inline vector portrait");
     const courtThemes = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju"];
     const courtArtwork = new Set();
@@ -219,6 +242,7 @@ const server = http.createServer((req, res) => {
     await guest.locator("#cardThemeSelect").selectOption("match");
     await guest.locator('.theme-grid button[data-theme="kaiju"]').click();
     if (await firstCourt.getAttribute("data-face-theme") !== "kaiju") throw new Error("Match card style did not follow the selected board theme");
+    await guest.locator("#gameTab").click();
 
     // Texas Hold'em: private hole cards, shared board, and all four betting streets.
     await guest.locator("#leave").click();
