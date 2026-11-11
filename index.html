@@ -1498,7 +1498,7 @@ handleAction=function(playerId,action){
  if(action&&action.kind==="TOKEN_EXCHANGE"){
   if(!host)return;const p=players.find(x=>x.id===playerId),amount=Number(action.chips);
   if(!p||!Number.isSafeInteger(amount)||amount<10||amount%10!==0||amount>(p.chips??0))return;
-  p.chips-=amount;p.tokens=(p.tokens??0)+(amount*10);p.slotMessage="Exchanged "+amount+" chips for "+(amount*10)+" tokens."broadcast();return;
+  p.chips-=amount;p.tokens=(p.tokens??0)+(amount*10);p.slotMessage="Exchanged "+amount+" chips for "+(amount*10)+" tokens.";broadcast();return;
  }
  if(action&&action.kind==="SHOP_BUY"){
   if(!host)return;const p=players.find(x=>x.id===playerId),items={"✦":250,"♛":500,"⚡":750,"👑":1000,"🎭":800,"🌸":650,"🌙":900,"🧿":1100,"🌈":1200,"👾":1300,"💎":1400,"🔥":1250,"☠️":1500,"🛡️":1600,"🐉":1800,"🦄":2200};
