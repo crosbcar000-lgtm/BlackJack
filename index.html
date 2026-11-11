@@ -1186,7 +1186,7 @@ render=function(){
    if(phase==="LOBBY"&&p.rouletteBet)meta+=" · Bet "+p.rouletteBet.amount;
    if(phase==="ROUND_OVER")outcome='<span class="small round-outcome">'+escape(p.rouletteResult||"No result")+'</span>';
   }
-  return '<div class="seat '+(active?"active":"")+(p&&p.chips<0?" in-debt":"")+'"><strong>'+(p?escape(p.name):"Open seat")+'</strong><span class="small muted">'+meta+'</span>'+debt+outcome+'</div>';
+  return '<div class="seat '+(active?"active":"")+(p&&p.chips<0?" in-debt":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted">'+(p?meta+" · ✧ "+(p.tokens??100)+" tokens":meta)+'</span>'+debt+outcome+'</div>';
  }).join("");
 };
 createRoom=async function(){
