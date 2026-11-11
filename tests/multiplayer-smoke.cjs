@@ -310,7 +310,7 @@ const server = http.createServer((req, res) => {
     const guestBanner = await guest.locator("#resultBanner").textContent();
     const roundStatus = await host.locator("#gameStatus").textContent();
     if (!hostSeat.includes("520") || !hostSeat.includes("Hand 1: Win") || !hostSeat.includes("Hand 2: Win")) throw new Error("Host split-hand outcomes or payout incorrect: " + hostSeat);
-    if (!guestSeat.includes("400") || !guestSeat.includes("Push")) throw new Error("Guest push result or payout incorrect after the 100-chip token exchange: " + guestSeat);
+    if (!guestSeat.includes("490") || !guestSeat.includes("Push")) throw new Error("Guest push result or payout incorrect after the 10-chip token exchange: " + guestSeat);
     if (!hostBanner.includes("YOU WON") || !guestBanner.includes("PUSH")) throw new Error("Personal result banners incorrect; host=" + hostBanner + ", guest=" + guestBanner);
     if (roundStatus.includes("CI Host") || roundStatus.includes("CI Guest")) throw new Error("Round status still lists other players' outcomes: " + roundStatus);
     await host.setViewportSize({ width: 1280, height: 768 });
