@@ -216,6 +216,41 @@ button:disabled{box-shadow:none;filter:saturate(.5)}
  .seat.active::before{animation:none}
 }
 
+
+/* Illustrated court cards and refined standard card faces. */
+.card{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(145deg,#fffefa,#f0eadb);border:1px solid #d9d2c0;color:#17201f;box-shadow:0 6px 13px #0005,0 1px 2px #0008,inset 0 0 0 1px #ffffffab}
+.card::after{inset:3px;border:1px solid #7c74551c;pointer-events:none}
+.pip-card{display:flex;align-items:center;justify-content:center;padding:5px;color:var(--pip-ink)}
+.pip-index{position:absolute;left:5px;top:4px;display:grid;gap:0;text-align:center;font-size:11px;line-height:.95;z-index:2}
+.pip-index b{font-size:13px}
+.pip-index i{font-size:10px;font-style:normal}
+.pip-center{font-size:34px;line-height:1;text-shadow:0 2px 2px #0001;z-index:1}
+.pip-card[data-rank="A"] .pip-center{font-size:46px}
+.pip-watermark{position:absolute;font-size:54px;opacity:.055;transform:rotate(-16deg);font-weight:900}
+.pip-value{position:absolute;right:5px;bottom:4px;font-size:6px;font-weight:900;letter-spacing:.1em;opacity:.4}
+.pip-bottom{position:absolute;right:5px;bottom:12px;font-size:8px;font-weight:900;transform:rotate(180deg);opacity:.7}
+.court-card{display:flex;align-items:center;justify-content:flex-start;flex-direction:column;gap:0;padding:3px 3px 4px;background:linear-gradient(145deg,var(--court-bg),color-mix(in srgb,var(--court-bg),#d6caa8 22%));border:1px solid var(--court-accent);box-shadow:0 6px 14px #0005,0 0 0 1px #fff8 inset}
+.court-card::before{content:"";position:absolute;inset:3px;border:1px solid color-mix(in srgb,var(--court-accent),transparent 36%);border-radius:6px;pointer-events:none}
+.court-card::after{inset:5px;border:1px solid color-mix(in srgb,var(--court-ink),transparent 88%)}
+.court-index{width:100%;height:13px;display:flex;align-items:center;justify-content:space-between;padding:0 3px;color:var(--court-ink);z-index:2;line-height:1}
+.court-index b{font-size:12px;font-weight:1000}
+.court-index i{font-style:normal;font-size:11px;color:var(--court-ink)}
+.court-card.red .court-index i,.court-card.red .court-bottom{color:#bd3542}
+.court-art{display:block;position:relative;z-index:1;width:calc(100% - 3px);height:calc(100% - 27px);min-height:0;filter:drop-shadow(0 1px 1px #0002)}
+.court-name{position:absolute;bottom:4px;left:5px;z-index:2;max-width:calc(100% - 19px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--court-ink);font-size:5px;line-height:1;font-weight:1000;letter-spacing:.025em}
+.court-bottom{position:absolute;bottom:3px;right:5px;z-index:2;font-size:6px;font-weight:950;line-height:1}
+.court-card[data-face-theme="neon"],.court-card[data-face-theme="circuit"]{box-shadow:0 5px 14px #0006,0 0 8px color-mix(in srgb,var(--court-accent),transparent 58%),inset 0 0 0 1px #fff9}
+.court-card[data-face-theme="noir"] .court-art{filter:grayscale(.65) contrast(1.05)}
+.card.back{position:relative;overflow:hidden;background-color:var(--felt2);background-image:linear-gradient(135deg,#ffffff22,#00000018),var(--felt-pattern);border:3px solid var(--gold)}
+.card.back::before{content:"♠";position:absolute;inset:0;display:grid;place-items:center;font-size:37px;color:#ffffffb8;text-shadow:0 2px 7px #0008}
+.card.back::after{inset:4px;border:1px solid #ffffff9c;border-radius:5px}
+@media(max-width:560px){
+ .pip-index{left:4px;top:4px;font-size:10px}.pip-index b{font-size:12px}
+ .pip-center{font-size:28px}.pip-card[data-rank="A"] .pip-center{font-size:38px}
+ .court-index{height:12px;padding:0 2px}.court-index b{font-size:10px}.court-index i{font-size:9px}
+ .court-name{left:4px;font-size:4px;bottom:4px}.court-bottom{right:4px;font-size:5px}
+}
+
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -273,7 +308,54 @@ function shuffleRoomCode(){const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s=
 function peerId(code){return "bjfriends"+code.toLowerCase()}
 function setNet(s){$("netState").textContent=s}
 function escape(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function cardHtml(c,back=false){if(back)return '<div class="card back"></div>';return '<div class="card '+(["♥","♦"].includes(c.s)?"red":"")+'"><span>'+c.r+'</span><span class="suit">'+c.s+'</span></div>'}
+const courtThemes={
+royal:{bg:"#f1e5c5",ink:"#234b3c",accent:"#b78a3b",shade:"#153326",motif:"laurel",roles:{J:"KNIGHT",Q:"QUEEN",K:"KING"}},
+neon:{bg:"#e8f6f2",ink:"#17204b",accent:"#e348b6",shade:"#0a1634",motif:"circuit",roles:{J:"RUNNER",Q:"ICON",K:"OVERLORD"}},
+midnight:{bg:"#e7eff9",ink:"#173858",accent:"#6a9bd1",shade:"#0c2545",motif:"stars",roles:{J:"SCOUT",Q:"ORACLE",K:"CAPTAIN"}},
+purple:{bg:"#f0e5f6",ink:"#57356d",accent:"#d1a1e4",shade:"#291839",motif:"runes",roles:{J:"ADEPT",Q:"SEER",K:"ARCHMAGE"}},
+arcade:{bg:"#fff0ce",ink:"#33235e",accent:"#f05b9c",shade:"#171438",motif:"pixel",roles:{J:"HERO",Q:"PIXEL QUEEN",K:"BOSS"}},
+starship:{bg:"#e4f4f5",ink:"#174a61",accent:"#65d8d0",shade:"#082131",motif:"stars",roles:{J:"PILOT",Q:"COMMANDER",K:"ADMIRAL"}},
+dungeon:{bg:"#e9e3cf",ink:"#354a3c",accent:"#bd9860",shade:"#18251e",motif:"stone",roles:{J:"ROGUE",Q:"ENCHANTRESS",K:"LORD"}},
+noir:{bg:"#ece7db",ink:"#28272d",accent:"#b7955f",shade:"#15151a",motif:"noir",roles:{J:"DETECTIVE",Q:"DIVA",K:"BOSS"}},
+pixel:{bg:"#eaf0d5",ink:"#285342",accent:"#e3bc55",shade:"#132a27",motif:"pixel",roles:{J:"HERO",Q:"PIXEL QUEEN",K:"LORD"}},
+circuit:{bg:"#e1f5ef",ink:"#155553",accent:"#42cbb1",shade:"#082e36",motif:"circuit",roles:{J:"RUNNER",Q:"ORACLE",K:"ARCHITECT"}},
+spellbook:{bg:"#eee3ef",ink:"#533a67",accent:"#d7b36f",shade:"#281a37",motif:"runes",roles:{J:"APPRENTICE",Q:"SEER",K:"ARCHMAGE"}},
+wasteland:{bg:"#efe1c5",ink:"#755033",accent:"#d28a4c",shade:"#2b2118",motif:"stone",roles:{J:"SCAVENGER",Q:"RAIDER",K:"WARLORD"}},
+kaiju:{bg:"#e5edcf",ink:"#345849",accent:"#e2aa52",shade:"#172d31",motif:"scales",roles:{J:"HUNTER",Q:"ORACLE",K:"TITAN"}},
+classic:{bg:"#f7edda",ink:"#762d3b",accent:"#bb9a60",shade:"#421f2a",motif:"laurel",roles:{J:"JACK",Q:"QUEEN",K:"KING"}},
+gold:{bg:"#f4e7c6",ink:"#765326",accent:"#d3ac5e",shade:"#3a2816",motif:"noir",roles:{J:"KNAVE",Q:"QUEEN",K:"KING"}}
+};
+function pipColor(s){return ["♥","♦"].includes(s)?"#bd3542":"#202a2b"}
+function activeFaceTheme(){const t=document.body.dataset.cardTheme||"match";return t!=="match"?t:(document.body.dataset.theme||"royal")}
+function courtOrnament(m,p){
+ const a=p.accent,i=p.ink;
+ if(m==="circuit")return '<path d="M4 13h12l5 5v8m22-13H31l-5 5v8M4 55h12l5-5v-7m35 12H44l-5-5v-7" fill="none" stroke="'+a+'" stroke-width="1.5" opacity=".8"/><circle cx="21" cy="27" r="2" fill="'+a+'"/><circle cx="39" cy="27" r="2" fill="'+a+'"/>';
+ if(m==="stars")return '<path d="M9 15l2 5 5 2-5 2-2 5-2-5-5-2 5-2zM50 12l2 4 4 2-4 2-2 4-2-4-4-2 4-2zM49 54l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="'+a+'" opacity=".8"/><circle cx="10" cy="48" r="1.5" fill="'+i+'"/><circle cx="50" cy="34" r="1.3" fill="'+i+'"/>';
+ if(m==="runes")return '<circle cx="30" cy="37" r="25" fill="none" stroke="'+a+'" stroke-width="1" stroke-dasharray="2 3"/><path d="M30 5l4 7-4 7-4-7zM8 37l7-4 7 4-7 4zM45 37l7-4 7 4-7 4zM30 59l4-7-4-7-4 7z" fill="none" stroke="'+a+'" stroke-width="1.2"/>';
+ if(m==="pixel")return '<path d="M4 12h8v8H4zM48 8h8v8h-8zM4 51h8v8H4zM48 53h8v8h-8zM13 5h5v5h-5zM43 23h5v5h-5z" fill="'+a+'" opacity=".8"/><path d="M6 32h6m36 0h6M30 5v6m0 42v6" stroke="'+i+'" stroke-width="1.5"/>';
+ if(m==="stone")return '<path d="M5 9l10 5-2 10-8 3m50-18-10 5 2 10 8 3M5 55l10-5-2-10-8-3m50 18-10-5 2-10 8-3" fill="none" stroke="'+a+'" stroke-width="1.5"/><path d="M8 31l5-3 3 5-4 4m40-6-5-3-3 5 4 4" fill="none" stroke="'+i+'"/>';
+ if(m==="scales")return '<path d="M8 12q7-8 14 0t14 0 14 0M4 24q7-8 14 0t14 0 14 0 10 0M4 48q7-8 14 0t14 0 14 0 10 0M8 60q7-8 14 0t14 0 14 0" fill="none" stroke="'+a+'" stroke-width="2" opacity=".7"/>';
+ return '<path d="M9 18q8-12 16 0M35 18q8-12 16 0M9 54q8 12 16 0M35 54q8 12 16 0" fill="none" stroke="'+a+'" stroke-width="1.7"/><circle cx="30" cy="11" r="3" fill="'+a+'"/><circle cx="30" cy="61" r="3" fill="'+a+'"/>';
+}
+function faceCardHtml(c){
+ const theme=activeFaceTheme(),p=courtThemes[theme]||courtThemes.royal,rank=c.r;
+ const role=p.roles[rank]||rank,suitColor=pipColor(c.s);
+ const crown=rank==="J"
+  ?'<path d="M15 29q-2-17 15-20 18 2 16 20l-6-5-5-8-8 8-7-3z" fill="'+p.ink+'" stroke="'+p.accent+'" stroke-width="2"/><path d="M38 12q8-13 15-8-4 8-15 13" fill="'+p.accent+'" stroke="'+p.ink+'" stroke-width="1.2"/>'
+  :'<path d="M17 22l3-10 8 7 7-7 8 10-3 7H20z" fill="'+p.accent+'" stroke="'+p.ink+'" stroke-width="1.5"/><path d="M20 25h20" stroke="'+p.ink+'" stroke-width="2"/><circle cx="20" cy="13" r="1.5" fill="'+p.bg+'"/><circle cx="37" cy="13" r="1.5" fill="'+p.bg+'"/>';
+ const hair=rank==="Q"
+  ?'<path d="M17 28q-8 13-4 38l7 3 1-26 8-12 8 12 1 26 8-5q4-26-8-39z" fill="'+p.ink+'"/>'
+  :'<path d="M17 29q-2-14 13-17 15 2 14 17l-6-8-8-4-8 8z" fill="'+p.ink+'"/>';
+ const beard=rank==="K"?'<path d="M20 39q10 8 20 0l-2 14-8 8-8-8z" fill="'+p.ink+'"/><path d="M25 48l5 5 5-5" fill="none" stroke="'+p.accent+'" stroke-width="1.4"/>':"";
+ const art='<svg class="court-art" viewBox="0 0 60 70" aria-hidden="true"><rect x="1" y="1" width="58" height="68" rx="7" fill="'+p.bg+'" stroke="'+p.accent+'" stroke-width="1.3"/>'+courtOrnament(p.motif,p)+'<path d="M5 68q2-21 18-24l7 5 7-5q16 3 18 24z" fill="'+p.shade+'" stroke="'+p.accent+'" stroke-width="1.4"/><path d="M17 54l13 8 13-8 6 14H11z" fill="'+p.ink+'"/><path d="M25 43v9l5 5 5-5v-9" fill="#d8a47e" stroke="#805840" stroke-width="1"/><path d="M16 31q-2-13 14-16 16 3 14 16l-3 11q-5 9-11 9t-11-9z" fill="#edc09b" stroke="#805840" stroke-width="1.1"/>'+hair+'<path d="M21 33q3-2 6 0m6 0q3-2 6 0" stroke="'+p.ink+'" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="25" cy="34" r="1.3" fill="#28201d"/><circle cx="35" cy="34" r="1.3" fill="#28201d"/><path d="M30 35l-2 6h4m-7 3q5 4 10 0" stroke="#965f4d" stroke-width="1.2" fill="none" stroke-linecap="round"/>'+beard+crown+'<path d="M18 57l12 7 12-7" fill="none" stroke="'+p.accent+'" stroke-width="2"/><text x="30" y="64" text-anchor="middle" font-size="10" font-weight="900" fill="'+suitColor+'">'+c.s+'</text></svg>';
+ return '<div class="card court-card '+(["♥","♦"].includes(c.s)?"red":"")+'" data-rank="'+rank+'" data-face-theme="'+theme+'" aria-label="'+({J:"Jack",Q:"Queen",K:"King"}[rank])+' of '+({"♠":"spades","♥":"hearts","♦":"diamonds","♣":"clubs"}[c.s])+'" style="--court-bg:'+p.bg+';--court-ink:'+p.ink+';--court-accent:'+p.accent+';--court-shade:'+p.shade+'"><span class="court-index"><b>'+rank+'</b><i>'+c.s+'</i></span>'+art+'<span class="court-name">'+role+'</span><span class="court-bottom">'+rank+' '+c.s+'</span></div>';
+}
+function cardHtml(c,back=false){
+ if(back)return '<div class="card back" aria-label="Face-down card"></div>';
+ if(["J","Q","K"].includes(c.r))return faceCardHtml(c);
+ const tone=pipColor(c.s),theme=activeFaceTheme(),value=c.r==="A"?"ACE":c.r;
+ return '<div class="card pip-card '+(["♥","♦"].includes(c.s)?"red":"")+'" data-rank="'+c.r+'" data-face-theme="'+theme+'" style="--pip-ink:'+tone+'"><span class="pip-index"><b>'+c.r+'</b><i>'+c.s+'</i></span><span class="pip-watermark">'+c.s+'</span><span class="pip-center">'+c.s+'</span><span class="pip-value">'+value+'</span><span class="pip-bottom">'+c.r+' '+c.s+'</span></div>';
+}
 function publicState(forId){return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,ready:p.ready,done:p.done,hands:p.hands.map((h,i)=>({cards:h.cards,bet:h.bet,done:h.done,result:h.result})),activeHand:p.activeHand})),dealer:dealer.map((c,i)=>phase==="PLAYING"&&i===1?null:c),dealerHidden:phase==="PLAYING",turnPlayer,turnHand,message:roundMessage,roundNumber,forId}}
 function sendTo(conn,msg){try{if(conn&&conn.open)conn.send(msg)}catch(e){console.warn(e)}}
 function broadcast(){const state=publicState();render();if(host){for(const [id,c] of connections)sendTo(c,{...state,forId:id})}}
