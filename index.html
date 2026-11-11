@@ -873,7 +873,7 @@ function render(){
     const outcomes=p&&phase==="ROUND_OVER"&&p.hands?.length
       ? '<span class="small round-outcome">'+p.hands.map((h,index)=>(p.hands.length>1?"Hand "+(index+1)+": ":"")+escape(h.result||"—")).join(" · ")+'</span>'
       : "";
-    return '<div class="seat '+(playing?"active":"")+'"><strong>'+(p?escape(p.name):"Open seat")+'</strong><span class="small muted">'+(p?"🪙 "+p.chips+" · "+(p.ready?"Ready":"Not ready")+(p.id===localUid?" · You":""):"Waiting for friend")+'</span>'+outcomes+'</div>';
+    return '<div class="seat '+(playing?"active":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted">'+(p?"🪙 "+p.chips+" · "+(p.ready?"Ready":"Not ready")+(p.id===localUid?" · You":"")+" · ✧ "+(p.tokens??0)+" tokens":"Waiting for friend")+'</span>'+outcomes+'</div>';
   }).join("");
   const hand=me?.hands?.[me.activeHand||0];
   $("myCards").innerHTML=hand?hand.cards.map(c=>cardHtml(c)).join(""):"";
