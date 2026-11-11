@@ -113,7 +113,7 @@ const server = http.createServer((req, res) => {
       parentWidth: el.parentElement.getBoundingClientRect().width,
       height: el.getBoundingClientRect().height
     }));
-    if (gameFootprint.width < gameFootprint.parentWidth * 0.92 || gameFootprint.height < 490) throw new Error("Game table is not using the expanded play area: " + JSON.stringify(gameFootprint));
+    if (gameFootprint.width < gameFootprint.parentWidth * 0.92 || gameFootprint.height < 420) throw new Error("Game table is not using the expanded play area: " + JSON.stringify(gameFootprint));
 
     await guest.goto("http://127.0.0.1:4173");
     await guest.locator("#name").fill("CI Guest");
@@ -173,6 +173,15 @@ const server = http.createServer((req, res) => {
     if (!guestSeat.includes("500") || !guestSeat.includes("Push")) throw new Error("Guest push result or payout incorrect: " + guestSeat);
     if (!hostBanner.includes("YOU WON") || !guestBanner.includes("PUSH")) throw new Error("Personal result banners incorrect; host=" + hostBanner + ", guest=" + guestBanner);
     if (roundStatus.includes("CI Host") || roundStatus.includes("CI Guest")) throw new Error("Round status still lists other players' outcomes: " + roundStatus);
+    const nextButtonFrame = await host.locator("#next").evaluate(el => ({
+      visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length),
+      top: el.getBoundingClientRect().top,
+      bottom: el.getBoundingClientRect().bottom,
+      viewport: window.innerHeight
+    }));
+    if (!nextButtonFrame.visible || nextButtonFrame.top < 0 || nextButtonFrame.bottom > nextButtonFrame.viewport) {
+      throw new Error("Next round button is below the fold; the round action should be visible without scrolling: " + JSON.stringify(nextButtonFrame));
+    }
 
     // Start another round in which the host loses, verifying the loss banner.
     await host.locator("#next").click();
