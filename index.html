@@ -973,7 +973,7 @@ async function joinRoom(){
   if(!/^[A-HJ-NP-Z2-9]{6}$/.test(code)){status("Enter a valid 6-character room code.");return}
   if(peer)peer.destroy();
   host=false;roomCode=code;localUid="";hostConn=null;chatMessages=[];setNet("Connecting…");status("Contacting room "+code+"…");
-  let gotState=false,welcomed=false,joinAttempts=0,joinRetry=null,joinTimeout=null;
+  let gotState=false,welcomed=false,joinAttempts=0,joinRetry=null,joinTimeout=null,removalNotice="";
   const clearJoinTimers=()=>{if(joinRetry)clearInterval(joinRetry);if(joinTimeout)clearTimeout(joinTimeout);joinRetry=null;joinTimeout=null};
   const sendJoin=()=>{
     if(!welcomed||!hostConn||!hostConn.open||gotState||joinAttempts>=6)return;
@@ -1007,8 +1007,8 @@ async function joinRoom(){
         }
       }else if(msg?.type==="KICKED"||msg?.type==="ROOM_CLOSED"){
         clearJoinTimers();
-        const reason=msg.message||"You were removed from the game.";
-        leave();setNet("Removed from game");status(reason);toast(reason);
+        removalNotice=msg.message||"You were removed from the game.";
+        leave();setNet("Removed from game");status(removalNotice);toast(removalNotice);
       }else if(msg?.type==="ERROR"){
         clearJoinTimers();status(msg.message||"The host could not add you to the table.");toast(msg.message||"Unable to join room");
       }else if(msg?.type==="STATE"||msg?.type==="SLOTS"){
@@ -1020,7 +1020,9 @@ async function joinRoom(){
       }
     });
     hostConn.on("close",()=>{
-      clearJoinTimers();setNet("Disconnected");
+      clearJoinTimers();
+      if(removalNotice){setNet("Removed from game");status(removalNotice);return}
+      setNet("Disconnected");
       if(!gotState)status("The host connection closed before the table finished syncing. Ask the host to reopen the room.");
       else status("Connection to host closed. Ask them to reopen the room.");
     });
