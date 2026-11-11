@@ -145,8 +145,9 @@ const server = http.createServer((req, res) => {
     // The floating slots arcade is draggable/closable and uses a separate synced token wallet.
     for (const page of [host, guest]) {
       if (!(await page.locator("#slotsPanel").isVisible())) throw new Error("Slots mini-tab did not appear in the room");
-      if (!(await page.locator("#slotsSpin").isEnabled())) throw new Error("Slots spin should be available with the starting token balance");
-      if ((await page.locator("#slotsTokenCount").textContent()).trim() !== "100 tokens") throw new Error("Each player should start with 100 separate slots tokens");
+      if ((await page.locator("#slotsTokenCount").textContent()).trim() !== "0 tokens") throw new Error("Players should start with no cosmetic tokens");
+      if (await page.locator("#slotsSpin").isEnabled()) throw new Error("Slots should require tokens before spinning");
+      if (await page.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair should not be affordable at the start");
     }
     await host.locator("#slotsMinimize").click();
     if (await host.locator("#slotsBody").isVisible() || !(await host.locator("#slotsHead").isVisible())) throw new Error("Slots minimize control did not collapse the arcade to its movable header");
@@ -156,15 +157,17 @@ const server = http.createServer((req, res) => {
     if (await host.locator("#slotsPanel").isVisible() || !(await host.locator("#slotsToggle").isVisible())) throw new Error("Slots hide/reopen control did not work");
     await host.locator("#slotsToggle").click();
     if (!(await host.locator("#slotsPanel").isVisible())) throw new Error("Slots mini-tab did not reopen");
+    await guest.locator("#slotsExchangeAmount").fill("100");
+    await guest.locator("#slotsExchangeButton").click();
+    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "10 tokens", null, { timeout: 10000 });
+    if (!(await guest.locator("#slotsCashBalance").textContent()).includes("400 chips")) throw new Error("Chip exchange did not deduct the game cash");
+    if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair should remain locked until the player earns substantially more tokens");
     const slotsBefore = await guest.locator("#slotsTokenCount").textContent();
     await guest.locator("#slotsSpin").click();
     await guest.waitForFunction(before => document.querySelector("#slotsTokenCount").textContent !== before, slotsBefore, { timeout: 10000 });
     const guestTokensAfterSpin = await guest.locator("#slotsTokenCount").textContent();
-    if (Number(guestTokensAfterSpin.replace(/\D/g, "")) < 95) throw new Error("Slot spin did not deduct the five-token wager");
-    await guest.locator('#slotsShop button[data-flair="✦"]').click();
-    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("✦ CI Guest")), null, { timeout: 10000 });
-    if (!(await guest.locator('#slotsShop button[data-flair="✦"]').textContent()).includes("Equipped")) throw new Error("Purchased name flair was not equipped");
-    if ((await guest.locator("#slotsTokenCount").textContent()) === "100 tokens") throw new Error("Name flair purchase did not use the separate token balance");
+    if (Number(guestTokensAfterSpin.replace(/\D/g, "")) < 5) throw new Error("Slot spin did not apply its five-token wager or a valid prize");
+    if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair became available without sufficient winnings");
 
     // Lobby chat syncs in both directions and renders user text without HTML interpretation.
     await host.locator("#lobbyChatInput").fill("Welcome, team!");
