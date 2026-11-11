@@ -162,12 +162,15 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "10 tokens", null, { timeout: 10000 });
     if (!(await guest.locator("#slotsCashBalance").textContent()).includes("400 chips")) throw new Error("Chip exchange did not deduct the game cash");
     if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair should remain locked until the player earns substantially more tokens");
-    const slotsBefore = await guest.locator("#slotsTokenCount").textContent();
+    await host.evaluate(() => { Math.random = () => 0.1; });
     await guest.locator("#slotsSpin").click();
-    await guest.waitForFunction(before => document.querySelector("#slotsTokenCount").textContent !== before, slotsBefore, { timeout: 10000 });
-    const guestTokensAfterSpin = await guest.locator("#slotsTokenCount").textContent();
-    if (Number(guestTokensAfterSpin.replace(/\D/g, "")) < 5) throw new Error("Slot spin did not apply its five-token wager or a valid prize");
-    if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair became available without sufficient winnings");
+    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "105 tokens", null, { timeout: 10000 });
+    if (!(await guest.locator("#slotsMessage").textContent()).includes("JACKPOT! +100 tokens")) throw new Error("Jackpot reward message did not match the 100-token payout");
+    const starshine = guest.locator('#slotsShop button[data-flair="✦"]');
+    if (await starshine.isEnabled()) throw new Error("Flair became available without sufficient winnings");
+    await starshine.evaluate(el => { el.disabled = false; el.click(); });
+    await guest.waitForTimeout(300);
+    if (await guest.locator("#slotsTokenCount").textContent() !== "105 tokens" || (await guest.locator(".seat").allTextContents()).some(text => text.includes("✦ CI Guest"))) throw new Error("Host accepted an underfunded flair purchase despite the increased shop price");
 
     // Lobby chat syncs in both directions and renders user text without HTML interpretation.
     await host.locator("#lobbyChatInput").fill("Welcome, team!");
