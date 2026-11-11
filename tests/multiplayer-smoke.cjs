@@ -123,6 +123,15 @@ const server = http.createServer((req, res) => {
     await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 10000 });
     await guest.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Host")), null, { timeout: 10000 });
 
+    // Lobby chat syncs in both directions and renders user text without HTML interpretation.
+    await host.locator("#lobbyChatInput").fill("Welcome, team!");
+    await host.locator("#lobbyChatSend").click();
+    await guest.waitForFunction(() => [...document.querySelectorAll("#chatLog .chat-message p")].some(el => el.textContent === "Welcome, team!"), null, { timeout: 10000 });
+    await guest.locator("#lobbyChatInput").fill("Hi from the guest.");
+    await guest.locator("#lobbyChatSend").click();
+    await host.waitForFunction(() => [...document.querySelectorAll("#chatLog .chat-message p")].some(el => el.textContent === "Hi from the guest."), null, { timeout: 10000 });
+    if (await guest.locator("#chatLog .chat-message p").count() !== 2 || await host.locator("#chatLog .chat-message p").count() !== 2) throw new Error("Lobby chat history did not sync to both players");
+
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
 
@@ -154,6 +163,7 @@ const server = http.createServer((req, res) => {
 
     await host.locator("#start").click();
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && !document.querySelector("#split").disabled, null, { timeout: 10000 });
+    if (await host.locator("#lobbyChat").isVisible() || await guest.locator("#lobbyChat").isVisible()) throw new Error("Lobby chat should tuck away while a hand is active");
     await guest.waitForFunction(() => document.querySelectorAll("#myCards .card").length === 2, null, { timeout: 10000 });
 
     await host.locator("#split").click();
@@ -186,10 +196,7 @@ const server = http.createServer((req, res) => {
 
     await host.setViewportSize({ width: 1280, height: 900 });
 
-    // Start another round in which the host loses, verifying the loss banner.
-    await host.locator("#next").click();
-    await host.waitForFunction(() => document.querySelector("#phase").textContent === "LOBBY" && !document.querySelector("#start").disabled, null, { timeout: 10000 });
-    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "LOBBY", null, { timeout: 10000 });
+    // The Next round button deals immediately; no lobby/Ready/Start detour.
     const lossTopCards = [
       card(0, "10"), card(1, "K"),  // dealer: 20
       card(2, "10"), card(1, "6"), // host: 16
@@ -210,7 +217,10 @@ const server = http.createServer((req, res) => {
       let index = 0;
       Math.random = () => values[index++] ?? 0;
     }, lossRandomValues);
-    await host.locator("#start").click();
+    await host.locator("#next").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && !document.querySelector("#stand").disabled, null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myCards .card").length === 2, null, { timeout: 10000 });
+    if (await host.locator("#start").isVisible() || await host.locator("#next").isVisible()) throw new Error("Next round did not immediately transition into the active hand");
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && !document.querySelector("#stand").disabled, null, { timeout: 10000 });
     await host.locator("#stand").click();
     await guest.waitForFunction(() => !document.querySelector("#stand").disabled, null, { timeout: 10000 });
@@ -290,6 +300,10 @@ const server = http.createServer((req, res) => {
     if (await host.locator("#myHoleCards .card").count() !== 2 || await host.locator("#communityCards .card").count() !== 5) throw new Error("Hold’em showdown did not show two hole cards and five community cards");
     const holdSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
     if (!holdSeat.includes("Won") && !holdSeat.includes("Lost")) throw new Error("Hold’em player list did not show a showdown result: " + holdSeat);
+    await host.locator("#next").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2 && document.querySelectorAll("#communityCards .card").length === 0, null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
+    if (await host.locator("#holdemPot").textContent() !== "15") throw new Error("Next Hold’em hand did not deal immediately with fresh blinds");
 
     // Roulette: one bet per player, a deterministic red result, and 1:1 payouts.
     await guest.locator("#leave").click();
@@ -315,9 +329,16 @@ const server = http.createServer((req, res) => {
     const rouletteGuestSeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
     if (!rouletteHostSeat.includes("Won 20 chips") || !rouletteHostSeat.includes("510")) throw new Error("Roulette red payout incorrect: " + rouletteHostSeat);
     if (!rouletteGuestSeat.includes("Lost 10 chips") || !rouletteGuestSeat.includes("490")) throw new Error("Roulette black loss incorrect: " + rouletteGuestSeat);
+    await host.evaluate(() => { Math.random = () => 0.05; });
+    await host.locator("#next").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "1", null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "1", null, { timeout: 10000 });
+    const rouletteHostSecondSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
+    const rouletteGuestSecondSeat = await guest.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
+    if (!rouletteHostSecondSeat.includes("520") || !rouletteGuestSecondSeat.includes("480")) throw new Error("Next roulette spin did not automatically repeat the previous wagers");
 
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
-    console.log("PASS: 13 themes, card styles, Blackjack multiplayer, Texas Hold’em betting/showdown, roulette bets/payouts, and personal results");
+    console.log("PASS: lobby chat, instant next rounds, 13 themes, card styles, Blackjack multiplayer, Texas Hold’em betting/showdown, and roulette bets/payouts");
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
