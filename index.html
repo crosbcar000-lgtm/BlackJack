@@ -535,6 +535,30 @@ body[data-theme=kaiju]{
  #gameTable .card{height:82px;width:58px}
  #gameTable .round-controls{padding:7px}
 }
+
+/* Persistent round-action dock: accessible even when the table fills the viewport. */
+.wrap.is-in-room #roomPanel{padding-bottom:108px}
+.wrap.is-in-room #roomPanel>.round-controls{
+ position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:100;
+ width:min(calc(100vw - 28px),520px);max-width:520px;min-height:62px;margin:0;
+ padding:9px 11px;gap:9px;transform:translateX(-50%);
+ border:1px solid #ffffff38;border-radius:16px;
+ background:color-mix(in srgb,var(--panel),#050806 18%);
+ box-shadow:0 14px 42px #0009,inset 0 1px #ffffff18;
+ backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2)
+}
+.wrap.is-in-room #roomPanel>.round-controls button{flex:1;min-width:0;min-height:44px;padding:9px 14px;font-size:14px}
+.wrap.is-in-room #roomPanel>.round-controls #start:not(:disabled),
+.wrap.is-in-room #roomPanel>.round-controls #next:not(.hidden){
+ background:var(--gold);color:#181713;border-color:transparent;
+ box-shadow:0 5px 18px color-mix(in srgb,var(--gold),transparent 78%)
+}
+.wrap.is-in-room #roomPanel>.round-controls #next:not(.hidden)::before{content:"↻";margin-right:7px;font-size:17px}
+@media(max-width:520px){
+ .wrap.is-in-room #roomPanel{padding-bottom:104px}
+ .wrap.is-in-room #roomPanel>.round-controls{width:calc(100vw - 22px);bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:8px;gap:7px}
+ .wrap.is-in-room #roomPanel>.round-controls button{padding:8px 9px;font-size:13px}
+}
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -566,8 +590,8 @@ body[data-theme=kaiju]{
 </section>
 <div class="result-banner hidden" id="resultBanner" role="status" aria-live="polite"></div>
 <div class="status" id="gameStatus" aria-live="polite">Waiting for players…</div>
-<div class="actions round-controls"><button class="primary" id="ready">Ready</button><button id="start">Start round</button><button id="next" class="primary hidden">Next round</button></div>
 </div>
+<div class="actions round-controls" id="roundControls"><button class="primary" id="ready">Ready</button><button id="start">Start round</button><button id="next" class="primary hidden">Next round</button></div>
 <div class="divider"></div><div class="row"><h3>Players</h3><span class="muted small">Maximum 6 seats</span></div><div class="seats" id="seats"></div></section>
 <details class="rules-dropdown" id="rulesDropdown">
 <summary><span>Game rules</span><span class="rules-hint">How to play this mode</span></summary>
@@ -673,6 +697,7 @@ function render(){
   $("phase").textContent=phase.replace("_"," ");
   $("start").classList.toggle("hidden",!host||phase!=="LOBBY");
   $("next").classList.toggle("hidden",!host||phase!=="ROUND_OVER");
+ $("roundControls").classList.toggle("hidden",!["ready","start","next"].some(id=>!$(id).classList.contains("hidden")));
   $("ready").classList.toggle("hidden",phase!=="LOBBY");
   const me=myPlayer();
   $("ready").disabled=!me||me.ready||phase!=="LOBBY";
