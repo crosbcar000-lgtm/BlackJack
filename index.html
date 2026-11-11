@@ -1462,7 +1462,7 @@ handleAction=function(playerId,action){
   p.tokens-=5;const reels=Array.from({length:3},()=>SLOT_SYMBOLS[Math.floor(Math.random()*SLOT_SYMBOLS.length)]);
   const counts=reels.reduce((m,x)=>(m[x]=(m[x]||0)+1,m),{}),best=Math.max(...Object.values(counts));
   const prize=best===3?100:best===2?15:0;p.tokens+=prize;p.slotReels=reels;
-  p.slotMessage=best===3?"JACKPOT! +0 tokens":best===2?"Nice match! +15 tokens":"No match — try again!";
+  p.slotMessage=best===3?"JACKPOT! +100 tokens":best===2?"Nice match! +15 tokens":"No match — try again!";
   broadcast();return;
  }
  if(action&&action.kind==="TOKEN_EXCHANGE"){
