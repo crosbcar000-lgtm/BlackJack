@@ -1431,6 +1431,11 @@ render=function(){
 
 /* Slots use a completely separate token wallet; the host validates every spin and purchase. */
 const SLOT_SYMBOLS=["🍒","🍋","🔔","⭐","💎","7️⃣"];
+function slotsUpdateExchange(){
+ const me=myPlayer(),amount=Number($("slotsExchangeAmount").value);
+ $("slotsExchangeAmount").max=Math.max(0,Math.floor((me?.chips??0)/100)*100);
+ $("slotsExchangeButton").disabled=!me||!hostConnReady()||!Number.isSafeInteger(amount)||amount<100||amount%100!==0||amount>(me.chips??0);
+}
 function slotsRender(){
  const dock=$("slotsDock"),me=myPlayer();if(!dock)return;
  const inRoom=!!roomCode;
@@ -1439,8 +1444,7 @@ function slotsRender(){
  dock.style.display=inRoom?"block":"none";
  $("slotsTokenCount").textContent=(me?.tokens??0)+" tokens";
  $("slotsCashBalance").textContent="Game cash: "+(me?.chips??0)+" chips";
- $("slotsExchangeAmount").max=Math.max(0,Math.floor((me?.chips??0)/100)*100);
- $("slotsExchangeButton").disabled=!me||(me.chips??0)<100||!hostConnReady();
+ slotsUpdateExchange();
  $("slotsSpin").disabled=!me||!hostConnReady()||(me.tokens??0)<5;
  $("slotsSpin").textContent=(me?.tokens??0)<5?"Need 5 tokens":"Spin · 5 tokens";
  $("slotsMessage").textContent=me?.slotMessage||"Play slots while your friends take their turns.";
@@ -1477,6 +1481,7 @@ handleAction=function(playerId,action){
  }
  return handleActionBeforeSlots(playerId,action);
 };
+$("slotsExchangeAmount").addEventListener("input",slotsUpdateExchange);
 $("slotsExchangeButton").addEventListener("click",()=>slotAction({kind:"TOKEN_EXCHANGE",chips:Number($("slotsExchangeAmount").value)}));
 $("slotsSpin").addEventListener("click",()=>slotAction({kind:"SLOT_SPIN"}));
 $("slotsMinimize").addEventListener("click",()=>{const minimized=$("slotsDock").classList.toggle("minimized");$("slotsMinimize").textContent=minimized?"＋":"−";$("slotsMinimize").setAttribute("aria-label",minimized?"Expand slots":"Minimize slots");$("slotsMinimize").setAttribute("aria-expanded",String(!minimized))});
