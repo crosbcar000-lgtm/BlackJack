@@ -70,7 +70,10 @@ const server = http.createServer((req, res) => {
       const selected = await button.getAttribute("aria-pressed");
       const look = await host.locator(".table").evaluate(el => {
         const style = getComputedStyle(el);
-        return style.backgroundImage + "|" + style.borderTopColor + "|" + style.backgroundColor;
+        const ornament = getComputedStyle(el, "::before");
+        return style.backgroundImage + "|" + style.borderTopColor + "|" + style.backgroundColor +
+          "|" + style.borderRadius + "|" + style.borderStyle + "|" + style.borderTopWidth +
+          "|" + ornament.backgroundImage + "|" + ornament.borderRadius;
       });
       if (selected !== "true") throw new Error("Theme button did not become selected: " + theme);
       if (!look || look.includes("none")) throw new Error("Table texture did not render for theme: " + theme);
@@ -200,7 +203,12 @@ const server = http.createServer((req, res) => {
       const faceTheme = await firstCourt.getAttribute("data-face-theme");
       if (faceTheme !== theme) throw new Error("Court artwork did not refresh for board theme: " + theme + " (got " + faceTheme + ")");
       const artwork = await firstCourt.locator("svg.court-art").evaluate(el => el.outerHTML);
-      courtArtwork.add(artwork);
+      const frame = await firstCourt.evaluate(el => {
+        const style = getComputedStyle(el);
+        const ornament = getComputedStyle(el, "::before");
+        return style.borderColor + "|" + style.borderStyle + "|" + style.borderRadius + "|" + ornament.backgroundImage;
+      });
+      courtArtwork.add(artwork + "|" + frame);
     }
     if (courtArtwork.size !== courtThemes.length) throw new Error("Some board themes reused the same court-card artwork");
     for (const style of ["classic", "midnight", "neon", "pixel", "gold"]) {
