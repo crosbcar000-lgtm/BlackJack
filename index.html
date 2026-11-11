@@ -930,7 +930,7 @@ function render(){
   const me=myPlayer();
   $("ready").disabled=!me||me.ready||phase!=="LOBBY";
   $("start").disabled=players.length<1||!players.every(p=>p.ready);
-  const seatMarkup=Array.from({length:6},(_,i)=>{
+  $("seats").innerHTML=Array.from({length:6},(_,i)=>{
     const p=players[i];
     const playing=phase==="PLAYING"&&players[turnPlayer]?.id===p?.id;
     const outcomes=p&&phase==="ROUND_OVER"&&p.hands?.length
@@ -1292,7 +1292,6 @@ render=function(){
   }
   return '<div class="seat '+(active?"active":"")+(p&&p.chips<0?" in-debt":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted seat-meta">'+meta+'</span>'+debt+outcome+'</div>';
  }).join("");
- $("seats").innerHTML=seatMarkup;
  if(gameMode==="holdem"){
   const sideHtml=(p)=>{
    if(!p)return '<div class="seat"><strong>Open seat</strong><span class="small muted">Waiting for friend</span></div>';
