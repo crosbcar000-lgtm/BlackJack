@@ -158,6 +158,19 @@ const server = http.createServer((req, res) => {
     if (await host.locator("#slotsPanel").isVisible() || !(await host.locator("#slotsToggle").isVisible())) throw new Error("Slots hide/reopen control did not work");
     await host.locator("#slotsToggle").click();
     if (!(await host.locator("#slotsPanel").isVisible())) throw new Error("Slots mini-tab did not reopen");
+    const sizeBeforeResize = await host.locator("#slotsDock").boundingBox();
+    const resizeHandle = await host.locator("#slotsResize").boundingBox();
+    if (!resizeHandle) throw new Error("Slots resize handle is missing");
+    await host.mouse.move(resizeHandle.x + resizeHandle.width / 2, resizeHandle.y + resizeHandle.height / 2);
+    await host.mouse.down();
+    await host.mouse.move(resizeHandle.x - 55, resizeHandle.y - 45, { steps: 5 });
+    await host.mouse.up();
+    const sizeAfterResize = await host.locator("#slotsDock").boundingBox();
+    if (!sizeAfterResize || sizeAfterResize.width < sizeBeforeResize.width + 40 || sizeAfterResize.height < sizeBeforeResize.height + 30) {
+      throw new Error("Dragging the slots resize handle should enlarge the arcade: before=" + JSON.stringify(sizeBeforeResize) + ", after=" + JSON.stringify(sizeAfterResize));
+    }
+    const savedSlotsSize = await host.evaluate(() => JSON.parse(localStorage.getItem("bj-slots-size") || "null"));
+    if (!savedSlotsSize || Math.abs(savedSlotsSize.width-sizeAfterResize.width)>2 || Math.abs(savedSlotsSize.height-sizeAfterResize.height)>2) throw new Error("Slots size was not saved after resizing");
     const dockBeforeDrag = await host.locator("#slotsDock").boundingBox();
     await host.mouse.move(dockBeforeDrag.x + 90, dockBeforeDrag.y + 18);
     await host.mouse.down();
@@ -430,7 +443,7 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 20000 });
     for (const page of [host, guest]) {
       const guide = page.locator("#holdemHandGuide");
-      if (!(await guide.isVisible()) || await guide.evaluate(el => el.open)) throw new Error("Hold’em hand guide should be visible and collapsed by default");
+      if (!(await guide.isVisible()) || !(await guide.evaluate(el => el.open))) throw new Error("Hold’em hand guide should be open by default");
     }
     await host.locator("#holdemHandGuide summary").click();
     const guideRows = host.locator("#holdemHandGuide li");
@@ -440,8 +453,12 @@ const server = http.createServer((req, res) => {
       if (!guideText.includes(name)) throw new Error("Hold’em hand guide is missing "+name);
     }
     if (!guideText.includes("A-2-3-4-5")) throw new Error("Hold’em guide should explain the ace-low straight");
+    for (const strength of ["Best possible","Near unbeatable","Extremely strong","Very strong","Strong","Good","Fair","Basic made hand","Weakest"]) {
+      if (!guideText.includes(strength)) throw new Error("Hold’em guide is missing the strength label: " + strength);
+    }
     await host.locator("#holdemHandGuide summary").click();
-    if (await host.locator("#holdemHandGuide").evaluate(el => el.open)) throw new Error("Hold’em hand guide should collapse when clicked again");
+    if (await host.locator("#holdemHandGuide").evaluate(el => el.open)) throw new Error("Hold’em hand guide should collapse when clicked");
+    await host.locator("#holdemHandGuide summary").click();
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
     await host.locator("#start").click();
@@ -449,11 +466,14 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
     for (const page of [host, guest]) {
       const handsTab = page.locator("#holdemHandsToggle");
-      if (!(await handsTab.isVisible()) || !(await handsTab.textContent()).includes("Hands")) throw new Error("Hold’em Hands tab is missing");
-      if (await page.locator("#holdemHandsPanel").isVisible()) throw new Error("Hands panel should start collapsed");
-      await handsTab.click();
-      if (await page.locator("#holdemHandsPanel .holdem-hand-row").count() !== 2) throw new Error("Hands tab should list both players");
+      if (!(await handsTab.isVisible()) || !(await handsTab.textContent()).includes("Hands")) throw new Error("Hold’em Table hands control is missing");
+      if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Table hands should be visible by default");
+      if (await page.locator("#holdemHandsPanel .holdem-hand-row").count() !== 2) throw new Error("Table hands should list both players");
       if (await page.locator("#holdemHandsPanel .card.back").count() !== 2 || await page.locator("#holdemHandsPanel .card:not(.back)").count() !== 2) throw new Error("Opponent hole cards must stay hidden before showdown");
+      await handsTab.click();
+      if (await page.locator("#holdemHandsPanel").isVisible()) throw new Error("Table hands toggle should collapse the list");
+      await handsTab.click();
+      if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Table hands toggle should reopen the list");
     }
     if (await guest.locator("#communityCards .card").count() !== 0) throw new Error("Community cards appeared before the pre-flop betting round");
     await guest.locator("#holdemCheckCall").click();
