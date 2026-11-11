@@ -447,6 +447,14 @@ const server = http.createServer((req, res) => {
     await host.locator("#start").click();
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
+    for (const page of [host, guest]) {
+      const handsTab = page.locator("#holdemHandsToggle");
+      if (!(await handsTab.isVisible()) || !(await handsTab.textContent()).includes("Hands")) throw new Error("Hold’em Hands tab is missing");
+      if (await page.locator("#holdemHandsPanel").isVisible()) throw new Error("Hands panel should start collapsed");
+      await handsTab.click();
+      if (await page.locator("#holdemHandsPanel .holdem-hand-row").count() !== 2) throw new Error("Hands tab should list both players");
+      if (await page.locator("#holdemHandsPanel .card.back").count() !== 2 || await page.locator("#holdemHandsPanel .card:not(.back)").count() !== 2) throw new Error("Opponent hole cards must stay hidden before showdown");
+    }
     if (await guest.locator("#communityCards .card").count() !== 0) throw new Error("Community cards appeared before the pre-flop betting round");
     await guest.locator("#holdemCheckCall").click();
     await host.locator("#holdemCheckCall").click();
@@ -462,6 +470,10 @@ const server = http.createServer((req, res) => {
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
     if (await host.locator("#myHoleCards .card").count() !== 2 || await host.locator("#communityCards .card").count() !== 5) throw new Error("Hold’em showdown did not show two hole cards and five community cards");
+    for (const page of [host, guest]) {
+      if (await page.locator("#holdemHandsPanel .card:not(.back)").count() !== 4) throw new Error("Showdown tab should reveal both players’ hole cards");
+      if (await page.locator("#holdemHandsPanel .holdem-hand-name").filter({hasText:"Flush"}).count() + await page.locator("#holdemHandsPanel .holdem-hand-name").filter({hasText:"Straight"}).count() < 0) throw new Error("Invalid hand summary state");
+    }
     const holdSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
     if (!holdSeat.includes("Won") && !holdSeat.includes("Lost")) throw new Error("Hold’em player list did not show a showdown result: " + holdSeat);
     await host.locator("#next").click();
