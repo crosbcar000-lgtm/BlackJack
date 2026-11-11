@@ -597,6 +597,19 @@ const server = http.createServer((req, res) => {
     const debtCard = host.locator(".seat.in-debt").filter({ hasText: "big fat loser" });
     if (await debtCard.count() !== 1) throw new Error("Negative-balance player did not get the debt styling");
 
+    // Reaching exactly -10,000 chips removes a player from the room.
+    await host.evaluate(() => {
+      const bankrupt = players.find(p => p.id !== localUid);
+      if (!bankrupt) throw new Error("Expected a guest before the bankruptcy threshold test");
+      bankrupt.chips = -9950;
+      broadcast();
+    });
+    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest") && el.textContent.includes("-9950")), null, { timeout: 10000 });
+    await host.locator("#next").click();
+    await host.waitForFunction(() => ![...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#lobbyStatus").textContent.includes("You hit -10,000 chips and were removed"), null, { timeout: 10000 });
+    if (await guest.locator("#roomPanel").isVisible()) throw new Error("Bankrupt guest remained in the room after reaching -10,000 chips");
+
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
     console.log("PASS: lobby chat, instant next rounds, dealer flip, green roulette 35:1 payout, negative chip balances, broke nickname, fanfares, 13 themes, card styles, Blackjack, and Texas Hold’em");
   } finally {
