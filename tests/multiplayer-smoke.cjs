@@ -166,7 +166,7 @@ const server = http.createServer((req, res) => {
     const dockAfterDrag = await host.locator("#slotsDock").boundingBox();
     if (!dockAfterDrag || dockAfterDrag.x >= dockBeforeDrag.x - 20 || dockAfterDrag.y >= dockBeforeDrag.y - 20) throw new Error("Slots dock did not move when dragging its header: before=" + JSON.stringify(dockBeforeDrag) + ", after=" + JSON.stringify(dockAfterDrag));
     if (dockAfterDrag.x < 0 || dockAfterDrag.y < 0 || dockAfterDrag.x + dockAfterDrag.width > 1280 || dockAfterDrag.y + dockAfterDrag.height > 900) throw new Error("Dragged slots dock moved outside the viewport: " + JSON.stringify(dockAfterDrag));
-    await guest.locator("#seats .seat").first().evaluate(el => { el.dataset.slotsRefreshMarker = "preserve"; });
+    for (const page of [host, guest]) await page.locator("#seats .seat").first().evaluate(el => { el.dataset.slotsRefreshMarker = "preserve"; });
     await guest.locator("#slotsExchangeAmount").fill("510");
     if (await guest.locator("#slotsExchangeButton").isEnabled()) throw new Error("Chip exchange should disable an amount larger than the player's balance");
     await guest.locator("#slotsExchangeAmount").fill("11");
@@ -177,8 +177,10 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "100 tokens", null, { timeout: 10000 });
     if (!(await guest.locator("#slotsCashBalance").textContent()).includes("490 chips")) throw new Error("10-chip exchange did not deduct game cash correctly");
     if (!(await guest.locator("#slotsMessage").textContent()).includes("Exchanged 10 chips for 100 tokens")) throw new Error("Token exchange did not award 100 tokens per 10 chips");
-    if (await guest.locator("#seats .seat").first().getAttribute("data-slots-refresh-marker") !== "preserve") throw new Error("Token exchange caused a full game-seat refresh");
-    if ((await guest.locator("#seats").textContent()).toLowerCase().includes("tokens")) throw new Error("Token totals should not appear in player seats after exchange");
+    for (const page of [host, guest]) {
+      if (await page.locator("#seats .seat").first().getAttribute("data-slots-refresh-marker") !== "preserve") throw new Error("Token exchange caused a full game-seat refresh");
+      if ((await page.locator("#seats").textContent()).toLowerCase().includes("tokens")) throw new Error("Token totals should not appear in player seats after exchange");
+    }
     if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair should remain locked until the player earns enough tokens");
     await host.evaluate(() => {
       const values = [0.1, 0.1, 0.3]; let index = 0;
@@ -194,7 +196,10 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(before => document.querySelector("#slotsMessage").textContent !== before, beforePairMessage, { timeout: 10000 });
     if ((await guest.locator("#slotsTokenCount").textContent()).trim() !== "100 tokens") throw new Error("Two-symbol slot payout should return the five-token stake after the five-token spin cost");
     if (!(await guest.locator("#slotsMessage").textContent()).includes("Nice match! +5 tokens")) throw new Error("Two-symbol slot payout should return five tokens, not inflate the wallet");
-    if (await guest.locator("#seats .seat").first().getAttribute("data-slots-refresh-marker") !== "preserve") throw new Error("Slot spin caused a full game-seat refresh");
+    for (const page of [host, guest]) {
+      if (await page.locator("#seats .seat").first().getAttribute("data-slots-refresh-marker") !== "preserve") throw new Error("Slot spin caused a full game-seat refresh");
+      if ((await page.locator("#seats").textContent()).toLowerCase().includes("tokens")) throw new Error("Token totals should not appear in player seats after spin");
+    }
     await host.evaluate(() => { Math.random = () => 0.1; });
     await guest.locator("#slotsSpin").click();
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "195 tokens", null, { timeout: 10000 });
@@ -203,7 +208,8 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "290 tokens", null, { timeout: 10000 });
     const starshine = guest.locator('#slotsShop button[data-flair="✦"]');
     if (!(await starshine.isEnabled())) throw new Error("Starshine should unlock at 250 tokens");
-    await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest") && el.textContent.includes("290 tokens")), null, { timeout: 10000 });
+    if ((await host.locator("#seats").textContent()).toLowerCase().includes("tokens")) throw new Error("Guest token balance leaked into a player seat");
+    if (await host.locator("#seats .seat").first().getAttribute("data-slots-refresh-marker") !== "preserve") throw new Error("Slot payouts refreshed the host game screen");
     await starshine.click();
     try {
       await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "40 tokens" && [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("✦ CI Guest")), null, { timeout: 10000 });
