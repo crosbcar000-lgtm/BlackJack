@@ -116,7 +116,7 @@ const server = http.createServer((req, res) => {
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
     await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
-    if (!(await host.locator("#slotsDock").isVisible())) throw new Error("Slots dock should appear after entering a room");
+    if (!(await host.locator("#slotsDock").isVisible())) { const debug = await host.evaluate(() => { const el=document.querySelector("#slotsDock"),r=el.getBoundingClientRect(); return {roomCode:document.querySelector("#roomCode")?.textContent,bodyClass:document.body.className,hasRoom:document.body.classList.contains("has-room"),dockClass:el.className,inlineDisplay:el.style.display,computedDisplay:getComputedStyle(el).display,visibility:getComputedStyle(el).visibility,rect:{x:r.x,y:r.y,width:r.width,height:r.height}}; }); throw new Error("Slots dock should appear after entering a room: "+JSON.stringify(debug)); }
     const code = await host.locator("#roomCode").textContent();
     if (!code || !/^[A-HJ-NP-Z2-9]{6}$/.test(code)) throw new Error("Host did not publish a valid room code");
     const gameFootprint = await host.locator("#gameTable").evaluate(el => ({
