@@ -154,10 +154,10 @@ const server = http.createServer((req, res) => {
     await guest.locator("#slotsSpin").click();
     await host.waitForFunction(before => document.querySelector("#slotsTokenCount").textContent !== before, slotsBefore, { timeout: 10000 });
     const guestTokensAfterSpin = await guest.locator("#slotsTokenCount").textContent();
-    if (Number(guestTokensAfterSpin.replace(/\\D/g, "")) < 95) throw new Error("Slot spin did not deduct the five-token wager");
+    if (Number(guestTokensAfterSpin.replace(/\D/g, "")) < 95) throw new Error("Slot spin did not deduct the five-token wager");
     await guest.locator('#slotsShop button[data-flair="✦"]').click();
     await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("✦ CI Guest")), null, { timeout: 10000 });
-    if (!(await guest.locator("#slotsShop button[data-flair="✦"]').textContent()).includes("Equipped")) throw new Error("Purchased name flair was not equipped");
+    if (!(await guest.locator('#slotsShop button[data-flair="✦"]').textContent()).includes("Equipped")) throw new Error("Purchased name flair was not equipped");
     if ((await guest.locator("#slotsTokenCount").textContent()) === "100 tokens") throw new Error("Name flair purchase did not use the separate token balance");
 
     // Lobby chat syncs in both directions and renders user text without HTML interpretation.
