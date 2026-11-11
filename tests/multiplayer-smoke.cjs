@@ -173,6 +173,7 @@ const server = http.createServer((req, res) => {
     if (!guestSeat.includes("500") || !guestSeat.includes("Push")) throw new Error("Guest push result or payout incorrect: " + guestSeat);
     if (!hostBanner.includes("YOU WON") || !guestBanner.includes("PUSH")) throw new Error("Personal result banners incorrect; host=" + hostBanner + ", guest=" + guestBanner);
     if (roundStatus.includes("CI Host") || roundStatus.includes("CI Guest")) throw new Error("Round status still lists other players' outcomes: " + roundStatus);
+    await host.setViewportSize({ width: 1280, height: 768 });
     const nextButtonFrame = await host.locator("#next").evaluate(el => ({
       visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length),
       top: el.getBoundingClientRect().top,
@@ -182,6 +183,8 @@ const server = http.createServer((req, res) => {
     if (!nextButtonFrame.visible || nextButtonFrame.top < 0 || nextButtonFrame.bottom > nextButtonFrame.viewport) {
       throw new Error("Next round button is below the fold; the round action should be visible without scrolling: " + JSON.stringify(nextButtonFrame));
     }
+
+    await host.setViewportSize({ width: 1280, height: 900 });
 
     // Start another round in which the host loses, verifying the loss banner.
     await host.locator("#next").click();
