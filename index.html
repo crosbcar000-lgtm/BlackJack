@@ -1152,7 +1152,7 @@ render=function(){
  }).join("");
 };
 createRoom=async function(){
- chatMessages=[];
+ chatMessages=[];celebration=null;lastCelebrationId="";
  gameMode=$("gameModeSelect").value||"blackjack";holdem=null;rouletteNumber=null;lastRouletteNumber=null;holdemButtonIndex=0;
  await createBlackjackRoom();if(gameMode==="roulette"&&players[0])players[0].ready=false;render();
 };
@@ -1353,6 +1353,8 @@ function syncCelebration(){
  const el=$("toast");if(el){el.textContent="🎉 "+celebration.message;el.classList.add("fanfare-toast");el.classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>{el.classList.add("hidden");el.classList.remove("fanfare-toast")},4300);}
 }
 document.addEventListener("pointerdown",()=>{if(fanFareAudio?.state==="suspended")fanFareAudio.resume().catch(()=>{});},{passive:true});
+const leaveBeforeFanfare=leave;
+leave=function(){celebration=null;lastCelebrationId="";leaveBeforeFanfare()};
 const originalBeginBlackjackRound=beginBlackjackRound;
 beginBlackjackRound=function(){originalBeginBlackjackRound();const naturals=players.filter(p=>p.hands?.[0]?.naturalEligible!==false&&p.hands?.[0]&&isBlackjack(p.hands[0].cards));if(naturals.length){triggerFanfare("blackjack",naturals.map(p=>p.name).join(" & ")+" drew BLACKJACK on the deal!");broadcast();}};
 
