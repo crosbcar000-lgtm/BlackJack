@@ -719,7 +719,7 @@ body.has-room #slotsDock{display:block}
 <div class="holdem-metrics"><div><span class="small muted">POT</span><strong id="holdemPot">0</strong></div><div><span class="small muted">TO CALL</span><strong id="holdemToCall">0</strong></div><div><span class="small muted">YOUR BET</span><strong id="holdemYourBet">0</strong></div></div>
 <div class="actions" id="holdemActions"><button id="holdemFold">Fold</button><button id="holdemCheckCall" class="primary">Check</button><button id="holdemRaise">Raise 20</button><button id="holdemAllIn" class="primary">All In</button></div>
 <div class="small muted" id="holdemHint">Two private cards, five shared community cards. Best five-card hand wins.</div>
-<div class="holdem-hands-wrap"><button type="button" class="holdem-hands-tab" id="holdemHandsToggle" aria-expanded="true" aria-controls="holdemHandsPanel">♣ Table hands <span id="holdemHandsCount">0</span></button><div class="holdem-hands-panel" id="holdemHandsPanel" aria-live="polite"><div class="holdem-hands-title">Table hands · opponents’ cards turn over at showdown</div><div id="holdemHandsList"></div></div></div>
+<div class="holdem-hands-wrap"><button type="button" class="holdem-hands-tab" id="holdemHandsToggle" aria-expanded="true" aria-controls="holdemHandsPanel">♣ Table Hands <span id="holdemHandsCount">0</span></button><div class="holdem-hands-panel" id="holdemHandsPanel" aria-live="polite"><div class="holdem-hands-title">Table hands · opponents’ cards turn over at showdown</div><div id="holdemHandsList"></div></div></div>
 <details class="holdem-hand-guide" id="holdemHandGuide" open>
  <summary>♣ Hold’em hand rankings</summary>
  <div class="hand-guide-content">
@@ -1661,6 +1661,7 @@ document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("cl
   applySize(width,height,rightGap,bottomGap);saveSize();
  });
  window.addEventListener("resize",()=>{
+  if(!dock.getClientRects().length)return;
   const r=dock.getBoundingClientRect(),rightGap=Math.max(4,innerWidth-r.right),bottomGap=Math.max(4,innerHeight-r.bottom);
   applySize(r.width,r.height,rightGap,bottomGap);
  });
