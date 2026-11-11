@@ -662,7 +662,7 @@ body.has-room #slotsDock{display:block}
 @media(max-width:520px){#slotsDock{right:10px;bottom:10px;width:min(310px,calc(100vw - 20px))}.slot-reel{width:54px}}
 </style></head>
 <body data-theme="royal"><div class="wrap">
-<header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
+<header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button><button id="copyInvite" disabled>Copy invite</button></div></header>
 <section class="hero"><span class="pill">PRIVATE FRIENDS GAME · UP TO 6 PLAYERS</span><h1>Your table.<br><span class="gold">Your rules.</span></h1><div class="muted">Bring your crew together for Blackjack, Texas Hold’em, or roulette. Private rooms, shared tables, and virtual chips only.</div></section>
 <nav class="app-tabs" role="tablist" aria-label="Main sections">
 <button class="app-tab" id="gameTab" type="button" role="tab" aria-selected="true" aria-controls="gameView">Game</button>
@@ -729,7 +729,6 @@ body.has-room #slotsDock{display:block}
 </section>
 </div>
 <div id="slotsDock" aria-label="Floating slots arcade">
- <button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button>
  <section id="slotsPanel">
   <header id="slotsHead"><strong>🎰 MINI SLOTS ARCADE</strong><span class="small" id="slotsTokenCount">0 tokens</span><button id="slotsMinimize" type="button" aria-label="Minimize slots" aria-expanded="true">−</button><button id="slotsClose" type="button" aria-label="Hide slots">×</button></header>
   <div id="slotsBody">
@@ -1441,8 +1440,10 @@ function slotsRender(){
  const dock=$("slotsDock"),me=myPlayer();if(!dock)return;
  const inRoom=!!roomCode;
  document.body.classList.toggle("has-room",inRoom);
+ const closed=dock.classList.contains("closed");
  dock.classList.toggle("hidden",!inRoom);
- dock.style.display=inRoom?"block":"none";
+ dock.style.display=inRoom&&!closed?"block":"none";
+ $("slotsToggle").classList.toggle("hidden",!inRoom||!closed);
  $("slotsTokenCount").textContent=(me?.tokens??0)+" tokens";
  $("slotsCashBalance").textContent="Game cash: "+(me?.chips??0)+" chips";
  slotsUpdateExchange();
@@ -1486,8 +1487,8 @@ $("slotsExchangeAmount").addEventListener("input",slotsUpdateExchange);
 $("slotsExchangeButton").addEventListener("click",()=>slotAction({kind:"TOKEN_EXCHANGE",chips:Number($("slotsExchangeAmount").value)}));
 $("slotsSpin").addEventListener("click",()=>slotAction({kind:"SLOT_SPIN"}));
 $("slotsMinimize").addEventListener("click",()=>{const minimized=$("slotsDock").classList.toggle("minimized");$("slotsBody").style.display=minimized?"none":"grid";$("slotsMinimize").textContent=minimized?"＋":"−";$("slotsMinimize").setAttribute("aria-label",minimized?"Expand slots":"Minimize slots");$("slotsMinimize").setAttribute("aria-expanded",String(!minimized))});
-$("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("closed");$("slotsToggle").classList.remove("hidden")});
-$("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");$("slotsToggle").classList.add("hidden")});
+$("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("closed");slotsRender()});
+$("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");slotsRender()});
 document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("click",()=>slotAction({kind:"SHOP_BUY",flair:b.dataset.flair})));
 (function enableSlotsDrag(){
  const head=$("slotsHead"),handle=head.querySelector("strong"),dock=$("slotsDock");let drag=null;
@@ -1500,7 +1501,7 @@ const renderBeforeSlots=render;
 render=function(){
  const inRoom=!!roomCode,dock=$("slotsDock");
  document.body.classList.toggle("has-room",inRoom);
- if(dock){dock.classList.toggle("hidden",!inRoom);dock.style.display=inRoom?"block":"none"}
+ if(dock){dock.classList.toggle("hidden",!inRoom);dock.style.display=inRoom&&!dock.classList.contains("closed")?"block":"none"}
  renderBeforeSlots();slotsRender();
 };
 
