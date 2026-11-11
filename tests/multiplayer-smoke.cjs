@@ -77,6 +77,7 @@ const server = http.createServer((req, res) => {
     // Verify every theme selects correctly and changes the actual table texture.
     const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju"];
     const tableLooks = new Set();
+    const previewLooks = new Set();
     for (const theme of themeNames) {
       const button = host.locator('.theme-grid button[data-theme="' + theme + '"]');
       if (await button.count() !== 1) throw new Error("Missing theme option: " + theme);
@@ -92,10 +93,18 @@ const server = http.createServer((req, res) => {
       if (selected !== "true") throw new Error("Theme button did not become selected: " + theme);
       if (!look || look.includes("none")) throw new Error("Table texture did not render for theme: " + theme);
       tableLooks.add(look);
+      const preview = await host.locator("#themePreviewBoard").evaluate(el => ({
+        theme:el.dataset.previewTheme,visible:!!el.getClientRects().length,
+        border:getComputedStyle(el).borderTopColor,image:getComputedStyle(el).backgroundImage,
+        label:document.querySelector("#themePreviewLabel").textContent
+      }));
+      if (!preview.visible || preview.theme !== theme || !preview.border || !preview.image.includes("gradient") || !preview.label.startsWith("Previewing ")) throw new Error("Live theme preview did not update for " + theme + ": " + JSON.stringify(preview));
+      previewLooks.add(preview.border+"|"+preview.image);
       const saved = await host.evaluate(() => localStorage.getItem("bj-theme"));
       if (saved !== theme) throw new Error("Theme was not saved on this device: " + theme);
     }
     if (tableLooks.size !== themeNames.length) throw new Error("Some themes share the same table appearance; expected 13 unique looks, got " + tableLooks.size);
+    if (previewLooks.size !== themeNames.length) throw new Error("Live board preview did not show 13 distinct theme appearances; got " + previewLooks.size);
     await host.locator('.theme-grid button[data-theme="royal"]').click();
     await host.locator("#cardThemeSelect").selectOption("classic");
     if (await host.locator("body").getAttribute("data-card-theme") !== "classic") throw new Error("Independent card theme did not apply");
@@ -122,6 +131,14 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 20000 });
     await host.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 10000 });
     await guest.waitForFunction(() => [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Host")), null, { timeout: 10000 });
+    for (const page of [host, guest]) {
+      const layout = await page.evaluate(() => {
+        const main = document.querySelector(".layout > main").getBoundingClientRect();
+        const chat = document.querySelector("#chatSidebar").getBoundingClientRect();
+        return {mainRight:main.right,chatLeft:chat.left,chatWidth:chat.width,visible:!!document.querySelector("#chatSidebar").getClientRects().length};
+      });
+      if (!layout.visible || layout.chatLeft < layout.mainRight - 1 || layout.chatWidth < 270) throw new Error("Chat is not arranged as a visible right-side panel: " + JSON.stringify(layout));
+    }
 
     // Lobby chat syncs in both directions and renders user text without HTML interpretation.
     await host.locator("#lobbyChatInput").fill("Welcome, team!");
@@ -163,7 +180,13 @@ const server = http.createServer((req, res) => {
 
     await host.locator("#start").click();
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && !document.querySelector("#split").disabled, null, { timeout: 10000 });
-    if (await host.locator("#lobbyChat").isVisible() || await guest.locator("#lobbyChat").isVisible()) throw new Error("Lobby chat should tuck away while a hand is active");
+    if (!(await host.locator("#chatSidebar").isVisible()) || !(await guest.locator("#chatSidebar").isVisible())) throw new Error("Chat sidebar should stay visible while a hand is active");
+    await host.locator("#lobbyChatInput").fill("Host live during the hand.");
+    await host.locator("#lobbyChatSend").click();
+    await guest.waitForFunction(() => [...document.querySelectorAll("#chatLog .chat-message p")].some(el => el.textContent === "Host live during the hand."), null, { timeout: 10000 });
+    await guest.locator("#lobbyChatInput").fill("Guest live during the hand.");
+    await guest.locator("#lobbyChatSend").click();
+    await host.waitForFunction(() => [...document.querySelectorAll("#chatLog .chat-message p")].some(el => el.textContent === "Guest live during the hand."), null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelectorAll("#myCards .card").length === 2, null, { timeout: 10000 });
 
     await host.locator("#split").click();

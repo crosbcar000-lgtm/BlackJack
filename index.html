@@ -590,6 +590,46 @@ body[data-theme=kaiju]{
 .dealer-flip-scene .dealer-flip-back{transform:rotateY(0deg)!important}
 .dealer-flip-scene:hover{transform:translateY(-3px) rotate(-1deg)}
 
+
+/* Live theme sample mirrors the felt, rail, light and card-back palette. */
+.theme-preview-wrap{margin:12px 0 15px;padding:11px;border:1px solid #ffffff1b;border-radius:15px;background:#0002}
+.theme-preview-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px}
+.theme-preview-heading strong{font-size:12px;letter-spacing:.02em}
+.theme-preview-heading span{font-size:10px;text-align:right}
+.theme-preview-board{position:relative;isolation:isolate;overflow:hidden;min-height:174px;display:flex;flex-direction:column;justify-content:space-between;gap:7px;padding:12px 15px;border:7px solid var(--table-frame);border-radius:22px;background-color:var(--felt2);background-image:var(--felt-pattern),radial-gradient(ellipse at 50% 42%,color-mix(in srgb,var(--felt),white 5%),var(--felt) 42%,var(--felt2));box-shadow:inset 0 0 0 2px var(--table-inset),inset 0 0 22px #0004,0 8px 20px #0004;transition:background-color .25s ease,background-image .25s ease,border-color .25s ease,box-shadow .25s ease}
+.theme-preview-board::before{content:"";position:absolute;inset:5px;border:1px solid #ffffff19;border-radius:14px;pointer-events:none;z-index:-1}
+.theme-preview-board::after{content:"";position:absolute;width:54%;height:46%;left:23%;top:27%;background:radial-gradient(ellipse,#ffffff0a,transparent 72%);pointer-events:none;z-index:-1}
+.theme-preview-zone{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.theme-preview-zone .zone-title{font-size:9px;letter-spacing:.16em;white-space:nowrap}
+.theme-preview-cards{display:flex;align-items:center;gap:6px}
+.theme-preview-board .card{width:37px;height:52px;min-width:37px;padding:4px;border-radius:6px;font-size:11px}
+.theme-preview-board .card .suit{font-size:18px}
+.theme-preview-board .card.back{border-width:2px}
+.theme-preview-footer{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;color:#ffffffa0;font-size:9px;font-weight:850;letter-spacing:.17em}
+@media(max-width:520px){.theme-preview-wrap{padding:8px}.theme-preview-board{min-height:158px;padding:9px 10px;border-width:5px}}
+/* Persistent chat sidebar: visible and usable throughout every game phase. */
+.layout.has-chat-sidebar{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(290px,330px);gap:18px;align-items:start}
+.layout.has-chat-sidebar>main{width:auto;min-width:0}
+#chatSidebar{position:sticky;top:12px;align-self:start;min-width:0;width:100%;height:calc(100svh - 24px);min-height:430px;max-height:900px;display:flex}
+#chatSidebar .lobby-chat{margin:0;width:100%;height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:15px}
+#chatSidebar .lobby-chat-head{align-items:flex-start;flex-direction:column;gap:2px}
+#chatSidebar #chatLog{flex:1;min-height:180px;height:auto;max-height:none}
+#chatSidebar .chat-form{align-items:stretch}
+#chatSidebar .chat-form input{width:1px}
+@media(max-width:900px){
+ .layout.has-chat-sidebar{display:block!important}
+ #chatSidebar{position:fixed;right:10px;bottom:calc(82px + env(safe-area-inset-bottom,0px));z-index:80;width:min(350px,calc(100vw - 20px));height:158px;min-height:0;max-height:calc(100svh - 150px)}
+ #chatSidebar .lobby-chat{padding:9px 11px;border-radius:14px;box-shadow:0 12px 38px #0009}
+ #chatSidebar .lobby-chat-head{flex-direction:row;align-items:center;gap:8px;margin-bottom:4px}
+ #chatSidebar .lobby-chat-head .small{font-size:9px}
+ #chatSidebar #chatLog{min-height:26px;padding:5px 8px;gap:4px}
+ #chatSidebar .chat-message p{font-size:11px}
+ #chatSidebar .chat-form{margin-top:5px;gap:6px}
+ #chatSidebar .chat-form input,#chatSidebar .chat-form button{min-height:34px;padding:5px 8px;font-size:12px}
+ #chatSidebar .chat-form button{min-width:58px}
+}
+@media(max-width:900px) and (max-height:560px){#chatSidebar{height:132px;bottom:calc(76px + env(safe-area-inset-bottom,0px))}#chatSidebar #chatLog{min-height:18px}}
+
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -624,22 +664,35 @@ body[data-theme=kaiju]{
 </div>
 <div class="actions round-controls" id="roundControls"><button class="primary" id="ready">Ready</button><button id="start">Start round</button><button id="next" class="primary hidden">Next round</button></div>
 <div class="divider"></div><div class="row"><h3>Players</h3><span class="muted small">Maximum 6 seats</span></div><div class="seats" id="seats"></div>
-<section class="lobby-chat" id="lobbyChat" aria-label="Lobby chat">
+</section>
+<details class="rules-dropdown" id="rulesDropdown">
+<summary><span>Game rules</span><span class="rules-hint">How to play this mode</span></summary>
+<div class="rules-content"><p class="rules" id="rulesText">Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.</p><p class="rules">No real money, cash value, or prizes.</p></div>
+</details>
+</main>
+<aside id="chatSidebar" class="chat-sidebar hidden" aria-label="Room chat">
+ <section class="lobby-chat" id="lobbyChat" aria-label="Lobby chat">
  <div class="lobby-chat-head"><h3>Lobby chat</h3><span class="small muted">Messages shared with everyone in this room</span></div>
  <div id="chatLog" role="log" aria-live="polite" aria-relevant="additions text"><div class="chat-empty">Say hello while everyone gets ready.</div></div>
  <form class="chat-form" id="lobbyChatForm">
   <input id="lobbyChatInput" type="text" maxlength="240" autocomplete="off" placeholder="Message your table…" aria-label="Chat message">
   <button id="lobbyChatSend" class="primary" type="submit">Send</button>
  </form>
-</section></section>
-<details class="rules-dropdown" id="rulesDropdown">
-<summary><span>Game rules</span><span class="rules-hint">How to play this mode</span></summary>
-<div class="rules-content"><p class="rules" id="rulesText">Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.</p><p class="rules">No real money, cash value, or prizes.</p></div>
-</details>
-</main></div></section>
+</section>
+</aside>
+</div></section>
 <section id="settingsView" class="tab-view hidden" role="tabpanel" aria-labelledby="settingsTab">
 <div class="settings-grid">
-<section class="panel"><h3>Table style</h3><p class="rules">Choose a world for your table. Each style changes the felt texture, rail, lighting, and colors.</p><div class="theme-grid"><button data-theme="royal" aria-pressed="true">♛ Royal</button><button data-theme="neon" aria-pressed="false">✦ Neon Grid</button><button data-theme="midnight" aria-pressed="false">☾ Deep Sea</button><button data-theme="purple" aria-pressed="false">✧ Arcane</button><button data-theme="arcade" aria-pressed="false">▦ Pixel Arcade</button><button data-theme="starship" aria-pressed="false">✧ Starship</button><button data-theme="dungeon" aria-pressed="false">⚒ Dungeon</button><button data-theme="noir" aria-pressed="false">◈ Film Noir</button><button data-theme="pixel" aria-pressed="false">▧ Pixel Kingdom</button><button data-theme="circuit" aria-pressed="false">⌁ Cyber City</button><button data-theme="spellbook" aria-pressed="false">✧ Arcane Academy</button><button data-theme="wasteland" aria-pressed="false">⌁ Wasteland</button><button data-theme="kaiju" aria-pressed="false">◉ Kaiju Cinema</button></div><p class="rules">Your choice is saved on this device.</p></section>
+<section class="panel"><h3>Table style</h3><p class="rules">Choose a world for your table. Each style changes the felt texture, rail, lighting, and colors.</p>
+<div class="theme-preview-wrap">
+ <div class="theme-preview-heading"><strong>Live board preview</strong><span class="small muted" id="themePreviewLabel" aria-live="polite">Previewing Royal</span></div>
+ <div class="theme-preview-board" id="themePreviewBoard" data-preview-theme="royal" aria-label="Preview of the selected table theme">
+  <div class="theme-preview-zone"><span class="zone-title">DEALER</span><div class="theme-preview-cards"><div class="card back" aria-hidden="true"></div><div class="card red"><b>K</b><span class="suit">♥</span></div></div></div>
+  <div class="theme-preview-zone"><span class="zone-title">YOUR HAND</span><div class="theme-preview-cards"><div class="card"><b>A</b><span class="suit">♠</span></div><div class="card red"><b>10</b><span class="suit">♦</span></div></div></div>
+  <div class="theme-preview-footer"><span>♠ ♥ ♦ ♣</span><span>TABLE NIGHT</span></div>
+ </div>
+</div>
+<div class="theme-grid"><button data-theme="royal" aria-pressed="true">♛ Royal</button><button data-theme="neon" aria-pressed="false">✦ Neon Grid</button><button data-theme="midnight" aria-pressed="false">☾ Deep Sea</button><button data-theme="purple" aria-pressed="false">✧ Arcane</button><button data-theme="arcade" aria-pressed="false">▦ Pixel Arcade</button><button data-theme="starship" aria-pressed="false">✧ Starship</button><button data-theme="dungeon" aria-pressed="false">⚒ Dungeon</button><button data-theme="noir" aria-pressed="false">◈ Film Noir</button><button data-theme="pixel" aria-pressed="false">▧ Pixel Kingdom</button><button data-theme="circuit" aria-pressed="false">⌁ Cyber City</button><button data-theme="spellbook" aria-pressed="false">✧ Arcane Academy</button><button data-theme="wasteland" aria-pressed="false">⌁ Wasteland</button><button data-theme="kaiju" aria-pressed="false">◉ Kaiju Cinema</button></div><p class="rules">Your choice is saved on this device.</p></section>
 <section class="panel"><h3>Card style</h3><p class="rules">Match the current table, or pick a separate deck design. Your choice is saved on this device.</p><label for="cardThemeSelect">CARD BACK DESIGN</label><select id="cardThemeSelect"><option value="match">Match table theme</option><option value="classic">Classic ivory</option><option value="midnight">Midnight blue</option><option value="neon">Neon prism</option><option value="pixel">Pixel mosaic</option><option value="gold">Antique gold</option></select></section>
 <details class="settings-info"><summary>About multiplayer and private rooms</summary><div class="rules-content"><section class="panel"><h3>How multiplayer works</h3><p class="rules">Players connect to a Cloudflare Worker over WebSockets. The Worker relays game messages; the host's browser deals and validates actions. No Firebase is used. Cloudflare's free plan has daily usage limits.</p><p class="rules">Friends-only trust model: the host can see and control the game state. Do not use this for valuable stakes.</p></section></div></details>
 </div>
@@ -855,8 +908,20 @@ function startNext(){if(!host||phase!=="ROUND_OVER")return;players=players.filte
 function leave(){if(peer)peer.destroy();peer=null;hostConn=null;connections.clear();roomCode="";host=false;players=[];dealer=[];shoe=[];phase="LOBBY";localUid="";setNet("Peer connection ready");render()}
 $("create").onclick=createRoom;$("join").onclick=joinRoom;$("ready").onclick=ready;$("start").onclick=beginRound;$("next").onclick=startNext;$("hit").onclick=()=>sendAction("HIT");$("stand").onclick=()=>sendAction("STAND");$("double").onclick=()=>sendAction("DOUBLE");$("split").onclick=()=>sendAction("SPLIT");$("leave").onclick=leave;
 $("copyInvite").onclick=async()=>{const url=location.origin+location.pathname+"?room="+roomCode;try{await navigator.clipboard.writeText("Join my Blackjack room: "+url+" — Code: "+roomCode);toast("Invite link and code copied")}catch{toast("Room code: "+roomCode)}};
-document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.onclick=()=>{document.body.dataset.theme=b.dataset.theme;localStorage.setItem("bj-theme",b.dataset.theme);document.querySelectorAll(".theme-grid button[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render()});
-document.body.dataset.theme=localStorage.getItem("bj-theme")||"royal";document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===document.body.dataset.theme)));
+function updateThemePreview(){
+ const preview=$("themePreviewBoard"),label=$("themePreviewLabel"),theme=document.body.dataset.theme||"royal";
+ if(preview)preview.dataset.previewTheme=theme;
+ const selected=document.querySelector('.theme-grid button[data-theme="'+theme+'"]');
+ if(label)label.textContent="Previewing "+(selected?selected.textContent.trim().replace(/\s+/g," "):theme);
+}
+document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.onclick=()=>{
+ document.body.dataset.theme=b.dataset.theme;localStorage.setItem("bj-theme",b.dataset.theme);
+ document.querySelectorAll(".theme-grid button[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+ updateThemePreview();render()
+});
+document.body.dataset.theme=localStorage.getItem("bj-theme")||"royal";
+document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===document.body.dataset.theme)));
+updateThemePreview();
 
 let gameMode="blackjack",holdem=null,rouletteNumber=null,holdemButtonIndex=0,lastRouletteNumber=null;
 function updateRulesText(mode){
@@ -927,7 +992,7 @@ function setBanner(net,detail){
 }
 
 function appendChatMessage(playerId,rawText){
- if(!host||!["LOBBY","ROUND_OVER"].includes(phase))return;
+ if(!host||!roomCode)return;
  const player=players.find(p=>p.id===playerId);
  const text=String(rawText??"").replace(/\\s+/g," ").trim().slice(0,240);
  if(!player||!text)return;
@@ -939,7 +1004,7 @@ function sendLobbyChat(event){
  if(event)event.preventDefault();
  const input=$("lobbyChatInput"),text=input.value.trim();
  if(!text)return;
- if(!["LOBBY","ROUND_OVER"].includes(phase)){toast("Chat is available between rounds.");return}
+ if(!roomCode){toast("Join a room to chat.");return}
  if(host)appendChatMessage(localUid,text);
  else if(hostConn&&hostConn.open)sendTo(hostConn,{type:"CHAT",text:text.slice(0,240)});
  else {toast("Chat is still connecting.");return}
@@ -949,7 +1014,7 @@ function sendLobbyChat(event){
 function renderLobbyChat(){
  const log=$("chatLog"),input=$("lobbyChatInput"),send=$("lobbyChatSend");
  if(!log||!input||!send)return;
- const available=["LOBBY","ROUND_OVER"].includes(phase);
+ const available=!!roomCode;
  const ready=host||!!(hostConn&&hostConn.open);
  input.disabled=!available||!ready;send.disabled=!available||!ready;
  const nearBottom=log.scrollHeight-log.scrollTop-log.clientHeight<36;
@@ -996,6 +1061,8 @@ receiveState=function(s){
 render=function(){
  const inRoom=!!roomCode;
  document.querySelector(".wrap").classList.toggle("is-in-room",inRoom);
+ document.querySelector(".layout").classList.toggle("has-chat-sidebar",inRoom);
+ $("chatSidebar").classList.toggle("hidden",!inRoom);
  $("lobby").classList.toggle("hidden",inRoom);$("roomPanel").classList.toggle("hidden",!inRoom);
  $("copyInvite").disabled=!inRoom;if(!inRoom)return;
  $("roomCode").textContent=roomCode;$("phase").textContent=phase.replace("_"," ");
@@ -1012,7 +1079,6 @@ render=function(){
  $("holdemBoard").classList.toggle("hidden",gameMode!=="holdem");
  $("rouletteBoard").classList.toggle("hidden",gameMode!=="roulette");
  updateRulesText(gameMode);
- $("lobbyChat").classList.toggle("hidden",phase==="PLAYING"||phase==="DEALER");
  renderLobbyChat();
  if(gameMode==="blackjack"){
   renderBlackjack();
