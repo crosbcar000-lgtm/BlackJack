@@ -1489,10 +1489,11 @@ $("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("clos
 $("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");$("slotsToggle").classList.add("hidden")});
 document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("click",()=>slotAction({kind:"SHOP_BUY",flair:b.dataset.flair})));
 (function enableSlotsDrag(){
- const head=$("slotsHead"),dock=$("slotsDock");let drag=null;
- head.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;const r=dock.getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};head.setPointerCapture(e.pointerId);dock.style.left=r.left+"px";dock.style.top=r.top+"px";dock.style.right="auto";dock.style.bottom="auto";});
- head.addEventListener("pointermove",e=>{if(!drag)return;const w=dock.offsetWidth,h=dock.offsetHeight;dock.style.left=Math.max(4,Math.min(innerWidth-w-4,e.clientX-drag.x))+"px";dock.style.top=Math.max(4,Math.min(innerHeight-h-4,e.clientY-drag.y))+"px";});
- const stop=()=>{drag=null};head.addEventListener("pointerup",stop);head.addEventListener("pointercancel",stop);
+ const head=$("slotsHead"),handle=head.querySelector("strong"),dock=$("slotsDock");let drag=null;
+ handle.style.cursor="grab";handle.style.touchAction="none";
+ handle.addEventListener("pointerdown",e=>{if(e.button!==0)return;const r=dock.getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};handle.setPointerCapture(e.pointerId);dock.style.left=r.left+"px";dock.style.top=r.top+"px";dock.style.right="auto";dock.style.bottom="auto";});
+ handle.addEventListener("pointermove",e=>{if(!drag)return;const w=dock.offsetWidth,h=dock.offsetHeight;dock.style.left=Math.max(4,Math.min(innerWidth-w-4,e.clientX-drag.x))+"px";dock.style.top=Math.max(4,Math.min(innerHeight-h-4,e.clientY-drag.y))+"px";});
+ const stop=()=>{drag=null};handle.addEventListener("pointerup",stop);handle.addEventListener("pointercancel",stop);
 })();
 const renderBeforeSlots=render;
 render=function(){
