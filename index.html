@@ -637,6 +637,22 @@ body[data-theme=kaiju]{
 
 .toast.fanfare-toast{font-weight:950;font-size:clamp(16px,3vw,22px);letter-spacing:.035em;text-align:center;color:#fff6cf;border:2px solid var(--gold);background:radial-gradient(ellipse at top,#755b20,#17130b 78%);box-shadow:0 0 0 4px #e4bd6722,0 12px 42px #000b,0 0 32px color-mix(in srgb,var(--gold),transparent 48%);animation:fanfare-pop .48s cubic-bezier(.16,1,.3,1) both;z-index:30}
 @keyframes fanfare-pop{0%{opacity:0;transform:translate(-50%,18px) scale(.82)}65%{opacity:1;transform:translate(-50%,-3px) scale(1.04)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+/* Floating slots arcade and separate cosmetic-token shop. */
+#slotsDock{position:fixed;z-index:50;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));color:var(--ink);filter:drop-shadow(0 16px 35px #0008)}
+#slotsDock.closed{width:auto;filter:none}
+#slotsPanel{border:1px solid color-mix(in srgb,var(--gold),transparent 35%);border-radius:17px;background:linear-gradient(145deg,#1b2b25,#0b1511);box-shadow:0 12px 36px #0009;overflow:hidden}
+#slotsHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;background:linear-gradient(100deg,#e4bd6730,#ffffff08);cursor:grab;touch-action:none;user-select:none}
+#slotsHead:active{cursor:grabbing}#slotsHead strong{color:var(--gold);letter-spacing:.06em}#slotsHead button{min-height:29px;padding:3px 9px}
+#slotsBody{padding:12px;display:grid;gap:10px}#slotsDock.closed #slotsPanel{display:none}
+#slotsReels{display:flex;justify-content:center;gap:9px;padding:10px;border:1px solid #ffffff20;border-radius:12px;background:radial-gradient(ellipse,#35533d,#101b16)}
+.slot-reel{display:grid;place-items:center;width:62px;height:58px;border-radius:10px;background:#f7edcf;color:#211b12;font-size:30px;box-shadow:inset 0 0 0 3px #c9a65d,0 4px 9px #0008}
+#slotsMessage{min-height:34px;text-align:center;color:#e8d8aa;font-size:12px}
+#slotsShop{border-top:1px solid #ffffff20;padding-top:9px;display:grid;gap:7px}#slotsShop h4{margin:0;color:var(--gold);font-size:12px;letter-spacing:.08em}
+.slot-shop-row{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:12px}.slot-shop-row button{padding:6px 9px;min-height:31px;font-size:11px}
+#slotsToggle{border:1px solid var(--gold);border-radius:999px;background:#17251e;color:var(--gold);padding:9px 13px;box-shadow:0 5px 18px #0008}
+#slotsDock:not(.in-room){display:none}#slotsSpin{width:100%}
+@media(max-width:520px){#slotsDock{right:10px;bottom:10px;width:min(310px,calc(100vw - 20px))}.slot-reel{width:54px}}
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -704,7 +720,27 @@ body[data-theme=kaiju]{
 <details class="settings-info"><summary>About multiplayer and private rooms</summary><div class="rules-content"><section class="panel"><h3>How multiplayer works</h3><p class="rules">Players connect to a Cloudflare Worker over WebSockets. The Worker relays game messages; the host's browser deals and validates actions. No Firebase is used. Cloudflare's free plan has daily usage limits.</p><p class="rules">Friends-only trust model: the host can see and control the game state. Do not use this for valuable stakes.</p></section></div></details>
 </div>
 </section>
-</div><div class="toast hidden" id="toast"></div>
+</div>
+<div id="slotsDock" class="in-room" aria-label="Floating slots arcade">
+ <button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button>
+ <section id="slotsPanel">
+  <header id="slotsHead"><strong>🎰 MINI SLOTS ARCADE</strong><span class="small" id="slotsTokenCount">100 tokens</span><button id="slotsClose" type="button" aria-label="Close slots">×</button></header>
+  <div id="slotsBody">
+   <div id="slotsReels" aria-label="Slot machine reels"><span class="slot-reel">🍒</span><span class="slot-reel">⭐</span><span class="slot-reel">💎</span></div>
+   <div class="small muted">5 tokens per spin · 3 matching = 100 · 2 matching = 15</div>
+   <button id="slotsSpin" class="primary" type="button">Spin · 5 tokens</button>
+   <div id="slotsMessage" role="status" aria-live="polite">Play slots while your friends take their turns.</div>
+   <div id="slotsShop"><h4>NAME FLAIR SHOP · TOKENS ONLY</h4>
+    <div class="slot-shop-row"><span>✦ Starshine · 25</span><button data-flair="✦" data-cost="25">Equip</button></div>
+    <div class="slot-shop-row"><span>♛ Royal · 50</span><button data-flair="♛" data-cost="50">Equip</button></div>
+    <div class="slot-shop-row"><span>⚡ Voltage · 75</span><button data-flair="⚡" data-cost="75">Equip</button></div>
+    <div class="slot-shop-row"><span>👑 Crown · 100</span><button data-flair="👑" data-cost="100">Equip</button></div>
+   </div>
+  </div>
+ </section>
+</div>
+
+<div class="toast hidden" id="toast"></div>
 <script src="./config.js"></script>
 <script src="./relay-client.js"></script>
 <script>
@@ -783,7 +819,7 @@ function cardHtml(c,back=false){
  const tone=pipColor(c.s),theme=activeFaceTheme(),value=c.r==="A"?"ACE":c.r;
  return '<div class="card pip-card '+(["♥","♦"].includes(c.s)?"red":"")+'" data-rank="'+c.r+'" data-face-theme="'+theme+'" style="--pip-ink:'+tone+'"><span class="pip-index"><b>'+c.r+'</b><i>'+c.s+'</i></span><span class="pip-watermark">'+c.s+'</span><span class="pip-center">'+c.s+'</span><span class="pip-value">'+value+'</span><span class="pip-bottom">'+c.r+' '+c.s+'</span></div>';
 }
-function publicState(forId){return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,ready:p.ready,done:p.done,hands:p.hands.map((h,i)=>({cards:h.cards,bet:h.bet,done:h.done,result:h.result})),activeHand:p.activeHand})),dealer:dealer.map((c,i)=>phase==="PLAYING"&&i===1?null:c),dealerHidden:phase==="PLAYING",turnPlayer,turnHand,message:roundMessage,roundNumber,forId}}
+function publicState(forId){return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,tokens:p.tokens??100,flair:p.flair||"",slotMessage:p.slotMessage||"",slotReels:p.slotReels||["🍒","⭐","💎"],ready:p.ready,done:p.done,hands:p.hands.map((h,i)=>({cards:h.cards,bet:h.bet,done:h.done,result:h.result})),activeHand:p.activeHand})),dealer:dealer.map((c,i)=>phase==="PLAYING"&&i===1?null:c),dealerHidden:phase==="PLAYING",turnPlayer,turnHand,message:roundMessage,roundNumber,forId}}
 function sendTo(conn,msg){try{if(conn&&conn.open)conn.send(msg)}catch(e){console.warn(e)}}
 function broadcast(){const state=publicState();render();if(host){for(const [id,c] of connections)sendTo(c,{...state,forId:id})}}
 function sendToAll(){broadcast()}
@@ -837,9 +873,9 @@ function render(){
 }
 function sendAction(action){if(host){handleAction(localUid,action)}else sendTo(hostConn,{type:"ACTION",action})}
 function receiveState(s){if(s.type!=="STATE")return;roomCode=s.code;phase=s.phase;players=s.players;dealer=s.dealer.map(c=>c||{hidden:true});turnPlayer=s.turnPlayer;turnHand=s.turnHand;roundMessage=s.message;roundNumber=s.roundNumber;render()}
-function addConnection(conn){conn.on("open",()=>{connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});toast("Player connected; joining table…")});conn.on("data",msg=>{if(!host)return;if(msg?.type==="JOIN"){if(players.length>=6){sendTo(conn,{type:"ERROR",message:"Room is full"});return}if(players.some(p=>p.id===conn.peer)){connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});sendTo(conn,publicState(conn.peer));return}if(phase!=="LOBBY"){sendTo(conn,{type:"ERROR",message:"This round has already started"});return}players.push({id:conn.peer,name:String(msg.name||"Player").slice(0,18),chips:500,ready:false,done:false,hands:[],activeHand:0});connections.set(conn.peer,conn);broadcast()}else if(msg?.type==="ACTION"){handleAction(conn.peer,msg.action)}else if(msg?.type==="READY"){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){p.ready=true;broadcast()}}else if(msg?.type==="CHAT"){appendChatMessage(conn.peer,msg.text)}});conn.on("close",()=>{connections.delete(conn.peer);if(host){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){players=players.filter(x=>x.id!==conn.peer);broadcast()}else if(p){p.disconnected=true;p.hands.forEach(h=>h.done=true);roundMessage=p.name+" disconnected; their remaining hands are stood.";if(phase==="PLAYING"&&players[turnPlayer]?.id===p.id)advanceTurn();else broadcast()}}});conn.on("error",e=>console.warn("peer connection",e))}
+function addConnection(conn){conn.on("open",()=>{connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});toast("Player connected; joining table…")});conn.on("data",msg=>{if(!host)return;if(msg?.type==="JOIN"){if(players.length>=6){sendTo(conn,{type:"ERROR",message:"Room is full"});return}if(players.some(p=>p.id===conn.peer)){connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});sendTo(conn,publicState(conn.peer));return}if(phase!=="LOBBY"){sendTo(conn,{type:"ERROR",message:"This round has already started"});return}players.push({id:conn.peer,name:String(msg.name||"Player").slice(0,18),chips:500,tokens:100,flair:"",ready:false,done:false,hands:[],activeHand:0});connections.set(conn.peer,conn);broadcast()}else if(msg?.type==="ACTION"){handleAction(conn.peer,msg.action)}else if(msg?.type==="READY"){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){p.ready=true;broadcast()}}else if(msg?.type==="CHAT"){appendChatMessage(conn.peer,msg.text)}});conn.on("close",()=>{connections.delete(conn.peer);if(host){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){players=players.filter(x=>x.id!==conn.peer);broadcast()}else if(p){p.disconnected=true;p.hands.forEach(h=>h.done=true);roundMessage=p.name+" disconnected; their remaining hands are stood.";if(phase==="PLAYING"&&players[turnPlayer]?.id===p.id)advanceTurn();else broadcast()}}});conn.on("error",e=>console.warn("peer connection",e))}
 // Host sends an initial state only after a data channel opens; joining identity is the peer id.
-async function createRoom(){if(!window.BlackjackRelay){status("Multiplayer client failed to load. Refresh and try again.");return}if(peer){peer.destroy()}host=true;roomCode=shuffleRoomCode();localUid=peerId(roomCode);players=[{id:localUid,name:name(),chips:500,ready:true,done:false,hands:[],activeHand:0}];dealer=[];shoe=[];phase="LOBBY";roundMessage="Room created. Share the code with your friends.";connections.clear();setNet("Starting room…");peer=new BlackjackRelay(localUid);peer.on("open",id=>{setNet("Room online");render();toast("Room "+roomCode+" is ready")});peer.on("connection",conn=>addConnection(conn));peer.on("error",e=>{setNet("Connection error");status(e.type==="unavailable-id"?"Room code collision. Please create another room.":e.message);console.error(e)});peer.on("disconnected",()=>{setNet("Signaling interrupted");status("The signaling connection dropped. Trying to reconnect…");try{peer.reconnect()}catch(e){console.warn("Peer reconnect",e)}});peer.on("close",()=>setNet("Offline"));render()}
+async function createRoom(){if(!window.BlackjackRelay){status("Multiplayer client failed to load. Refresh and try again.");return}if(peer){peer.destroy()}host=true;roomCode=shuffleRoomCode();localUid=peerId(roomCode);players=[{id:localUid,name:name(),chips:500,tokens:100,flair:"",ready:true,done:false,hands:[],activeHand:0}];dealer=[];shoe=[];phase="LOBBY";roundMessage="Room created. Share the code with your friends.";connections.clear();setNet("Starting room…");peer=new BlackjackRelay(localUid);peer.on("open",id=>{setNet("Room online");render();toast("Room "+roomCode+" is ready")});peer.on("connection",conn=>addConnection(conn));peer.on("error",e=>{setNet("Connection error");status(e.type==="unavailable-id"?"Room code collision. Please create another room.":e.message);console.error(e)});peer.on("disconnected",()=>{setNet("Signaling interrupted");status("The signaling connection dropped. Trying to reconnect…");try{peer.reconnect()}catch(e){console.warn("Peer reconnect",e)}});peer.on("close",()=>setNet("Offline"));render()}
 async function joinRoom(){
   if(!window.BlackjackRelay){status("Multiplayer client failed to load. Check the page files and refresh.");return}
   const code=$("joinCode").value.trim().toUpperCase();
@@ -1060,7 +1096,7 @@ publicState=function(forId){
 broadcast=function(){if(host)players.forEach(p=>{if(p.chips<=-500)p.name="big fat loser"});render();if(host)for(const [id,c] of connections)sendTo(c,publicState(id));};
 receiveState=function(s){
  if(s.type!=="STATE")return;
- roomCode=s.code;phase=s.phase;gameMode=s.gameMode||"blackjack";players=s.players||[];
+ roomCode=s.code;phase=s.phase;gameMode=s.gameMode||"blackjack";players=s.players||[];players.forEach(p=>{p.tokens=p.tokens??100;p.flair=p.flair||"";});
  dealer=(s.dealer||[]).map(c=>c||{hidden:true});turnPlayer=s.turnPlayer||0;turnHand=s.turnHand||0;
  roundMessage=s.message||"";roundNumber=s.roundNumber||0;chatMessages=Array.isArray(s.chatMessages)?s.chatMessages:[];holdem=s.holdem||null;rouletteNumber=s.rouletteNumber??null;celebration=s.celebration||null;
  if($("gameModeSelect"))$("gameModeSelect").value=gameMode;render();
@@ -1383,6 +1419,57 @@ render=function(){
   polishedPhase=phase;
  }
 };
+
+
+/* Slots use a completely separate token wallet; the host validates every spin and purchase. */
+const SLOT_SYMBOLS=["🍒","🍋","🔔","⭐","💎","7️⃣"];
+function slotsRender(){
+ const dock=$("slotsDock"),me=myPlayer();if(!dock)return;
+ dock.classList.toggle("in-room",!!roomCode);
+ $("slotsTokenCount").textContent=(me?.tokens??100)+" tokens";
+ $("slotsSpin").disabled=!me||!hostConnReady()||(me.tokens??100)<5;
+ $("slotsSpin").textContent=(me?.tokens??100)<5?"Need 5 tokens":"Spin · 5 tokens";
+ $("slotsMessage").textContent=me?.slotMessage||"Play slots while your friends take their turns.";
+ const reels=me?.slotReels||["🍒","⭐","💎"];
+ $("slotsReels").innerHTML=reels.map(x=>'<span class="slot-reel">'+escape(x)+'</span>').join("");
+ document.querySelectorAll("#slotsShop button").forEach(b=>{
+  const active=me?.flair===b.dataset.flair;
+  b.disabled=!me||active||(me.tokens??100)<Number(b.dataset.cost);
+  b.textContent=active?"Equipped":(me?.tokens??100)<Number(b.dataset.cost)?"Need tokens":"Buy & equip";
+ });
+ $("slotsToggle").textContent="🎰 Slots · "+(me?.tokens??100);
+}
+function hostConnReady(){return host||!!(hostConn&&hostConn.open)}
+function slotAction(action){if(!roomCode){toast("Join a room to use slots.");return}if(host)handleAction(localUid,action);else if(hostConn&&hostConn.open)sendTo(hostConn,{type:"ACTION",action});else toast("Connecting to the table…")}
+const handleActionBeforeSlots=handleAction;
+handleAction=function(playerId,action){
+ if(action&&action.kind==="SLOT_SPIN"){
+  if(!host)return;const p=players.find(x=>x.id===playerId);if(!p||(p.tokens??100)<5)return;
+  p.tokens-=5;const reels=Array.from({length:3},()=>SLOT_SYMBOLS[Math.floor(Math.random()*SLOT_SYMBOLS.length)]);
+  const counts=reels.reduce((m,x)=>(m[x]=(m[x]||0)+1,m),{}),best=Math.max(...Object.values(counts));
+  const prize=best===3?100:best===2?15:0;p.tokens+=prize;p.slotReels=reels;
+  p.slotMessage=best===3?"JACKPOT! +100 tokens":best===2?"Nice match! +15 tokens":"No match — try again!";
+  broadcast();return;
+ }
+ if(action&&action.kind==="SHOP_BUY"){
+  if(!host)return;const p=players.find(x=>x.id===playerId),items={"✦":25,"♛":50,"⚡":75,"👑":100};
+  if(!p||!Object.prototype.hasOwnProperty.call(items,action.flair)||p.flair===action.flair||(p.tokens??100)<items[action.flair])return;
+  p.tokens-=items[action.flair];p.flair=action.flair;p.slotMessage=action.flair+" name flair equipped!";broadcast();return;
+ }
+ return handleActionBeforeSlots(playerId,action);
+};
+$("slotsSpin").addEventListener("click",()=>slotAction({kind:"SLOT_SPIN"}));
+$("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("closed");$("slotsToggle").classList.remove("hidden")});
+$("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");$("slotsToggle").classList.add("hidden")});
+document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("click",()=>slotAction({kind:"SHOP_BUY",flair:b.dataset.flair})));
+(function enableSlotsDrag(){
+ const head=$("slotsHead"),dock=$("slotsDock");let drag=null;
+ head.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;const r=dock.getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};head.setPointerCapture(e.pointerId);dock.style.left=r.left+"px";dock.style.top=r.top+"px";dock.style.right="auto";dock.style.bottom="auto";});
+ head.addEventListener("pointermove",e=>{if(!drag)return;const w=dock.offsetWidth,h=dock.offsetHeight;dock.style.left=Math.max(4,Math.min(innerWidth-w-4,e.clientX-drag.x))+"px";dock.style.top=Math.max(4,Math.min(innerHeight-h-4,e.clientY-drag.y))+"px";});
+ const stop=()=>{drag=null};head.addEventListener("pointerup",stop);head.addEventListener("pointercancel",stop);
+})();
+const renderBeforeSlots=render;
+render=function(){renderBeforeSlots();slotsRender()};
 
 const invited=new URLSearchParams(location.search).get("room");if(invited)$("joinCode").value=invited.toUpperCase();render();
 })();
