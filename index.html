@@ -1005,6 +1005,10 @@ async function joinRoom(){
           sendJoin();
           joinRetry=setInterval(sendJoin,1500);
         }
+      }else if(msg?.type==="KICKED"||msg?.type==="ROOM_CLOSED"){
+        clearJoinTimers();
+        const reason=msg.message||"You were removed from the game.";
+        leave();setNet("Removed from game");status(reason);toast(reason);
       }else if(msg?.type==="ERROR"){
         clearJoinTimers();status(msg.message||"The host could not add you to the table.");toast(msg.message||"Unable to join room");
       }else if(msg?.type==="STATE"||msg?.type==="SLOTS"){
@@ -1682,6 +1686,55 @@ document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("cl
   applySize(r.width,r.height,rightGap,bottomGap);
  });
 })();
+/* Remove players once their chip balance reaches the bankruptcy limit. */
+const BANKRUPTCY_LIMIT=-10000;
+let bankruptcyShutdown=false;
+function removeBankruptPlayers(){
+ if(!host||bankruptcyShutdown||!(phase==="LOBBY"||phase==="ROUND_OVER"))return false;
+ const eliminated=players.filter(p=>Number(p.chips)<=BANKRUPTCY_LIMIT);
+ if(!eliminated.length)return false;
+ const eliminatedIds=new Set(eliminated.map(p=>p.id));
+ const hostEliminated=eliminatedIds.has(localUid);
+ const names=eliminated.map(p=>p.name).join(", ");
+ for(const p of eliminated){
+  const conn=connections.get(p.id);
+  if(p.id!==localUid&&conn){
+   sendTo(conn,{type:"KICKED",message:"You hit -10,000 chips and were removed from the game."});
+   connections.delete(p.id);
+   setTimeout(()=>{try{conn.close()}catch(error){}},350);
+  }else if(p.id!==localUid)connections.delete(p.id);
+ }
+ players=players.filter(p=>!eliminatedIds.has(p.id));
+ if(hostEliminated){
+  bankruptcyShutdown=true;
+  const roomMessage="The host reached -10,000 chips and was removed. This room is now closed.";
+  for(const [id,conn] of connections)sendTo(conn,{type:"ROOM_CLOSED",message:roomMessage});
+  const hostMessage="You hit -10,000 chips and were removed. The room is now closed.";
+  setTimeout(()=>{
+   leave();bankruptcyShutdown=false;setNet("Peer connection ready");status(hostMessage);toast(hostMessage);
+  },350);
+  return true;
+ }
+ roundMessage=names+" hit -10,000 chips and "+(eliminated.length===1?"was":"were")+" removed from the game.";
+ toast(roundMessage);
+ if(phase==="LOBBY"){turnPlayer=0;turnHand=0;holdem=null;}
+ return true;
+}
+const broadcastBeforeBankruptcy=broadcast;
+broadcast=function(){
+ if(bankruptcyShutdown){render();return}
+ removeBankruptPlayers();
+ if(bankruptcyShutdown)return;
+ broadcastBeforeBankruptcy();
+};
+const broadcastSlotsBeforeBankruptcy=broadcastSlots;
+broadcastSlots=function(){
+ if(bankruptcyShutdown)return;
+ removeBankruptPlayers();
+ if(bankruptcyShutdown)return;
+ broadcastSlotsBeforeBankruptcy();
+};
+
 const renderBeforeSlots=render;
 render=function(){
  const inRoom=!!roomCode,dock=$("slotsDock");
