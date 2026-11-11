@@ -1303,10 +1303,11 @@ render=function(){
   const sideHtml=(p)=>{
    if(!p)return '<div class="seat"><strong>Open seat</strong><span class="small muted">Waiting for friend</span></div>';
    const mine=p.id===localUid,reveal=phase==="ROUND_OVER"||mine,dealt=Array.isArray(p.holeCards)&&p.holeCards.length===2&&p.holeCards.every(Boolean);
-   const cards=dealt?(reveal?p.holeCards.map(c=>cardHtml(c,false)).join(""):'<div class="card back"></div><div class="card back"></div>'):'';
+   const cards=dealt&&reveal?p.holeCards.map(c=>cardHtml(c,false)).join(""):phase==="PLAYING"?'<div class="card back"></div><div class="card back"></div>':'';
+   const showCards=dealt||phase==="PLAYING";
    const state=phase==="ROUND_OVER"?(p.holdemResult||"Hand complete"):p.folded?"Folded":p.allIn?"All-in":players[holdem?.turnIndex]?.id===p.id?"Acting":"In hand";
    const handName=phase==="ROUND_OVER"?(p.holdemHandName||(p.folded?"Folded":"Showdown")):(mine&&dealt&&(holdem?.board||[]).length>=3?pokerName(bestHoldem(p.holeCards.concat(holdem.board))):"");
-   return '<div class="seat holdem-hand-row '+(players[holdem?.turnIndex]?.id===p.id&&phase==="PLAYING"?"active":"")+'"><strong>'+(p.flair?escape(p.flair)+" ":"")+escape(p.name)+(mine?" · You":"")+'</strong><span class="small muted seat-meta">'+state+'</span>'+(dealt?'<div class="seat-cards">'+cards+'</div>':'<div class="seat-card-hidden">'+(phase==="PLAYING"?"Cards dealt face down":"Waiting for deal")+'</div>')+'<span class="holdem-hand-name">'+escape(handName||(reveal?"—":"Hidden"))+'<span class="small">'+(phase==="ROUND_OVER"?escape(p.holdemResult||""):"")+'</span></span></div>';
+   return '<div class="seat holdem-hand-row '+(players[holdem?.turnIndex]?.id===p.id&&phase==="PLAYING"?"active":"")+'"><strong>'+(p.flair?escape(p.flair)+" ":"")+escape(p.name)+(mine?" · You":"")+'</strong><span class="small muted seat-meta">'+state+'</span>'+(showCards?'<div class="seat-cards">'+cards+'</div>':'<div class="seat-card-hidden">Waiting for deal</div>')+'<span class="holdem-hand-name">'+escape(handName||(reveal?"—":"Hidden"))+'<span class="small">'+(phase==="ROUND_OVER"?escape(p.holdemResult||""):"")+'</span></span></div>';
   };
   const others=players.filter(p=>p.id!==localUid),me=players.find(p=>p.id===localUid);
   const ordered=me?[...others.slice(0,Math.ceil(others.length/2)),me,...others.slice(Math.ceil(others.length/2))]:others;
