@@ -205,7 +205,10 @@ const server = http.createServer((req, res) => {
     await guest.locator("#lobbyChatInput").fill("Hi from the guest.");
     await guest.locator("#lobbyChatSend").click();
     await host.waitForFunction(() => [...document.querySelectorAll("#chatLog .chat-message p")].some(el => el.textContent === "Hi from the guest."), null, { timeout: 10000 });
-    if (await guest.locator("#chatLog .chat-message p").count() !== 2 || await host.locator("#chatLog .chat-message p").count() !== 2) throw new Error("Lobby chat history did not sync to both players");
+    await guest.waitForFunction(() => [...document.querySelectorAll("#chatLog .chat-message p")].some(el => el.textContent === "Hi from the guest."), null, { timeout: 10000 });
+    const hostChat = await host.locator("#chatLog .chat-message p").allTextContents();
+    const guestChat = await guest.locator("#chatLog .chat-message p").allTextContents();
+    if (guestChat.length !== 2 || hostChat.length !== 2) throw new Error("Lobby chat history did not sync to both players: host=" + JSON.stringify(hostChat) + ", guest=" + JSON.stringify(guestChat));
 
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
