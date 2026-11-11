@@ -641,12 +641,22 @@ body[data-theme=kaiju]{
 /* Floating slots arcade and separate cosmetic-token shop. */
 #slotsDock{display:none;position:fixed;z-index:50;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));color:var(--ink);filter:drop-shadow(0 16px 35px #0008)}
 #slotsDock.closed{display:none;width:auto;filter:none}
-#slotsPanel{border:1px solid color-mix(in srgb,var(--gold),transparent 35%);border-radius:17px;background:linear-gradient(145deg,#1b2b25,#0b1511);box-shadow:0 12px 36px #0009;overflow:hidden}
+#slotsPanel{max-height:min(82svh,720px);display:flex;flex-direction:column;border:1px solid color-mix(in srgb,var(--gold),transparent 35%);border-radius:17px;background:linear-gradient(145deg,#1b2b25,#0b1511);box-shadow:0 12px 36px #0009;overflow:hidden}
 #slotsHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;background:linear-gradient(100deg,#e4bd6730,#ffffff08);cursor:grab;touch-action:none;user-select:none}
 #slotsHead:active{cursor:grabbing}#slotsHead strong{color:var(--gold);letter-spacing:.06em}#slotsHead button{min-height:29px;padding:3px 9px}
-#slotsBody{padding:12px;display:grid;gap:10px}#slotsDock.closed #slotsPanel{display:none}
+#slotsBody{padding:12px;display:grid;gap:10px;overflow-y:auto;overscroll-behavior:contain}#slotsDock.closed #slotsPanel{display:none}
 #slotsReels{display:flex;justify-content:center;gap:9px;padding:10px;border:1px solid #ffffff20;border-radius:12px;background:radial-gradient(ellipse,#35533d,#101b16)}
 .slot-reel{display:grid;place-items:center;width:62px;height:58px;border-radius:10px;background:#f7edcf;color:#211b12;font-size:30px;box-shadow:inset 0 0 0 3px #c9a65d,0 4px 9px #0008}
+#slotsReels.spinning{border-color:var(--gold);box-shadow:0 0 18px color-mix(in srgb,var(--gold),transparent 58%),inset 0 0 18px #ffffff22}
+#slotsReels.spinning .slot-reel{transform-style:preserve-3d;animation:slot-reel-roll .95s cubic-bezier(.12,.8,.18,1) both}
+#slotsReels.spinning .slot-reel:nth-child(2){animation-delay:.07s}
+#slotsReels.spinning .slot-reel:nth-child(3){animation-delay:.14s}
+@keyframes slot-reel-roll{
+ 0%{transform:rotateX(0) translateY(0) scale(1);filter:blur(0)}
+ 28%{transform:rotateX(540deg) translateY(-7px) scale(1.04);filter:blur(2px)}
+ 62%{transform:rotateX(1260deg) translateY(6px) scale(.98);filter:blur(1.5px)}
+ 100%{transform:rotateX(1800deg) translateY(0) scale(1);filter:blur(0)}
+}
 #slotsMessage{min-height:34px;text-align:center;color:#e8d8aa;font-size:12px}
 #slotsExchange{border-top:1px solid #ffffff20;padding-top:9px;display:grid;gap:7px}#slotsExchange h4{margin:0;color:var(--gold);font-size:12px;letter-spacing:.08em}#slotsExchange input{width:100%;min-width:0;padding:7px;border-radius:8px;background:#101b16;color:#fff;border:1px solid #ffffff30}#slotsShop{border-top:1px solid #ffffff20;padding-top:9px;display:grid;gap:7px}#slotsShop h4{margin:0;color:var(--gold);font-size:12px;letter-spacing:.08em}
 .slot-shop-row{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:12px}.slot-shop-row button{padding:6px 9px;min-height:31px;font-size:11px}
@@ -736,12 +746,24 @@ body.has-room #slotsDock{display:block}
    <div class="small muted">5 tokens per spin · 3 matching = 100 · 2 matching = 5</div>
    <button id="slotsSpin" class="primary" type="button">Spin · 5 tokens</button>
    <div id="slotsMessage" role="status" aria-live="polite">Play slots while your friends take their turns.</div>
-   <div id="slotsExchange"><h4>CHIP EXCHANGE</h4><div class="small muted">Trade 100 game chips for 10 tokens. Tokens are separate from your betting balance.</div><div class="row"><input id="slotsExchangeAmount" type="number" min="100" step="100" value="100" aria-label="Chips to exchange"><button id="slotsExchangeButton" type="button">Exchange</button></div><div class="small muted" id="slotsCashBalance">Game cash: 500 chips</div></div>
+   <div id="slotsExchange"><h4>CHIP EXCHANGE</h4><div class="small muted">Trade 10 game chips for 100 tokens. Tokens are separate from your betting balance.</div><div class="row"><input id="slotsExchangeAmount" type="number" min="10" step="10" value="10" aria-label="Chips to exchange"><button id="slotsExchangeButton" type="button">Exchange</button></div><div class="small muted" id="slotsCashBalance">Game cash: 500 chips</div></div>
    <div id="slotsShop"><h4>NAME FLAIR SHOP · TOKENS ONLY</h4>
     <div class="slot-shop-row"><span>✦ Starshine · 250</span><button data-flair="✦" data-cost="250">Equip</button></div>
     <div class="slot-shop-row"><span>♛ Royal · 500</span><button data-flair="♛" data-cost="500">Equip</button></div>
     <div class="slot-shop-row"><span>⚡ Voltage · 750</span><button data-flair="⚡" data-cost="750">Equip</button></div>
     <div class="slot-shop-row"><span>👑 Crown · 1,000</span><button data-flair="👑" data-cost="1000">Equip</button></div>
+    <div class="slot-shop-row"><span>🎭 Jester · 800</span><button data-flair="🎭" data-cost="800">Equip</button></div>
+    <div class="slot-shop-row"><span>🌸 Blossom · 650</span><button data-flair="🌸" data-cost="650">Equip</button></div>
+    <div class="slot-shop-row"><span>🌙 Moonlight · 900</span><button data-flair="🌙" data-cost="900">Equip</button></div>
+    <div class="slot-shop-row"><span>🧿 Mystic · 1,100</span><button data-flair="🧿" data-cost="1100">Equip</button></div>
+    <div class="slot-shop-row"><span>🌈 Prism · 1,200</span><button data-flair="🌈" data-cost="1200">Equip</button></div>
+    <div class="slot-shop-row"><span>👾 Glitch · 1,300</span><button data-flair="👾" data-cost="1300">Equip</button></div>
+    <div class="slot-shop-row"><span>💎 Diamond · 1,400</span><button data-flair="💎" data-cost="1400">Equip</button></div>
+    <div class="slot-shop-row"><span>🔥 Inferno · 1,250</span><button data-flair="🔥" data-cost="1250">Equip</button></div>
+    <div class="slot-shop-row"><span>☠️ Reaper · 1,500</span><button data-flair="☠️" data-cost="1500">Equip</button></div>
+    <div class="slot-shop-row"><span>🛡️ Guardian · 1,600</span><button data-flair="🛡️" data-cost="1600">Equip</button></div>
+    <div class="slot-shop-row"><span>🐉 Dragon · 1,800</span><button data-flair="🐉" data-cost="1800">Equip</button></div>
+    <div class="slot-shop-row"><span>🦄 Mythic · 2,200</span><button data-flair="🦄" data-cost="2200">Equip</button></div>
    </div>
   </div>
  </section>
@@ -1435,8 +1457,8 @@ render=function(){
 const SLOT_SYMBOLS=["🍒","🍋","🔔","⭐","💎","7️⃣"];
 function slotsUpdateExchange(){
  const me=myPlayer(),amount=Number($("slotsExchangeAmount").value);
- $("slotsExchangeAmount").max=Math.max(0,Math.floor((me?.chips??0)/100)*100);
- $("slotsExchangeButton").disabled=!me||!hostConnReady()||!Number.isSafeInteger(amount)||amount<100||amount%100!==0||amount>(me.chips??0);
+ $("slotsExchangeAmount").max=Math.max(0,Math.floor((me?.chips??0)/10)*10);
+ $("slotsExchangeButton").disabled=!me||!hostConnReady()||!Number.isSafeInteger(amount)||amount<10||amount%10!==0||amount>(me.chips??0);
 }
 function slotsRender(){
  const dock=$("slotsDock"),me=myPlayer();if(!dock)return;
@@ -1475,11 +1497,11 @@ handleAction=function(playerId,action){
  }
  if(action&&action.kind==="TOKEN_EXCHANGE"){
   if(!host)return;const p=players.find(x=>x.id===playerId),amount=Number(action.chips);
-  if(!p||!Number.isSafeInteger(amount)||amount<100||amount%100!==0||amount>(p.chips??0))return;
-  p.chips-=amount;p.tokens=(p.tokens??0)+(amount/10);p.slotMessage="Exchanged "+amount+" chips for "+(amount/10)+" tokens.";broadcast();return;
+  if(!p||!Number.isSafeInteger(amount)||amount<10||amount%10!==0||amount>(p.chips??0))return;
+  p.chips-=amount;p.tokens=(p.tokens??0)+(amount*10);p.slotMessage="Exchanged "+amount+" chips for "+(amount*10)+" tokens."broadcast();return;
  }
  if(action&&action.kind==="SHOP_BUY"){
-  if(!host)return;const p=players.find(x=>x.id===playerId),items={"✦":250,"♛":500,"⚡":750,"👑":1000};
+  if(!host)return;const p=players.find(x=>x.id===playerId),items={"✦":250,"♛":500,"⚡":750,"👑":1000,"🎭":800,"🌸":650,"🌙":900,"🧿":1100,"🌈":1200,"👾":1300,"💎":1400,"🔥":1250,"☠️":1500,"🛡️":1600,"🐉":1800,"🦄":2200};
   if(!p||!Object.prototype.hasOwnProperty.call(items,action.flair)||p.flair===action.flair||(p.tokens??0)<items[action.flair])return;
   p.tokens-=items[action.flair];p.flair=action.flair;p.slotMessage=action.flair+" name flair equipped!";broadcast();return;
  }
@@ -1487,7 +1509,7 @@ handleAction=function(playerId,action){
 };
 $("slotsExchangeAmount").addEventListener("input",slotsUpdateExchange);
 $("slotsExchangeButton").addEventListener("click",()=>slotAction({kind:"TOKEN_EXCHANGE",chips:Number($("slotsExchangeAmount").value)}));
-$("slotsSpin").addEventListener("click",()=>slotAction({kind:"SLOT_SPIN"}));
+$("slotsSpin").addEventListener("click",()=>{const reels=$("slotsReels");reels.classList.remove("spinning");void reels.offsetWidth;reels.classList.add("spinning");window.setTimeout(()=>reels.classList.remove("spinning"),1050);slotAction({kind:"SLOT_SPIN"})});
 $("slotsMinimize").addEventListener("click",()=>{const minimized=$("slotsDock").classList.toggle("minimized");$("slotsBody").style.display=minimized?"none":"grid";$("slotsMinimize").textContent=minimized?"＋":"−";$("slotsMinimize").setAttribute("aria-label",minimized?"Expand slots":"Minimize slots");$("slotsMinimize").setAttribute("aria-expanded",String(!minimized))});
 $("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("closed");slotsRender()});
 $("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");slotsRender()});
