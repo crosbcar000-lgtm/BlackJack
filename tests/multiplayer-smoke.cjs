@@ -38,6 +38,7 @@ const server = http.createServer((req, res) => {
     }
 
     await host.goto("http://127.0.0.1:4173");
+    if (await host.locator("#slotsDock").isVisible()) throw new Error("Slots dock must stay hidden in the lobby so it cannot block joining");
 
     // Verify responsive layout, keyboard focus, motion polish, and reduced-motion support.
     await host.setViewportSize({ width: 375, height: 812 });
@@ -115,6 +116,7 @@ const server = http.createServer((req, res) => {
     await host.locator("#name").fill("CI Host");
     await host.locator("#create").click();
     await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
+    if (!(await host.locator("#slotsDock").isVisible())) throw new Error("Slots dock should appear after entering a room");
     const code = await host.locator("#roomCode").textContent();
     if (!code || !/^[A-HJ-NP-Z2-9]{6}$/.test(code)) throw new Error("Host did not publish a valid room code");
     const gameFootprint = await host.locator("#gameTable").evaluate(el => ({
@@ -146,8 +148,12 @@ const server = http.createServer((req, res) => {
       if (!(await page.locator("#slotsSpin").isEnabled())) throw new Error("Slots spin should be available with the starting token balance");
       if ((await page.locator("#slotsTokenCount").textContent()).trim() !== "100 tokens") throw new Error("Each player should start with 100 separate slots tokens");
     }
+    await host.locator("#slotsMinimize").click();
+    if (await host.locator("#slotsBody").isVisible() || !(await host.locator("#slotsHead").isVisible())) throw new Error("Slots minimize control did not collapse the arcade to its movable header");
+    await host.locator("#slotsMinimize").click();
+    if (!(await host.locator("#slotsBody").isVisible())) throw new Error("Slots expand control did not restore the arcade");
     await host.locator("#slotsClose").click();
-    if (await host.locator("#slotsPanel").isVisible() || !(await host.locator("#slotsToggle").isVisible())) throw new Error("Slots close/reopen control did not work");
+    if (await host.locator("#slotsPanel").isVisible() || !(await host.locator("#slotsToggle").isVisible())) throw new Error("Slots hide/reopen control did not work");
     await host.locator("#slotsToggle").click();
     if (!(await host.locator("#slotsPanel").isVisible())) throw new Error("Slots mini-tab did not reopen");
     const slotsBefore = await guest.locator("#slotsTokenCount").textContent();
