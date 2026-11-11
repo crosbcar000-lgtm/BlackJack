@@ -873,7 +873,7 @@ function render(){
     const outcomes=p&&phase==="ROUND_OVER"&&p.hands?.length
       ? '<span class="small round-outcome">'+p.hands.map((h,index)=>(p.hands.length>1?"Hand "+(index+1)+": ":"")+escape(h.result||"—")).join(" · ")+'</span>'
       : "";
-    return '<div class="seat '+(playing?"active":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted">'+(p?"🪙 "+p.chips+" · "+(p.ready?"Ready":"Not ready")+(p.id===localUid?" · You":"")+" · ✧ "+(p.tokens??0)+" tokens":"Waiting for friend")+'</span>'+outcomes+'</div>';
+    return '<div class="seat '+(playing?"active":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted seat-meta">'+(p?"🪙 "+p.chips+" · "+(p.ready?"Ready":"Not ready")+(p.id===localUid?" · You":""):"Waiting for friend")+'</span>'+outcomes+'</div>';
   }).join("");
   const hand=me?.hands?.[me.activeHand||0];
   $("myCards").innerHTML=hand?hand.cards.map(c=>cardHtml(c)).join(""):"";
@@ -1127,6 +1127,11 @@ publicState=function(forId){
 };
 broadcast=function(){if(host)players.forEach(p=>{if(p.chips<=-500)p.name="big fat loser"});render();if(host)for(const [id,c] of connections)sendTo(c,publicState(id));};
 receiveState=function(s){
+ if(s.type==="SLOTS"){
+  const updates=new Map((s.players||[]).map(p=>[p.id,p]));
+  players=players.map(p=>{const slot=updates.get(p.id);return slot?{...p,...slot}:p;});
+  slotsRender();slotsUpdateSeatDisplays();return;
+ }
  if(s.type!=="STATE")return;
  roomCode=s.code;phase=s.phase;gameMode=s.gameMode||"blackjack";players=s.players||[];players.forEach(p=>{p.tokens=p.tokens??0;p.flair=p.flair||"";});
  dealer=(s.dealer||[]).map(c=>c||{hidden:true});turnPlayer=s.turnPlayer||0;turnHand=s.turnHand||0;
@@ -1218,7 +1223,7 @@ render=function(){
    if(phase==="LOBBY"&&p.rouletteBet)meta+=" · Bet "+p.rouletteBet.amount;
    if(phase==="ROUND_OVER")outcome='<span class="small round-outcome">'+escape(p.rouletteResult||"No result")+'</span>';
   }
-  return '<div class="seat '+(active?"active":"")+(p&&p.chips<0?" in-debt":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted">'+(p?meta+" · ✧ "+(p.tokens??0)+" tokens":meta)+'</span>'+debt+outcome+'</div>';
+  return '<div class="seat '+(active?"active":"")+(p&&p.chips<0?" in-debt":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted seat-meta">'+meta+'</span>'+debt+outcome+'</div>';
  }).join("");
 };
 createRoom=async function(){
@@ -1483,6 +1488,20 @@ function slotsRender(){
  });
  $("slotsToggle").textContent="🎰 Slots · "+(me?.tokens??0);
 }
+function slotsUpdateSeatDisplays(){
+ document.querySelectorAll("#seats .seat").forEach((seat,index)=>{
+  const p=players[index];if(!p)return;
+  const name=seat.querySelector("strong"),meta=seat.querySelector(".seat-meta");
+  if(name)name.textContent=(p.flair?p.flair+" ":"")+p.name;
+  if(meta)meta.textContent=meta.textContent.replace(/^🪙\\s*-?\\d+/, "🪙 "+p.chips);
+ });
+}
+function broadcastSlots(){
+ if(!host)return;
+ slotsRender();slotsUpdateSeatDisplays();
+ const state={type:"SLOTS",players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,tokens:p.tokens??0,flair:p.flair||"",slotMessage:p.slotMessage||"",slotReels:p.slotReels||["🍒","⭐","💎"]}))};
+ for(const [id,c] of connections)sendTo(c,{...state,forId:id});
+}
 function hostConnReady(){return host||!!(hostConn&&hostConn.open)}
 function slotAction(action){if(!roomCode){toast("Join a room to use slots.");return}if(host)handleAction(localUid,action);else if(hostConn&&hostConn.open)sendTo(hostConn,{type:"ACTION",action});else toast("Connecting to the table…")}
 const handleActionBeforeSlots=handleAction;
@@ -1493,17 +1512,17 @@ handleAction=function(playerId,action){
   const counts=reels.reduce((m,x)=>(m[x]=(m[x]||0)+1,m),{}),best=Math.max(...Object.values(counts));
   const prize=best===3?100:best===2?5:0;p.tokens+=prize;p.slotReels=reels;
   p.slotMessage=best===3?"JACKPOT! +100 tokens":best===2?"Nice match! +5 tokens":"No match — try again!";
-  broadcast();return;
+  broadcastSlots();return;
  }
  if(action&&action.kind==="TOKEN_EXCHANGE"){
   if(!host)return;const p=players.find(x=>x.id===playerId),amount=Number(action.chips);
   if(!p||!Number.isSafeInteger(amount)||amount<10||amount%10!==0||amount>(p.chips??0))return;
-  p.chips-=amount;p.tokens=(p.tokens??0)+(amount*10);p.slotMessage="Exchanged "+amount+" chips for "+(amount*10)+" tokens.";broadcast();return;
+  p.chips-=amount;p.tokens=(p.tokens??0)+(amount*10);p.slotMessage="Exchanged "+amount+" chips for "+(amount*10)+" tokens.";broadcastSlots();return;
  }
  if(action&&action.kind==="SHOP_BUY"){
   if(!host)return;const p=players.find(x=>x.id===playerId),items={"✦":250,"♛":500,"⚡":750,"👑":1000,"🎭":800,"🌸":650,"🌙":900,"🧿":1100,"🌈":1200,"👾":1300,"💎":1400,"🔥":1250,"☠️":1500,"🛡️":1600,"🐉":1800,"🦄":2200};
   if(!p||!Object.prototype.hasOwnProperty.call(items,action.flair)||p.flair===action.flair||(p.tokens??0)<items[action.flair])return;
-  p.tokens-=items[action.flair];p.flair=action.flair;p.slotMessage=action.flair+" name flair equipped!";broadcast();return;
+  p.tokens-=items[action.flair];p.flair=action.flair;p.slotMessage=action.flair+" name flair equipped!";broadcastSlots();return;
  }
  return handleActionBeforeSlots(playerId,action);
 };
