@@ -487,7 +487,7 @@ function startNext(){if(!host||phase!=="ROUND_OVER")return;players=players.filte
 function leave(){if(peer)peer.destroy();peer=null;hostConn=null;connections.clear();roomCode="";host=false;players=[];dealer=[];shoe=[];phase="LOBBY";localUid="";setNet("Peer connection ready");render()}
 $("create").onclick=createRoom;$("join").onclick=joinRoom;$("ready").onclick=ready;$("start").onclick=beginRound;$("next").onclick=startNext;$("hit").onclick=()=>sendAction("HIT");$("stand").onclick=()=>sendAction("STAND");$("double").onclick=()=>sendAction("DOUBLE");$("split").onclick=()=>sendAction("SPLIT");$("leave").onclick=leave;
 $("copyInvite").onclick=async()=>{const url=location.origin+location.pathname+"?room="+roomCode;try{await navigator.clipboard.writeText("Join my Blackjack room: "+url+" — Code: "+roomCode);toast("Invite link and code copied")}catch{toast("Room code: "+roomCode)}};
-document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.onclick=()=>{document.body.dataset.theme=b.dataset.theme;localStorage.setItem("bj-theme",b.dataset.theme);document.querySelectorAll(".theme-grid button[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
+document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.onclick=()=>{document.body.dataset.theme=b.dataset.theme;localStorage.setItem("bj-theme",b.dataset.theme);document.querySelectorAll(".theme-grid button[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render()});
 document.body.dataset.theme=localStorage.getItem("bj-theme")||"royal";document.querySelectorAll(".theme-grid button[data-theme]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.theme===document.body.dataset.theme)));
 
 let gameMode="blackjack",holdem=null,rouletteNumber=null,holdemButtonIndex=0,lastRouletteNumber=null;
@@ -762,7 +762,7 @@ $("holdemCheckCall").onclick=()=>sendAction("CHECK_CALL");
 $("holdemRaise").onclick=()=>sendAction("RAISE");
 $("placeRouletteBet").onclick=()=>sendAction({kind:"ROULETTE_BET",betType:$("rouletteBetType").value,amount:Number($("rouletteAmount").value),number:Number($("rouletteNumber").value)});
 $("rouletteBetType").onchange=()=>{$("rouletteNumber").parentElement.classList.toggle("hidden",$("rouletteBetType").value!=="number")};
-$("cardThemeSelect").onchange=()=>{document.body.dataset.cardTheme=$("cardThemeSelect").value;localStorage.setItem("bj-card-theme",$("cardThemeSelect").value)};
+$("cardThemeSelect").onchange=()=>{document.body.dataset.cardTheme=$("cardThemeSelect").value;localStorage.setItem("bj-card-theme",$("cardThemeSelect").value);render()};
 document.body.dataset.cardTheme=localStorage.getItem("bj-card-theme")||"match";
 $("cardThemeSelect").value=document.body.dataset.cardTheme;$("rouletteNumber").parentElement.classList.add("hidden");
 
