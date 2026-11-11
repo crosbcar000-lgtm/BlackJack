@@ -177,6 +177,7 @@ button:disabled{box-shadow:none;filter:saturate(.5)}
 .holdem-side-seats .seat-cards .card{width:clamp(22px,2.7vw,32px);min-width:clamp(22px,2.7vw,32px);height:clamp(32px,3.8vw,45px);font-size:8px;border-radius:5px}
 .holdem-side-seats .seat-card-hidden{color:var(--muted);font-size:10px;margin-top:2px}
 .holdem-side-seats .holdem-hand-name{font-size:10px;line-height:1.3;text-align:center}
+.holdem-side-seats .holdem-chip-balance{font-size:11px;font-weight:850;line-height:1.2;color:var(--gold);letter-spacing:.02em;text-align:center;margin-top:1px}
 @media(max-width:650px){.holdem-center{margin:0}.holdem-hands-panel{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px;pointer-events:auto}.holdem-side-seats{width:auto;min-width:0;gap:6px}.holdem-side-seats .seat{min-height:82px;padding:7px 4px}.holdem-side-seats .seat strong{font-size:10px}.holdem-side-seats .seat .seat-meta{font-size:9px}.holdem-side-seats .seat-cards .card{width:22px;min-width:22px;height:32px;font-size:7px}}
 .holdem-metrics{gap:clamp(16px,5vw,46px);padding:11px 16px;border:1px solid #ffffff1a;border-radius:16px;background:#00000018}
 .holdem-metrics strong{font-size:22px;text-shadow:0 1px 12px color-mix(in srgb,var(--gold),transparent 65%)}
@@ -1298,7 +1299,7 @@ render=function(){
    const showCards=dealt||phase==="PLAYING";
    const state=phase==="ROUND_OVER"?(p.holdemResult||"Hand complete"):p.folded?"Folded":p.allIn?"All-in":players[holdem?.turnIndex]?.id===p.id?"Acting":"In hand";
    const handName=phase==="ROUND_OVER"?(p.holdemHandName||(p.folded?"Folded":"Showdown")):(mine&&dealt&&(holdem?.board||[]).length>=3?pokerName(bestHoldem(p.holeCards.concat(holdem.board))):"");
-   return '<div class="seat holdem-hand-row '+(players[holdem?.turnIndex]?.id===p.id&&phase==="PLAYING"?"active":"")+'"><strong>'+(p.flair?escape(p.flair)+" ":"")+escape(p.name)+(mine?" · You":"")+'</strong><span class="small muted seat-meta">'+state+'</span>'+(showCards?'<div class="seat-cards">'+cards+'</div>':'<div class="seat-card-hidden">Waiting for deal</div>')+'<span class="holdem-hand-name">'+escape(handName||(reveal?"—":"Hidden"))+'<span class="small">'+(phase==="ROUND_OVER"?escape(p.holdemResult||""):"")+'</span></span></div>';
+   return '<div class="seat holdem-hand-row '+(players[holdem?.turnIndex]?.id===p.id&&phase==="PLAYING"?"active":"")+'"><strong>'+(p.flair?escape(p.flair)+" ":"")+escape(p.name)+(mine?" · You":"")+'</strong><span class="small muted seat-meta">'+state+'</span>'+(showCards?'<div class="seat-cards">'+cards+'</div>':'<div class="seat-card-hidden">Waiting for deal</div>')+'<span class="holdem-chip-balance">'+Number(p.chips??0).toLocaleString()+" chips"+'</span><span class="holdem-hand-name">'+escape(handName||(reveal?"—":"Hidden"))+'<span class="small">'+(phase==="ROUND_OVER"?escape(p.holdemResult||""):"")+'</span></span></div>';
   };
   const others=players.filter(p=>p.id!==localUid),me=players.find(p=>p.id===localUid);
   const ordered=me?[...others.slice(0,Math.ceil(others.length/2)),me,...others.slice(Math.ceil(others.length/2))]:others;
