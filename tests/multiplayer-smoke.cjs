@@ -157,7 +157,12 @@ const server = http.createServer((req, res) => {
     if (await host.locator("#slotsPanel").isVisible() || !(await host.locator("#slotsToggle").isVisible())) throw new Error("Slots hide/reopen control did not work");
     await host.locator("#slotsToggle").click();
     if (!(await host.locator("#slotsPanel").isVisible())) throw new Error("Slots mini-tab did not reopen");
+    await guest.locator("#slotsExchangeAmount").fill("550");
+    if (await guest.locator("#slotsExchangeButton").isEnabled()) throw new Error("Chip exchange should disable an amount larger than the player's balance");
+    await guest.locator("#slotsExchangeAmount").fill("101");
+    if (await guest.locator("#slotsExchangeButton").isEnabled()) throw new Error("Chip exchange should require exact 100-chip increments");
     await guest.locator("#slotsExchangeAmount").fill("100");
+    if (!(await guest.locator("#slotsExchangeButton").isEnabled())) throw new Error("A valid chip exchange should be enabled");
     await guest.locator("#slotsExchangeButton").click();
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "10 tokens", null, { timeout: 10000 });
     if (!(await guest.locator("#slotsCashBalance").textContent()).includes("400 chips")) throw new Error("Chip exchange did not deduct the game cash");
