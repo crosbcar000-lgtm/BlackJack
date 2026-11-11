@@ -165,34 +165,47 @@ const server = http.createServer((req, res) => {
     const dockAfterDrag = await host.locator("#slotsDock").boundingBox();
     if (!dockAfterDrag || dockAfterDrag.x >= dockBeforeDrag.x - 20 || dockAfterDrag.y >= dockBeforeDrag.y - 20) throw new Error("Slots dock did not move when dragging its header: before=" + JSON.stringify(dockBeforeDrag) + ", after=" + JSON.stringify(dockAfterDrag));
     if (dockAfterDrag.x < 0 || dockAfterDrag.y < 0 || dockAfterDrag.x + dockAfterDrag.width > 1280 || dockAfterDrag.y + dockAfterDrag.height > 900) throw new Error("Dragged slots dock moved outside the viewport: " + JSON.stringify(dockAfterDrag));
-    await guest.locator("#slotsExchangeAmount").fill("550");
+    await guest.locator("#slotsExchangeAmount").fill("510");
     if (await guest.locator("#slotsExchangeButton").isEnabled()) throw new Error("Chip exchange should disable an amount larger than the player's balance");
-    await guest.locator("#slotsExchangeAmount").fill("101");
-    if (await guest.locator("#slotsExchangeButton").isEnabled()) throw new Error("Chip exchange should require exact 100-chip increments");
-    await guest.locator("#slotsExchangeAmount").fill("100");
-    if (!(await guest.locator("#slotsExchangeButton").isEnabled())) throw new Error("A valid chip exchange should be enabled");
+    await guest.locator("#slotsExchangeAmount").fill("11");
+    if (await guest.locator("#slotsExchangeButton").isEnabled()) throw new Error("Chip exchange should require exact 10-chip increments");
+    await guest.locator("#slotsExchangeAmount").fill("10");
+    if (!(await guest.locator("#slotsExchangeButton").isEnabled())) throw new Error("A valid 10-chip exchange should be enabled");
     await guest.locator("#slotsExchangeButton").click();
-    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "10 tokens", null, { timeout: 10000 });
-    if (!(await guest.locator("#slotsCashBalance").textContent()).includes("400 chips")) throw new Error("Chip exchange did not deduct the game cash");
-    if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair should remain locked until the player earns substantially more tokens");
+    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "100 tokens", null, { timeout: 10000 });
+    if (!(await guest.locator("#slotsCashBalance").textContent()).includes("490 chips")) throw new Error("10-chip exchange did not deduct game cash correctly");
+    if (!(await guest.locator("#slotsMessage").textContent()).includes("Exchanged 10 chips for 100 tokens")) throw new Error("Token exchange did not award 100 tokens per 10 chips");
+    if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair should remain locked until the player earns enough tokens");
     await host.evaluate(() => {
       const values = [0.1, 0.1, 0.3]; let index = 0;
       Math.random = () => values[index++ % values.length];
     });
     const beforePairMessage = await guest.locator("#slotsMessage").textContent();
     await guest.locator("#slotsSpin").click();
+    const spinning = await guest.locator("#slotsReels").evaluate(el => ({
+      active:el.classList.contains("spinning"),
+      animations:[...el.children].map(reel => getComputedStyle(reel).animationName)
+    }));
+    if (!spinning.active || spinning.animations.some(name => name !== "slot-reel-roll")) throw new Error("Slot reels did not play their spinning animation: " + JSON.stringify(spinning));
     await guest.waitForFunction(before => document.querySelector("#slotsMessage").textContent !== before, beforePairMessage, { timeout: 10000 });
-    if ((await guest.locator("#slotsTokenCount").textContent()).trim() !== "10 tokens") throw new Error("Two-symbol slot payout should return the five-token stake after the five-token spin cost");
+    if ((await guest.locator("#slotsTokenCount").textContent()).trim() !== "100 tokens") throw new Error("Two-symbol slot payout should return the five-token stake after the five-token spin cost");
     if (!(await guest.locator("#slotsMessage").textContent()).includes("Nice match! +5 tokens")) throw new Error("Two-symbol slot payout should return five tokens, not inflate the wallet");
     await host.evaluate(() => { Math.random = () => 0.1; });
     await guest.locator("#slotsSpin").click();
-    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "105 tokens", null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "195 tokens", null, { timeout: 10000 });
     if (!(await guest.locator("#slotsMessage").textContent()).includes("JACKPOT! +100 tokens")) throw new Error("Jackpot reward message did not match the 100-token payout");
+    await guest.locator("#slotsSpin").click();
+    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "290 tokens", null, { timeout: 10000 });
     const starshine = guest.locator('#slotsShop button[data-flair="✦"]');
-    if (await starshine.isEnabled()) throw new Error("Flair became available without sufficient winnings");
-    await starshine.evaluate(el => { el.disabled = false; el.click(); });
-    await guest.waitForTimeout(300);
-    if (await guest.locator("#slotsTokenCount").textContent() !== "105 tokens" || (await guest.locator(".seat").allTextContents()).some(text => text.includes("✦ CI Guest"))) throw new Error("Host accepted an underfunded flair purchase despite the increased shop price");
+    if (!(await starshine.isEnabled())) throw new Error("Starshine should unlock at 250 tokens");
+    await starshine.click();
+    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "40 tokens" && [...document.querySelectorAll(".seat")].some(el => el.textContent.includes("✦ CI Guest")), null, { timeout: 10000 });
+    const crown = guest.locator('#slotsShop button[data-flair="👑"]');
+    await crown.evaluate(el => { el.disabled = false; el.click(); });
+    await guest.waitForTimeout(250);
+    if (await guest.locator("#slotsTokenCount").textContent() !== "40 tokens" || (await guest.locator(".seat").allTextContents()).some(text => text.includes("👑 CI Guest"))) throw new Error("Host accepted an underfunded Crown purchase");
+    const flairCount = await guest.locator("#slotsShop button[data-flair]").count();
+    if (flairCount < 16) throw new Error("The flair shop should offer at least 16 styles, found " + flairCount);
     // The expanded arcade is an intentional overlay; hide it before checking the underlying chat controls.
     await host.locator("#slotsClose").click();
     await guest.locator("#slotsClose").click();
