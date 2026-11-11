@@ -164,6 +164,17 @@ button:disabled{box-shadow:none;filter:saturate(.5)}
 .theme-grid button[aria-pressed=true]::after{font-size:8px;letter-spacing:.1em}
 .theme-grid button:before{width:16px;height:16px;flex-basis:16px}
 #cardThemeSelect{margin-top:3px}
+.holdem-table-layout{display:grid;grid-template-columns:minmax(105px,1fr) minmax(0,3fr) minmax(105px,1fr);gap:clamp(7px,1.5vw,18px);align-items:stretch;width:100%}
+.holdem-center{display:flex;flex-direction:column;gap:13px;min-width:0}
+.holdem-side-seats{display:flex;flex-direction:column;justify-content:space-around;gap:12px;min-width:0}
+.holdem-side-seats .seat{min-width:0;min-height:84px;padding:9px 7px;border:1px solid color-mix(in srgb,var(--gold),transparent 65%);border-radius:15px;background:linear-gradient(145deg,#ffffff12,#00000024);box-shadow:0 7px 16px #0003;text-align:center;overflow-wrap:anywhere}
+.holdem-side-seats .seat strong{font-size:clamp(10px,1.1vw,13px);line-height:1.25}
+.holdem-side-seats .seat .seat-meta{font-size:10px;line-height:1.35}
+.holdem-side-seats .seat.active{border:2px solid var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold),transparent 82%),0 8px 20px #0005}
+.holdem-side-seats .seat-cards{display:flex;justify-content:center;gap:3px;margin-top:7px}
+.holdem-side-seats .seat-cards .card{width:clamp(22px,2.7vw,32px);min-width:clamp(22px,2.7vw,32px);height:clamp(32px,3.8vw,45px);font-size:8px;border-radius:5px}
+.holdem-side-seats .seat-card-hidden{color:var(--muted);font-size:10px;margin-top:6px}
+@media(max-width:650px){.holdem-table-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.holdem-center{grid-column:1/-1;grid-row:1}.holdem-side-seats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.holdem-side-seats .seat{min-height:76px;padding:7px 4px}.holdem-side-seats .seat strong{font-size:10px}.holdem-side-seats .seat .seat-meta{font-size:9px}.holdem-side-seats .seat-cards .card{width:22px;min-width:22px;height:32px;font-size:7px}}
 .holdem-metrics{gap:clamp(16px,5vw,46px);padding:11px 16px;border:1px solid #ffffff1a;border-radius:16px;background:#00000018}
 .holdem-metrics strong{font-size:22px;text-shadow:0 1px 12px color-mix(in srgb,var(--gold),transparent 65%)}
 #holdemHint{text-align:center;max-width:560px;margin:0 auto}
@@ -714,6 +725,9 @@ body.has-room #slotsDock{display:block}
 <div class="actions"><button id="hit">Hit</button><button id="stand">Stand</button><button id="double">Double</button><button id="split">Split</button></div>
 </section>
 <section id="holdemBoard" class="game-board hidden">
+<div class="holdem-table-layout">
+ <div class="holdem-side-seats" id="holdemSeatsLeft" aria-label="Players on left side of table"></div>
+ <div class="holdem-center">
 <div class="zone"><div class="zone-title">Community cards · <span id="holdemStreet">Waiting for deal</span></div><div class="cards" id="communityCards"></div></div>
 <div class="zone"><div class="zone-title">Your hole cards</div><div class="cards" id="myHoleCards"></div></div>
 <div class="holdem-metrics"><div><span class="small muted">POT</span><strong id="holdemPot">0</strong></div><div><span class="small muted">TO CALL</span><strong id="holdemToCall">0</strong></div><div><span class="small muted">YOUR BET</span><strong id="holdemYourBet">0</strong></div></div>
@@ -739,6 +753,9 @@ body.has-room #slotsDock{display:block}
   <div class="small muted hand-guide-note">Aces can be high or low in a straight (A-2-3-4-5).</div>
  </div>
 </details>
+ </div>
+ <div class="holdem-side-seats" id="holdemSeatsRight" aria-label="Players on right side of table"></div>
+</div>
 </section>
 <section id="rouletteBoard" class="game-board hidden">
 <div class="zone"><div class="zone-title">European roulette · 0–36</div><div class="roulette-wheel" id="rouletteWheel"><span id="rouletteResult">?</span></div><div class="small muted" id="rouletteOutcome">Place one bet to join the spin.</div></div>
@@ -913,7 +930,7 @@ function render(){
   const me=myPlayer();
   $("ready").disabled=!me||me.ready||phase!=="LOBBY";
   $("start").disabled=players.length<1||!players.every(p=>p.ready);
-  $("seats").innerHTML=Array.from({length:6},(_,i)=>{
+  const seatMarkup=Array.from({length:6},(_,i)=>{
     const p=players[i];
     const playing=phase==="PLAYING"&&players[turnPlayer]?.id===p?.id;
     const outcomes=p&&phase==="ROUND_OVER"&&p.hands?.length
@@ -1275,6 +1292,21 @@ render=function(){
   }
   return '<div class="seat '+(active?"active":"")+(p&&p.chips<0?" in-debt":"")+'"><strong>'+(p?escape((p.flair?p.flair+" ":"")+p.name):"Open seat")+'</strong><span class="small muted seat-meta">'+meta+'</span>'+debt+outcome+'</div>';
  }).join("");
+ $("seats").innerHTML=seatMarkup;
+ if(gameMode==="holdem"){
+  const sideHtml=(p)=>{
+   if(!p)return '<div class="seat"><strong>Open seat</strong><span class="small muted">Waiting for friend</span></div>';
+   const mine=p.id===localUid,reveal=phase==="ROUND_OVER"||mine,dealt=Array.isArray(p.holeCards)&&p.holeCards.length===2&&p.holeCards.every(Boolean);
+   const cards=dealt?(reveal?p.holeCards.map(c=>cardHtml(c,false)).join(""):'<div class="card back"></div><div class="card back"></div>'):'';
+   const state=phase==="ROUND_OVER"?(p.holdemResult||"Hand complete"):p.folded?"Folded":p.allIn?"All-in":players[holdem?.turnIndex]?.id===p.id?"Acting":"In hand";
+   return '<div class="seat '+(players[holdem?.turnIndex]?.id===p.id&&phase==="PLAYING"?"active":"")+'"><strong>'+(p.flair?escape(p.flair)+" ":"")+escape(p.name)+(mine?" · You":"")+'</strong><span class="small muted seat-meta">'+state+'</span>'+(dealt?'<div class="seat-cards">'+cards+'</div>':'<div class="seat-card-hidden">'+(phase==="PLAYING"?"Cards dealt face down":"Waiting for deal")+'</div>')+(phase==="ROUND_OVER"&&p.holdemHandName?'<span class="small round-outcome">'+escape(p.holdemHandName)+'</span>':'')+'</div>';
+  };
+  const others=players.filter(p=>p.id!==localUid),me=players.find(p=>p.id===localUid);
+  const ordered=me?[...others.slice(0,Math.ceil(others.length/2)),me,...others.slice(Math.ceil(others.length/2))]:others;
+  const split=Math.ceil(ordered.length/2);
+  $("holdemSeatsLeft").innerHTML=ordered.slice(0,split).map(sideHtml).join("")||sideHtml(null);
+  $("holdemSeatsRight").innerHTML=ordered.slice(split).map(sideHtml).join("")||sideHtml(null);
+ }
 };
 createRoom=async function(){
  chatMessages=[];celebration=null;lastCelebrationId="";
