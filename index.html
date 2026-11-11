@@ -640,7 +640,7 @@ body[data-theme=kaiju]{
 
 /* Floating slots arcade and separate cosmetic-token shop. */
 #slotsDock{display:none;position:fixed;z-index:50;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));color:var(--ink);filter:drop-shadow(0 16px 35px #0008)}
-#slotsDock.closed{width:auto;filter:none}
+#slotsDock.closed{display:none;width:auto;filter:none}
 #slotsPanel{border:1px solid color-mix(in srgb,var(--gold),transparent 35%);border-radius:17px;background:linear-gradient(145deg,#1b2b25,#0b1511);box-shadow:0 12px 36px #0009;overflow:hidden}
 #slotsHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;background:linear-gradient(100deg,#e4bd6730,#ffffff08);cursor:grab;touch-action:none;user-select:none}
 #slotsHead:active{cursor:grabbing}#slotsHead strong{color:var(--gold);letter-spacing:.06em}#slotsHead button{min-height:29px;padding:3px 9px}
