@@ -39,6 +39,27 @@ const server = http.createServer((req, res) => {
 
     await host.goto("http://127.0.0.1:4173");
 
+    // Verify responsive layout, keyboard focus, motion polish, and reduced-motion support.
+    await host.setViewportSize({ width: 375, height: 812 });
+    const mobileOverflow = await host.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+    if (mobileOverflow) throw new Error("Mobile layout has horizontal page overflow");
+    const polish = await host.evaluate(() => ({
+      panelAnimation: getComputedStyle(document.querySelector(".panel")).animationName,
+      tableTransition: getComputedStyle(document.querySelector("#gameTable") || document.querySelector(".table")).transitionDuration,
+      focusStyle: getComputedStyle(document.querySelector("button")).outlineStyle,
+      reducedMotionRule: [...document.styleSheets].some(sheet => {
+        try { return [...sheet.cssRules].some(rule => rule.conditionText?.includes("prefers-reduced-motion")); }
+        catch { return false; }
+      })
+    }));
+    if (polish.panelAnimation !== "panel-arrive" || !polish.reducedMotionRule) throw new Error("Visual polish or reduced-motion styles are missing");
+    await host.emulateMedia({ reducedMotion: "reduce" });
+    await host.locator("#create").focus();
+    const reducedDuration = await host.locator("#create").evaluate(el => getComputedStyle(el).transitionDuration);
+    if (!reducedDuration || parseFloat(reducedDuration) > 0.001) throw new Error("Reduced-motion preference is not respected");
+    await host.emulateMedia({ reducedMotion: "no-preference" });
+    await host.setViewportSize({ width: 1280, height: 900 });
+
     // Verify every theme selects correctly and changes the actual table texture.
     const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju"];
     const tableLooks = new Set();
