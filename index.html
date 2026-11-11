@@ -830,8 +830,8 @@ function render(){
   const active=isMyTurn()&&!currentHand()?.done;
   $("hit").disabled=!active;
   $("stand").disabled=!active;
-  $("double").disabled=!active||currentHand().cards.length!==2||myPlayer().chips<currentHand().bet;
-  $("split").disabled=!active||currentHand().cards.length!==2||currentHand().cards[0].r!==currentHand().cards[1].r||myPlayer().chips<currentHand().bet;
+  $("double").disabled=!active||currentHand().cards.length!==2;
+  $("split").disabled=!active||currentHand().cards.length!==2||currentHand().cards[0].r!==currentHand().cards[1].r;
 }
 function sendAction(action){if(host){handleAction(localUid,action)}else sendTo(hostConn,{type:"ACTION",action})}
 function receiveState(s){if(s.type!=="STATE")return;roomCode=s.code;phase=s.phase;players=s.players;dealer=s.dealer.map(c=>c||{hidden:true});turnPlayer=s.turnPlayer;turnHand=s.turnHand;roundMessage=s.message;roundNumber=s.roundNumber;render()}
@@ -1087,6 +1087,15 @@ render=function(){
  renderLobbyChat();
  if(gameMode==="blackjack"){
   renderBlackjack();
+  $("seats").querySelectorAll(".seat").forEach((seat,index)=>{
+   const player=players[index];
+   if(player&&player.chips<0){
+    seat.classList.add("in-debt");
+    const label=document.createElement("span");label.className="debt-callout";
+    label.textContent="🚨 BROKE ALERT · IOU "+Math.abs(player.chips)+" chips";
+    seat.appendChild(label);
+   }
+  });
   const m=$("myCards").querySelectorAll(".card"),d=$("dealerCards").querySelectorAll(".card");
   if(m.length<cardCounts.my)cardCounts.my=0;if(d.length<cardCounts.dealer)cardCounts.dealer=0;
   for(let i=cardCounts.my;i<m.length;i++)m[i].classList.add("deal-in");
@@ -1107,7 +1116,7 @@ render=function(){
   $("holdemActions").classList.toggle("hidden",phase!=="PLAYING");
   $("holdemFold").disabled=!myTurn;$("holdemCheckCall").disabled=!myTurn;
   $("holdemCheckCall").textContent=owe>0?"Call "+Math.min(owe,me?.chips||0):"Check";
-  $("holdemRaise").disabled=!myTurn||!(me?.chips>owe);
+  $("holdemRaise").disabled=!myTurn;
   $("holdemRaise").textContent="Raise +"+Math.max(10,holdem?.lastRaise||10);
   $("holdemHint").textContent=phase==="ROUND_OVER"?(me?.holdemResult||"Hand complete")+(me?.holdemHandName?" · "+me.holdemHandName:""):
    myTurn?"Your turn. Fold, check/call, or raise.":me?.folded?"You folded. Waiting for the hand to finish.":"Waiting for the other players.";

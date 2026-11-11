@@ -180,6 +180,11 @@ const server = http.createServer((req, res) => {
 
     await host.locator("#start").click();
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && !document.querySelector("#split").disabled, null, { timeout: 10000 });
+    const blackjackActionLogic = await host.locator("#double").evaluate(el => ({
+      doubleDisabled:el.disabled,
+      splitDisabled:document.querySelector("#split").disabled
+    }));
+    if (blackjackActionLogic.doubleDisabled || blackjackActionLogic.splitDisabled) throw new Error("Blackjack double/split controls were unexpectedly disabled at the active pair");
     if (!(await host.locator("#chatSidebar").isVisible()) || !(await guest.locator("#chatSidebar").isVisible())) throw new Error("Chat sidebar should stay visible while a hand is active");
     await host.locator("#lobbyChatInput").fill("Host live during the hand.");
     await host.locator("#lobbyChatSend").click();
