@@ -179,8 +179,10 @@ const server = http.createServer((req, res) => {
       const values = [0.1, 0.1, 0.3]; let index = 0;
       Math.random = () => values[index++ % values.length];
     });
+    const beforePairMessage = await guest.locator("#slotsMessage").textContent();
     await guest.locator("#slotsSpin").click();
-    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "10 tokens", null, { timeout: 10000 });
+    await guest.waitForFunction(before => document.querySelector("#slotsMessage").textContent !== before, beforePairMessage, { timeout: 10000 });
+    if ((await guest.locator("#slotsTokenCount").textContent()).trim() !== "10 tokens") throw new Error("Two-symbol slot payout should return the five-token stake after the five-token spin cost");
     if (!(await guest.locator("#slotsMessage").textContent()).includes("Nice match! +5 tokens")) throw new Error("Two-symbol slot payout should return five tokens, not inflate the wallet");
     await host.evaluate(() => { Math.random = () => 0.1; });
     await guest.locator("#slotsSpin").click();
