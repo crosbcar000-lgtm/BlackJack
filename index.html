@@ -1480,7 +1480,7 @@ function slotsRender(){
  $("slotsSpin").textContent=(me?.tokens??0)<5?"Need 5 tokens":"Spin · 5 tokens";
  $("slotsMessage").textContent=me?.slotMessage||"Play slots while your friends take their turns.";
  const reels=me?.slotReels||["🍒","⭐","💎"];
- $("slotsReels").innerHTML=reels.map(x=>'<span class="slot-reel">'+escape(x)+'</span>').join("");
+ if(!$("slotsReels").classList.contains("spinning"))$("slotsReels").innerHTML=reels.map(x=>'<span class="slot-reel">'+escape(x)+'</span>').join("");
  document.querySelectorAll("#slotsShop button").forEach(b=>{
   const active=me?.flair===b.dataset.flair;
   b.disabled=!me||active||(me.tokens??0)<Number(b.dataset.cost);
@@ -1493,7 +1493,7 @@ function slotsUpdateSeatDisplays(){
   const p=players[index];if(!p)return;
   const name=seat.querySelector("strong"),meta=seat.querySelector(".seat-meta");
   if(name)name.textContent=(p.flair?p.flair+" ":"")+p.name;
-  if(meta)meta.textContent=meta.textContent.replace(/^🪙\\s*-?\\d+/, "🪙 "+p.chips);
+  if(meta)meta.textContent=meta.textContent.replace(/^🪙\s*-?\d+/, "🪙 "+p.chips);
  });
 }
 function broadcastSlots(){
@@ -1528,7 +1528,7 @@ handleAction=function(playerId,action){
 };
 $("slotsExchangeAmount").addEventListener("input",slotsUpdateExchange);
 $("slotsExchangeButton").addEventListener("click",()=>slotAction({kind:"TOKEN_EXCHANGE",chips:Number($("slotsExchangeAmount").value)}));
-$("slotsSpin").addEventListener("click",()=>{const reels=$("slotsReels");reels.classList.remove("spinning");void reels.offsetWidth;reels.classList.add("spinning");window.setTimeout(()=>reels.classList.remove("spinning"),1050);slotAction({kind:"SLOT_SPIN"})});
+$("slotsSpin").addEventListener("click",()=>{const reels=$("slotsReels");reels.classList.remove("spinning");void reels.offsetWidth;reels.classList.add("spinning");window.setTimeout(()=>{reels.classList.remove("spinning");slotsRender()},1050);slotAction({kind:"SLOT_SPIN"})});
 $("slotsMinimize").addEventListener("click",()=>{const minimized=$("slotsDock").classList.toggle("minimized");$("slotsBody").style.display=minimized?"none":"grid";$("slotsMinimize").textContent=minimized?"＋":"−";$("slotsMinimize").setAttribute("aria-label",minimized?"Expand slots":"Minimize slots");$("slotsMinimize").setAttribute("aria-expanded",String(!minimized))});
 $("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("closed");slotsRender()});
 $("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");slotsRender()});
