@@ -487,6 +487,54 @@ body[data-theme=kaiju]{
  #gameTable .actions{gap:7px}
  #gameTable .actions button{min-width:0;flex:1;padding:9px 8px}
 }
+
+/* Compact in-room framing keeps round controls above the fold on laptops. */
+.wrap.is-in-room{padding-top:10px;padding-bottom:18px}
+.wrap.is-in-room .top{padding-bottom:8px}
+.wrap.is-in-room .app-tabs{margin-top:7px;margin-bottom:11px;padding-bottom:7px}
+.wrap.is-in-room #roomPanel{padding:clamp(10px,1.5vw,16px);border-radius:18px}
+.wrap.is-in-room #roomPanel>.divider{margin:9px 0}
+#gameTable{min-height:clamp(420px,calc(100svh - 385px),570px);padding:clamp(14px,2vw,26px);gap:12px}
+#gameTable .game-board{gap:clamp(10px,1.4vh,17px)}
+#gameTable .zone{gap:5px}
+#gameTable .cards{min-height:clamp(88px,10vh,118px);margin:4px 6px;gap:clamp(7px,.8vw,12px)}
+#gameTable .card{width:clamp(60px,4.8vw,74px);height:clamp(86px,6.8vw,104px);padding:6px}
+#gameTable .card .suit{font-size:clamp(25px,2.1vw,32px)}
+#gameTable .actions button{min-height:43px;padding:9px 17px}
+#gameTable #resultBanner{padding:10px 20px;font-size:clamp(22px,3vw,30px)}
+#gameTable .round-controls{margin-top:0;padding:9px 12px;gap:9px;border:1px solid #ffffff25;border-radius:14px;background:linear-gradient(110deg,#0003,#ffffff0a);box-shadow:inset 0 1px #ffffff0c,0 7px 20px #0002}
+#gameTable .round-controls button{min-width:116px;min-height:44px;font-size:14px;letter-spacing:.01em}
+#gameTable .round-controls #start:not(:disabled),#gameTable .round-controls #next:not(.hidden){background:var(--gold);color:#181713;border-color:transparent;box-shadow:0 5px 18px color-mix(in srgb,var(--gold),transparent 78%)}
+#gameTable .round-controls #next:not(.hidden)::before{content:"↻";margin-right:7px;font-size:16px}
+#seats{gap:10px}
+#seats .seat{min-height:72px;padding:11px 13px;border-style:solid;border-color:#ffffff2b;background:linear-gradient(145deg,#ffffff0b,#0000000c);box-shadow:inset 0 1px #ffffff0a}
+#seats .seat strong{font-size:14px;letter-spacing:.01em}
+#seats .seat .small{font-size:12px;line-height:1.5}
+#seats .seat.active{border-color:var(--gold);background:linear-gradient(135deg,color-mix(in srgb,var(--gold),transparent 86%),#ffffff08);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold),transparent 72%),0 5px 16px #0002}
+#roomPanel>.row:first-child .code{font-size:clamp(22px,3vw,28px)}
+@media(max-width:820px){
+ #gameTable{min-height:clamp(400px,calc(100svh - 340px),490px);padding:13px;gap:10px}
+ #gameTable .game-board{gap:10px}
+ #gameTable .cards{min-height:94px}
+ #gameTable .round-controls{padding:8px;gap:7px}
+ #gameTable .round-controls button{min-width:96px}
+ #seats{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+}
+@media(max-width:520px){
+ #gameTable{min-height:clamp(400px,calc(100svh - 325px),470px);padding:11px}
+ #gameTable .card{width:clamp(53px,12.5vw,65px);height:clamp(77px,18vw,94px)}
+ #gameTable .round-controls{width:100%}
+ #gameTable .round-controls button{min-width:0;flex:1;padding:8px 9px;font-size:13px}
+ #seats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-height:760px) and (min-width:821px){
+ .wrap.is-in-room{padding-top:6px}
+ #gameTable{min-height:420px;padding:12px;gap:8px}
+ #gameTable .game-board{gap:8px}
+ #gameTable .cards{min-height:84px}
+ #gameTable .card{height:82px;width:58px}
+ #gameTable .round-controls{padding:7px}
+}
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -518,7 +566,7 @@ body[data-theme=kaiju]{
 </section>
 <div class="result-banner hidden" id="resultBanner" role="status" aria-live="polite"></div>
 <div class="status" id="gameStatus" aria-live="polite">Waiting for players…</div>
-<div class="actions"><button class="primary" id="ready">Ready</button><button id="start">Start round</button><button id="next" class="hidden">Next round</button></div>
+<div class="actions round-controls"><button class="primary" id="ready">Ready</button><button id="start">Start round</button><button id="next" class="primary hidden">Next round</button></div>
 </div>
 <div class="divider"></div><div class="row"><h3>Players</h3><span class="muted small">Maximum 6 seats</span></div><div class="seats" id="seats"></div></section>
 <details class="rules-dropdown" id="rulesDropdown">
