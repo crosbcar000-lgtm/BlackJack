@@ -563,6 +563,23 @@ body[data-theme=kaiju]{
 /* A transformed animated panel would become the fixed dock's containing block. */
 .wrap.is-in-room #roomPanel{animation:none!important;transform:none!important}
 /* build stamp: persistent round-action dock */
+
+/* Room lobby chat: compact, readable, and visually distinct from the felt. */
+.lobby-chat{margin-top:14px;padding:15px 17px;border:1px solid #ffffff22;border-radius:17px;background:linear-gradient(135deg,#ffffff0a,transparent 55%),var(--panel);box-shadow:0 10px 25px #0002}
+.lobby-chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.lobby-chat-head h3{margin:0;font-size:15px}
+.lobby-chat-head .small{font-size:11px}
+#chatLog{height:132px;max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:10px 11px;border:1px solid #ffffff15;border-radius:12px;background:#0002;scrollbar-width:thin;overscroll-behavior:contain}
+.chat-empty{margin:auto;color:var(--muted);font-size:12px;text-align:center}
+.chat-message{display:grid;grid-template-columns:auto 1fr;gap:3px 8px;align-items:baseline;min-width:0}
+.chat-message-head{display:flex;align-items:baseline;gap:7px;min-width:0}
+.chat-message strong{font-size:12px;color:var(--gold);overflow-wrap:anywhere}
+.chat-message time{font-size:10px;color:var(--muted);white-space:nowrap}
+.chat-message p{grid-column:1/-1;margin:0;color:var(--ink);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+.chat-form{display:flex;gap:8px;margin-top:9px;align-items:center}
+.chat-form input{flex:1;min-width:0;min-height:42px;padding:9px 12px}
+.chat-form button{min-width:76px;min-height:42px;padding:8px 14px}
+@media(max-width:520px){.lobby-chat{padding:12px}.chat-form{gap:6px}.chat-form button{min-width:68px}}
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -596,7 +613,15 @@ body[data-theme=kaiju]{
 <div class="status" id="gameStatus" aria-live="polite">Waiting for players…</div>
 </div>
 <div class="actions round-controls" id="roundControls"><button class="primary" id="ready">Ready</button><button id="start">Start round</button><button id="next" class="primary hidden">Next round</button></div>
-<div class="divider"></div><div class="row"><h3>Players</h3><span class="muted small">Maximum 6 seats</span></div><div class="seats" id="seats"></div></section>
+<div class="divider"></div><div class="row"><h3>Players</h3><span class="muted small">Maximum 6 seats</span></div><div class="seats" id="seats"></div>
+<section class="lobby-chat" id="lobbyChat" aria-label="Lobby chat">
+ <div class="lobby-chat-head"><h3>Lobby chat</h3><span class="small muted">Messages shared with everyone in this room</span></div>
+ <div id="chatLog" role="log" aria-live="polite" aria-relevant="additions text"><div class="chat-empty">Say hello while everyone gets ready.</div></div>
+ <form class="chat-form" id="lobbyChatForm">
+  <input id="lobbyChatInput" type="text" maxlength="240" autocomplete="off" placeholder="Message your table…" aria-label="Chat message">
+  <button id="lobbyChatSend" class="primary" type="submit">Send</button>
+ </form>
+</section></section>
 <details class="rules-dropdown" id="rulesDropdown">
 <summary><span>Game rules</span><span class="rules-hint">How to play this mode</span></summary>
 <div class="rules-content"><p class="rules" id="rulesText">Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.</p><p class="rules">No real money, cash value, or prizes.</p></div>
@@ -615,6 +640,7 @@ body[data-theme=kaiju]{
 <script>
 (()=>{"use strict";
 const $=id=>document.getElementById(id);let peer=null,host=false,hostConn=null,connections=new Map(),roomCode="",players=[],dealer=[],shoe=[],phase="LOBBY",turnPlayer=0,turnHand=0,roundMessage="Waiting for players…",roundNumber=0,localUid="",dealerRevealed=false,roomClosed=false;
+let chatMessages=[];
 const suits=["♠","♥","♦","♣"],ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 const uid=()=>Math.random().toString(36).slice(2,11);const name=()=>($("name").value.trim().slice(0,18)||"Player");
 function toast(s){$("toast").textContent=s;$("toast").classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.add("hidden"),3200)}
@@ -741,7 +767,7 @@ function render(){
 }
 function sendAction(action){if(host){handleAction(localUid,action)}else sendTo(hostConn,{type:"ACTION",action})}
 function receiveState(s){if(s.type!=="STATE")return;roomCode=s.code;phase=s.phase;players=s.players;dealer=s.dealer.map(c=>c||{hidden:true});turnPlayer=s.turnPlayer;turnHand=s.turnHand;roundMessage=s.message;roundNumber=s.roundNumber;render()}
-function addConnection(conn){conn.on("open",()=>{connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});toast("Player connected; joining table…")});conn.on("data",msg=>{if(!host)return;if(msg?.type==="JOIN"){if(players.length>=6){sendTo(conn,{type:"ERROR",message:"Room is full"});return}if(players.some(p=>p.id===conn.peer)){connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});sendTo(conn,publicState(conn.peer));return}if(phase!=="LOBBY"){sendTo(conn,{type:"ERROR",message:"This round has already started"});return}players.push({id:conn.peer,name:String(msg.name||"Player").slice(0,18),chips:500,ready:false,done:false,hands:[],activeHand:0});connections.set(conn.peer,conn);broadcast()}else if(msg?.type==="ACTION"){handleAction(conn.peer,msg.action)}else if(msg?.type==="READY"){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){p.ready=true;broadcast()}}});conn.on("close",()=>{connections.delete(conn.peer);if(host){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){players=players.filter(x=>x.id!==conn.peer);broadcast()}else if(p){p.disconnected=true;p.hands.forEach(h=>h.done=true);roundMessage=p.name+" disconnected; their remaining hands are stood.";if(phase==="PLAYING"&&players[turnPlayer]?.id===p.id)advanceTurn();else broadcast()}}});conn.on("error",e=>console.warn("peer connection",e))}
+function addConnection(conn){conn.on("open",()=>{connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});toast("Player connected; joining table…")});conn.on("data",msg=>{if(!host)return;if(msg?.type==="JOIN"){if(players.length>=6){sendTo(conn,{type:"ERROR",message:"Room is full"});return}if(players.some(p=>p.id===conn.peer)){connections.set(conn.peer,conn);sendTo(conn,{type:"WELCOME",id:conn.peer});sendTo(conn,publicState(conn.peer));return}if(phase!=="LOBBY"){sendTo(conn,{type:"ERROR",message:"This round has already started"});return}players.push({id:conn.peer,name:String(msg.name||"Player").slice(0,18),chips:500,ready:false,done:false,hands:[],activeHand:0});connections.set(conn.peer,conn);broadcast()}else if(msg?.type==="ACTION"){handleAction(conn.peer,msg.action)}else if(msg?.type==="READY"){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){p.ready=true;broadcast()}}else if(msg?.type==="CHAT"){appendChatMessage(conn.peer,msg.text)}});conn.on("close",()=>{connections.delete(conn.peer);if(host){const p=players.find(p=>p.id===conn.peer);if(p&&phase==="LOBBY"){players=players.filter(x=>x.id!==conn.peer);broadcast()}else if(p){p.disconnected=true;p.hands.forEach(h=>h.done=true);roundMessage=p.name+" disconnected; their remaining hands are stood.";if(phase==="PLAYING"&&players[turnPlayer]?.id===p.id)advanceTurn();else broadcast()}}});conn.on("error",e=>console.warn("peer connection",e))}
 // Host sends an initial state only after a data channel opens; joining identity is the peer id.
 async function createRoom(){if(!window.BlackjackRelay){status("Multiplayer client failed to load. Refresh and try again.");return}if(peer){peer.destroy()}host=true;roomCode=shuffleRoomCode();localUid=peerId(roomCode);players=[{id:localUid,name:name(),chips:500,ready:true,done:false,hands:[],activeHand:0}];dealer=[];shoe=[];phase="LOBBY";roundMessage="Room created. Share the code with your friends.";connections.clear();setNet("Starting room…");peer=new BlackjackRelay(localUid);peer.on("open",id=>{setNet("Room online");render();toast("Room "+roomCode+" is ready")});peer.on("connection",conn=>addConnection(conn));peer.on("error",e=>{setNet("Connection error");status(e.type==="unavailable-id"?"Room code collision. Please create another room.":e.message);console.error(e)});peer.on("disconnected",()=>{setNet("Signaling interrupted");status("The signaling connection dropped. Trying to reconnect…");try{peer.reconnect()}catch(e){console.warn("Peer reconnect",e)}});peer.on("close",()=>setNet("Offline"));render()}
 async function joinRoom(){
@@ -749,7 +775,7 @@ async function joinRoom(){
   const code=$("joinCode").value.trim().toUpperCase();
   if(!/^[A-HJ-NP-Z2-9]{6}$/.test(code)){status("Enter a valid 6-character room code.");return}
   if(peer)peer.destroy();
-  host=false;roomCode=code;localUid="";hostConn=null;setNet("Connecting…");status("Contacting room "+code+"…");
+  host=false;roomCode=code;localUid="";hostConn=null;chatMessages=[];setNet("Connecting…");status("Contacting room "+code+"…");
   let gotState=false,welcomed=false,joinAttempts=0,joinRetry=null,joinTimeout=null;
   const clearJoinTimers=()=>{if(joinRetry)clearInterval(joinRetry);if(joinTimeout)clearTimeout(joinTimeout);joinRetry=null;joinTimeout=null};
   const sendJoin=()=>{
@@ -855,8 +881,55 @@ function setBanner(net,detail){
  b.className="result-banner show "+kind;
  b.innerHTML="<strong>"+(net>0?"YOU WON!":net<0?"YOU LOST":"PUSH")+"</strong><span class=\"result-detail\">"+escape(detail||"")+"</span>";
 }
+
+function appendChatMessage(playerId,rawText){
+ if(!host||!["LOBBY","ROUND_OVER"].includes(phase))return;
+ const player=players.find(p=>p.id===playerId);
+ const text=String(rawText??"").replace(/\\s+/g," ").trim().slice(0,240);
+ if(!player||!text)return;
+ chatMessages.push({id:uid(),playerId,name:player.name,text,at:Date.now()});
+ if(chatMessages.length>60)chatMessages.splice(0,chatMessages.length-60);
+ broadcast();
+}
+function sendLobbyChat(event){
+ if(event)event.preventDefault();
+ const input=$("lobbyChatInput"),text=input.value.trim();
+ if(!text)return;
+ if(!["LOBBY","ROUND_OVER"].includes(phase)){toast("Chat is available between rounds.");return}
+ if(host)appendChatMessage(localUid,text);
+ else if(hostConn&&hostConn.open)sendTo(hostConn,{type:"CHAT",text:text.slice(0,240)});
+ else {toast("Chat is still connecting.");return}
+ input.value="";
+ input.focus();
+}
+function renderLobbyChat(){
+ const log=$("chatLog"),input=$("lobbyChatInput"),send=$("lobbyChatSend");
+ if(!log||!input||!send)return;
+ const available=["LOBBY","ROUND_OVER"].includes(phase);
+ const ready=host||!!(hostConn&&hostConn.open);
+ input.disabled=!available||!ready;send.disabled=!available||!ready;
+ const nearBottom=log.scrollHeight-log.scrollTop-log.clientHeight<36;
+ log.replaceChildren();
+ if(!chatMessages.length){
+  const empty=document.createElement("div");empty.className="chat-empty";empty.textContent="Say hello while everyone gets ready.";log.appendChild(empty);
+ }else{
+  chatMessages.slice(-60).forEach(message=>{
+   const item=document.createElement("div");item.className="chat-message";
+   const head=document.createElement("div");head.className="chat-message-head";
+   const who=document.createElement("strong");who.textContent=message.name||"Player";
+   const time=document.createElement("time");time.dateTime=new Date(message.at||Date.now()).toISOString();
+   time.textContent=new Date(message.at||Date.now()).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+   head.append(who,time);
+   const body=document.createElement("p");body.textContent=message.text||"";
+   item.append(head,body);log.appendChild(item);
+  });
+ }
+ if(nearBottom)log.scrollTop=log.scrollHeight;
+}
+$("lobbyChatForm").addEventListener("submit",sendLobbyChat);
+
 publicState=function(forId){
- return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,gameMode,
+ return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,gameMode,chatMessages:chatMessages.slice(-60),
  players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,ready:p.ready,done:p.done,
  hands:(p.hands||[]).map(h=>({cards:h.cards,bet:h.bet,done:h.done,result:h.result})),activeHand:p.activeHand,
  holeCards:p.holeCards?(gameMode==="holdem"&&phase!=="ROUND_OVER"&&p.id!==forId?p.holeCards.map(()=>null):p.holeCards):null,
@@ -873,7 +946,7 @@ receiveState=function(s){
  if(s.type!=="STATE")return;
  roomCode=s.code;phase=s.phase;gameMode=s.gameMode||"blackjack";players=s.players||[];
  dealer=(s.dealer||[]).map(c=>c||{hidden:true});turnPlayer=s.turnPlayer||0;turnHand=s.turnHand||0;
- roundMessage=s.message||"";roundNumber=s.roundNumber||0;holdem=s.holdem||null;rouletteNumber=s.rouletteNumber??null;
+ roundMessage=s.message||"";roundNumber=s.roundNumber||0;chatMessages=Array.isArray(s.chatMessages)?s.chatMessages:[];holdem=s.holdem||null;rouletteNumber=s.rouletteNumber??null;
  if($("gameModeSelect"))$("gameModeSelect").value=gameMode;render();
 };
 render=function(){
@@ -895,6 +968,8 @@ render=function(){
  $("holdemBoard").classList.toggle("hidden",gameMode!=="holdem");
  $("rouletteBoard").classList.toggle("hidden",gameMode!=="roulette");
  updateRulesText(gameMode);
+ $("lobbyChat").classList.toggle("hidden",phase==="PLAYING"||phase==="DEALER");
+ renderLobbyChat();
  if(gameMode==="blackjack"){
   renderBlackjack();
   const m=$("myCards").querySelectorAll(".card"),d=$("dealerCards").querySelectorAll(".card");
@@ -950,6 +1025,7 @@ render=function(){
  }).join("");
 };
 createRoom=async function(){
+ chatMessages=[];
  gameMode=$("gameModeSelect").value||"blackjack";holdem=null;rouletteNumber=null;lastRouletteNumber=null;holdemButtonIndex=0;
  await createBlackjackRoom();if(gameMode==="roulette"&&players[0])players[0].ready=false;render();
 };
@@ -959,16 +1035,35 @@ beginRound=function(){
  if(gameMode==="holdem")beginHoldemRound();else spinRouletteRound();
 };
 startNext=function(){
- if(gameMode==="blackjack"){nextBlackjackRound();return}
  if(!host||phase!=="ROUND_OVER")return;
  players=players.filter(p=>!p.disconnected);dealer=[];shoe=[];turnPlayer=0;turnHand=0;
  rouletteNumber=null;lastRouletteNumber=null;holdem=null;
  players.forEach(p=>{
   p.hands=[];p.holeCards=null;p.streetBet=0;p.committed=0;p.folded=false;p.allIn=false;p.acted=false;
-  p.holdemResult="";p.holdemHandName="";p.roundNet=0;p.rouletteBet=null;p.rouletteResult="";
-  p.ready=gameMode==="holdem";
+  p.holdemResult="";p.holdemHandName="";p.roundNet=0;
+  p.ready=true;
  });
- phase="LOBBY";roundMessage=gameMode==="holdem"?"Ready for the next hand.":"Place your bets for the next spin.";broadcast();
+ phase="LOBBY";
+ if(gameMode==="blackjack"){
+  roundMessage="Dealing round "+(roundNumber+1)+"…";
+  beginBlackjackRound();
+  return;
+ }
+ if(gameMode==="holdem"){
+  roundMessage="Dealing the next hand…";
+  beginHoldemRound();
+  return;
+ }
+ const canRepeatRoulette=players.length>0&&players.every(p=>p.rouletteBet&&p.chips>=p.rouletteBet.amount);
+ if(canRepeatRoulette){
+  players.forEach(p=>{p.chips-=p.rouletteBet.amount;p.rouletteResult="";});
+  roundMessage="Repeating everyone's previous roulette bets…";
+  spinRouletteRound();
+  return;
+ }
+ players.forEach(p=>{p.rouletteBet=null;p.rouletteResult="";p.ready=false;});
+ roundMessage="Some players need to choose a new roulette bet. Place bets, then spin.";
+ broadcast();
 };
 handleAction=function(playerId,action){
  if(gameMode==="blackjack"){handleBlackjackAction(playerId,action);return}
