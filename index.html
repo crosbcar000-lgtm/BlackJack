@@ -993,39 +993,41 @@ $("settingsTab").onclick=()=>activateTab("settings");
 $("gameModeSelect").onchange=()=>updateRulesText($("gameModeSelect").value);
 
 const cardCounts={my:0,dealer:0,community:0,hole:0};
-let dealerRevealKey="";
+let dealerRevealKey="",dealerRevealAnimationEpoch=0;
 function animateDealerReveal(){
  if(phase!=="ROUND_OVER")return;
  const root=$("dealerCards"),key=roomCode+":"+roundNumber;
+ const fronts=Array.from(root.children).map((front,index)=>({front,index})).filter(item=>item.index>0&&item.front.classList.contains("card"));
+ if(!fronts.length)return;
  const shouldAnimate=dealerRevealKey!==key;
- if(shouldAnimate)dealerRevealKey=key;
- Array.from(root.children).forEach((front,index)=>{
-  if(index===0||!front.classList.contains("card"))return;
+ if(!shouldAnimate){
+  fronts.forEach(({front})=>{
+   const width=Math.round(front.getBoundingClientRect().width)||55;
+   const height=Math.round(front.getBoundingClientRect().height)||79;
+   const face=front.cloneNode(true);face.classList.remove("deal-in");face.classList.add("dealer-flip-face");
+   const back=document.createElement("div");back.className="card back dealer-flip-back";back.setAttribute("aria-label","Face-down card");
+   const inner=document.createElement("div");inner.className="dealer-flip-inner";inner.append(face,back);
+   const scene=document.createElement("div");scene.className="dealer-flip-scene is-flipped";
+   scene.style.width=width+"px";scene.style.height=height+"px";scene.dataset.reveal="complete";
+   scene.setAttribute("role","group");scene.setAttribute("aria-label","Dealer revealed card");scene.appendChild(inner);
+   front.replaceWith(scene);
+  });
+  return;
+ }
+ const epoch=++dealerRevealAnimationEpoch;let finalDelay=90;
+ fronts.forEach(({front,index})=>{
   const width=Math.round(front.getBoundingClientRect().width)||55;
   const height=Math.round(front.getBoundingClientRect().height)||79;
-  const face=front.cloneNode(true);
-  face.classList.remove("deal-in");
-  face.classList.add("dealer-flip-face");
-  const back=document.createElement("div");
-  back.className="card back dealer-flip-back";
-  back.setAttribute("aria-label","Face-down card");
-  const inner=document.createElement("div");
-  inner.className="dealer-flip-inner";
-  inner.append(face,back);
-  const scene=document.createElement("div");
-  scene.className="dealer-flip-scene";
-  scene.style.width=width+"px";
-  scene.style.height=height+"px";
-  scene.dataset.reveal=shouldAnimate?"animated":"complete";
-  scene.setAttribute("role","group");
-  scene.setAttribute("aria-label","Dealer revealed card");
-  scene.appendChild(inner);
-  if(!shouldAnimate)scene.classList.add("is-flipped");
-  front.replaceWith(scene);
-  if(shouldAnimate){
-   window.setTimeout(()=>scene.classList.add("is-flipped"),90+(index-1)*230);
-  }
+  const face=front.cloneNode(true);face.classList.remove("deal-in");face.classList.add("dealer-flip-face");
+  const back=document.createElement("div");back.className="card back dealer-flip-back";back.setAttribute("aria-label","Face-down card");
+  const inner=document.createElement("div");inner.className="dealer-flip-inner";inner.append(face,back);
+  const scene=document.createElement("div");scene.className="dealer-flip-scene";
+  scene.style.width=width+"px";scene.style.height=height+"px";scene.dataset.reveal="animated";
+  scene.setAttribute("role","group");scene.setAttribute("aria-label","Dealer revealed card");scene.appendChild(inner);
+  const delay=90+(index-1)*230;finalDelay=Math.max(finalDelay,delay);
+  front.replaceWith(scene);window.setTimeout(()=>scene.classList.add("is-flipped"),delay);
  });
+ window.setTimeout(()=>{if(dealerRevealAnimationEpoch===epoch)dealerRevealKey=key},finalDelay+850);
 }
 const renderBlackjack=render,createBlackjackRoom=createRoom,nextBlackjackRound=startNext,handleBlackjackAction=handleAction;
 let beginBlackjackRound=beginRound;
