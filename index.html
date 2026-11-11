@@ -1314,6 +1314,9 @@ render=function(){
   const split=Math.ceil(ordered.length/2);
   $("holdemSeatsLeft").innerHTML=ordered.slice(0,split).map(sideHtml).join("")||sideHtml(null);
   $("holdemSeatsRight").innerHTML=ordered.slice(split).map(sideHtml).join("")||sideHtml(null);
+ }else{
+  $("holdemSeatsLeft").innerHTML="";
+  $("holdemSeatsRight").innerHTML="";
  }
 };
 createRoom=async function(){
