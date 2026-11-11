@@ -1082,7 +1082,7 @@ $("lobbyChatForm").addEventListener("submit",sendLobbyChat);
 
 publicState=function(forId){
  return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,gameMode,chatMessages:chatMessages.slice(-60),
- players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,ready:p.ready,done:p.done,
+ players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,tokens:p.tokens??100,flair:p.flair||"",slotMessage:p.slotMessage||"",slotReels:p.slotReels||["🍒","⭐","💎"],ready:p.ready,done:p.done,
  hands:(p.hands||[]).map(h=>({cards:h.cards,bet:h.bet,done:h.done,result:h.result})),activeHand:p.activeHand,
  holeCards:p.holeCards?(gameMode==="holdem"&&phase!=="ROUND_OVER"&&p.id!==forId?p.holeCards.map(()=>null):p.holeCards):null,
  streetBet:p.streetBet||0,committed:p.committed||0,folded:!!p.folded,allIn:!!p.allIn,acted:!!p.acted,
