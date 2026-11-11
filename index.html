@@ -1484,7 +1484,7 @@ handleAction=function(playerId,action){
 $("slotsExchangeAmount").addEventListener("input",slotsUpdateExchange);
 $("slotsExchangeButton").addEventListener("click",()=>slotAction({kind:"TOKEN_EXCHANGE",chips:Number($("slotsExchangeAmount").value)}));
 $("slotsSpin").addEventListener("click",()=>slotAction({kind:"SLOT_SPIN"}));
-$("slotsMinimize").addEventListener("click",()=>{const minimized=$("slotsDock").classList.toggle("minimized");$("slotsMinimize").textContent=minimized?"＋":"−";$("slotsMinimize").setAttribute("aria-label",minimized?"Expand slots":"Minimize slots");$("slotsMinimize").setAttribute("aria-expanded",String(!minimized))});
+$("slotsMinimize").addEventListener("click",()=>{const minimized=$("slotsDock").classList.toggle("minimized");$("slotsBody").style.display=minimized?"none":"grid";$("slotsMinimize").textContent=minimized?"＋":"−";$("slotsMinimize").setAttribute("aria-label",minimized?"Expand slots":"Minimize slots");$("slotsMinimize").setAttribute("aria-expanded",String(!minimized))});
 $("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("closed");$("slotsToggle").classList.remove("hidden")});
 $("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");$("slotsToggle").classList.add("hidden")});
 document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("click",()=>slotAction({kind:"SHOP_BUY",flair:b.dataset.flair})));
