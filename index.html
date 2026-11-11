@@ -559,6 +559,9 @@ body[data-theme=kaiju]{
  .wrap.is-in-room #roomPanel>.round-controls{width:calc(100vw - 22px);bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:8px;gap:7px}
  .wrap.is-in-room #roomPanel>.round-controls button{padding:8px 9px;font-size:13px}
 }
+
+/* A transformed animated panel would become the fixed dock's containing block. */
+.wrap.is-in-room #roomPanel{animation:none!important;transform:none!important}
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
