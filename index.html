@@ -639,7 +639,7 @@ body[data-theme=kaiju]{
 @keyframes fanfare-pop{0%{opacity:0;transform:translate(-50%,18px) scale(.82)}65%{opacity:1;transform:translate(-50%,-3px) scale(1.04)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
 
 /* Floating slots arcade and separate cosmetic-token shop. */
-#slotsDock{position:fixed;z-index:50;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));color:var(--ink);filter:drop-shadow(0 16px 35px #0008)}
+#slotsDock{display:none;position:fixed;z-index:50;right:18px;bottom:18px;width:min(330px,calc(100vw - 24px));color:var(--ink);filter:drop-shadow(0 16px 35px #0008)}
 #slotsDock.closed{width:auto;filter:none}
 #slotsPanel{border:1px solid color-mix(in srgb,var(--gold),transparent 35%);border-radius:17px;background:linear-gradient(145deg,#1b2b25,#0b1511);box-shadow:0 12px 36px #0009;overflow:hidden}
 #slotsHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;background:linear-gradient(100deg,#e4bd6730,#ffffff08);cursor:grab;touch-action:none;user-select:none}
@@ -651,7 +651,14 @@ body[data-theme=kaiju]{
 #slotsShop{border-top:1px solid #ffffff20;padding-top:9px;display:grid;gap:7px}#slotsShop h4{margin:0;color:var(--gold);font-size:12px;letter-spacing:.08em}
 .slot-shop-row{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:12px}.slot-shop-row button{padding:6px 9px;min-height:31px;font-size:11px}
 #slotsToggle{border:1px solid var(--gold);border-radius:999px;background:#17251e;color:var(--gold);padding:9px 13px;box-shadow:0 5px 18px #0008}
-#slotsDock:not(.in-room){display:none}#slotsSpin{width:100%}
+body.has-room #slotsDock{display:block}
+#slotsDock.minimized{width:auto;max-width:calc(100vw - 24px)}
+#slotsDock.minimized #slotsBody{display:none}
+#slotsDock.minimized #slotsPanel{border-radius:999px}
+#slotsDock.minimized #slotsHead{padding:7px 10px;gap:8px}
+#slotsDock.minimized #slotsTokenCount{display:none}
+#slotsDock.minimized #slotsHead strong{font-size:12px;white-space:nowrap}
+#slotsSpin{width:100%}
 @media(max-width:520px){#slotsDock{right:10px;bottom:10px;width:min(310px,calc(100vw - 20px))}.slot-reel{width:54px}}
 </style></head>
 <body data-theme="royal"><div class="wrap">
@@ -721,10 +728,10 @@ body[data-theme=kaiju]{
 </div>
 </section>
 </div>
-<div id="slotsDock" class="in-room" aria-label="Floating slots arcade">
+<div id="slotsDock" aria-label="Floating slots arcade">
  <button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button>
  <section id="slotsPanel">
-  <header id="slotsHead"><strong>🎰 MINI SLOTS ARCADE</strong><span class="small" id="slotsTokenCount">100 tokens</span><button id="slotsClose" type="button" aria-label="Close slots">×</button></header>
+  <header id="slotsHead"><strong>🎰 MINI SLOTS ARCADE</strong><span class="small" id="slotsTokenCount">100 tokens</span><button id="slotsMinimize" type="button" aria-label="Minimize slots" aria-expanded="true">−</button><button id="slotsClose" type="button" aria-label="Hide slots">×</button></header>
   <div id="slotsBody">
    <div id="slotsReels" aria-label="Slot machine reels"><span class="slot-reel">🍒</span><span class="slot-reel">⭐</span><span class="slot-reel">💎</span></div>
    <div class="small muted">5 tokens per spin · 3 matching = 100 · 2 matching = 15</div>
@@ -1425,7 +1432,7 @@ render=function(){
 const SLOT_SYMBOLS=["🍒","🍋","🔔","⭐","💎","7️⃣"];
 function slotsRender(){
  const dock=$("slotsDock"),me=myPlayer();if(!dock)return;
- dock.classList.toggle("in-room",!!roomCode);
+ document.body.classList.toggle("has-room",!!roomCode);
  $("slotsTokenCount").textContent=(me?.tokens??100)+" tokens";
  $("slotsSpin").disabled=!me||!hostConnReady()||(me.tokens??100)<5;
  $("slotsSpin").textContent=(me?.tokens??100)<5?"Need 5 tokens":"Spin · 5 tokens";
@@ -1459,6 +1466,7 @@ handleAction=function(playerId,action){
  return handleActionBeforeSlots(playerId,action);
 };
 $("slotsSpin").addEventListener("click",()=>slotAction({kind:"SLOT_SPIN"}));
+$("slotsMinimize").addEventListener("click",()=>{const minimized=$("slotsDock").classList.toggle("minimized");$("slotsMinimize").textContent=minimized?"＋":"−";$("slotsMinimize").setAttribute("aria-label",minimized?"Expand slots":"Minimize slots");$("slotsMinimize").setAttribute("aria-expanded",String(!minimized))});
 $("slotsClose").addEventListener("click",()=>{$("slotsDock").classList.add("closed");$("slotsToggle").classList.remove("hidden")});
 $("slotsToggle").addEventListener("click",()=>{$("slotsDock").classList.remove("closed");$("slotsToggle").classList.add("hidden")});
 document.querySelectorAll("#slotsShop button").forEach(b=>b.addEventListener("click",()=>slotAction({kind:"SHOP_BUY",flair:b.dataset.flair})));
