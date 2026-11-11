@@ -175,6 +175,13 @@ const server = http.createServer((req, res) => {
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "10 tokens", null, { timeout: 10000 });
     if (!(await guest.locator("#slotsCashBalance").textContent()).includes("400 chips")) throw new Error("Chip exchange did not deduct the game cash");
     if (await guest.locator('#slotsShop button[data-flair="✦"]').isEnabled()) throw new Error("Flair should remain locked until the player earns substantially more tokens");
+    await host.evaluate(() => {
+      const values = [0.1, 0.1, 0.3]; let index = 0;
+      Math.random = () => values[index++ % values.length];
+    });
+    await guest.locator("#slotsSpin").click();
+    await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "10 tokens", null, { timeout: 10000 });
+    if (!(await guest.locator("#slotsMessage").textContent()).includes("Nice match! +5 tokens")) throw new Error("Two-symbol slot payout should return five tokens, not inflate the wallet");
     await host.evaluate(() => { Math.random = () => 0.1; });
     await guest.locator("#slotsSpin").click();
     await guest.waitForFunction(() => document.querySelector("#slotsTokenCount").textContent === "105 tokens", null, { timeout: 10000 });
