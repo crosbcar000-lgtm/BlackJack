@@ -537,7 +537,7 @@ body[data-theme=kaiju]{
 <section class="panel"><h3>Card style</h3><p class="rules">Match the current table, or pick a separate deck design. Your choice is saved on this device.</p><label for="cardThemeSelect">CARD BACK DESIGN</label><select id="cardThemeSelect"><option value="match">Match table theme</option><option value="classic">Classic ivory</option><option value="midnight">Midnight blue</option><option value="neon">Neon prism</option><option value="pixel">Pixel mosaic</option><option value="gold">Antique gold</option></select></section>
 <section class="panel"><h3>Rules</h3><p class="rules" id="rulesText">Beat the dealer without going over 21. Aces count as 1 or 11; face cards count as 10. Dealer stands on soft 17. Blackjack pays 3:2. Double and split are available on eligible hands.</p><p class="rules">No real money, cash value, or prizes.</p></section>
 <section class="panel"><h3>How multiplayer works</h3><p class="rules">Players connect to a Cloudflare Worker over WebSockets. The Worker relays game messages; the host's browser deals and validates actions. No Firebase is used. Cloudflare's free plan has daily usage limits.</p><p class="rules">Friends-only trust model: the host can see and control the game state. Do not use this for valuable stakes.</p></section>
-</div><div class="toast hidden" id="toast"></div>
+</div></section></div><div class="toast hidden" id="toast"></div>
 <script src="./config.js"></script>
 <script src="./relay-client.js"></script>
 <script>
