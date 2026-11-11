@@ -379,8 +379,51 @@ const server = http.createServer((req, res) => {
     const rouletteGuestSecondSeat = await guest.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
     if (!rouletteHostSecondSeat.includes("520") || !rouletteGuestSecondSeat.includes("480")) throw new Error("Next roulette spin did not automatically repeat the previous wagers");
 
+    // Green wins on zero at 35:1; repeated losing wagers are allowed to create debt.
+    await guest.locator("#leave").click();
+    await host.locator("#leave").click();
+    await host.locator("#gameModeSelect").selectOption("roulette");
+    await host.locator("#name").fill("CI Host");
+    await host.locator("#create").click();
+    await host.waitForFunction(() => document.querySelector("#netState").textContent === "Room online", null, { timeout: 20000 });
+    const greenCode = await host.locator("#roomCode").textContent();
+    await guest.locator("#name").fill("CI Guest");
+    await guest.locator("#joinCode").fill(greenCode);
+    await guest.locator("#join").click();
+    await guest.waitForFunction(() => document.querySelector("#netState").textContent === "Connected to host", null, { timeout: 20000 });
+    if (!(await host.locator("#rouletteBetType option[value='green']").count())) throw new Error("Green roulette bet option is missing");
+    await host.locator("#rouletteBetType").selectOption("green");
+    await guest.locator("#rouletteBetType").selectOption("black");
+    await host.locator("#rouletteAmount").selectOption("50");
+    await guest.locator("#rouletteAmount").selectOption("50");
+    await host.locator("#placeRouletteBet").click();
+    await guest.locator("#placeRouletteBet").click();
+    await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
+    await host.evaluate(() => { Math.random = () => 0; });
+    await host.locator("#start").click();
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
+    const greenHostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
+    const greenGuestSeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
+    if (!greenHostSeat.includes("Won 1800 chips") || !greenHostSeat.includes("2250")) throw new Error("Green zero payout should pay 35:1 plus returned stake: " + greenHostSeat);
+    if (!greenGuestSeat.includes("Lost 50 chips") || !greenGuestSeat.includes("450")) throw new Error("Green zero should beat a black bet: " + greenGuestSeat);
+
+    // Ten more zero results drain the black bettor below zero. Next spin must still run.
+    for (let spin = 0; spin < 10; spin++) {
+      await host.evaluate(() => { Math.random = () => 0; });
+      await host.locator("#next").click();
+      await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
+      await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
+    }
+    const debtSeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
+    if (!debtSeat.includes("-50") || !debtSeat.includes("BROKE ALERT") || !debtSeat.includes("IOU 50 chips")) {
+      throw new Error("A player below zero should remain in the game and get the debt callout: " + debtSeat);
+    }
+    const debtCard = host.locator(".seat.in-debt").filter({ hasText: "CI Guest" });
+    if (await debtCard.count() !== 1) throw new Error("Negative-balance player did not get the debt styling");
+
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
-    console.log("PASS: lobby chat, instant next rounds, 13 themes, card styles, Blackjack multiplayer, Texas Hold’em betting/showdown, and roulette bets/payouts");
+    console.log("PASS: lobby chat, instant next rounds, dealer flip, green roulette 35:1 payout, negative chip balances and debt callouts, 13 themes, card styles, Blackjack, and Texas Hold’em");
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
