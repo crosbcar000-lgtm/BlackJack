@@ -476,6 +476,10 @@ const server = http.createServer((req, res) => {
       const ownName = page === host ? "CI Host" : "CI Guest";
       const ownSeat = sideSeats.filter({hasText:ownName});
       if (await ownSeat.locator(".seat-cards .card:not(.back)").count() !== 2) throw new Error("A player's own hole cards should be visible in their side seat");
+      if (!(await ownSeat.locator(".holdem-chip-balance").textContent())?.trim().endsWith(" chips")) throw new Error("Each player's chip balance should appear underneath their hand");
+      const otherName = page === host ? "CI Guest" : "CI Host";
+      const otherSeat = sideSeats.filter({hasText:otherName});
+      if (!(await otherSeat.locator(".holdem-chip-balance").textContent())?.trim().endsWith(" chips")) throw new Error("The opponent's chip balance should appear underneath their hand");
     }
     if (await guest.locator("#communityCards .card").count() !== 0) throw new Error("Community cards appeared before the pre-flop betting round");
     await guest.locator("#holdemCheckCall").click();
