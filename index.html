@@ -945,9 +945,12 @@ async function joinRoom(){
         }
       }else if(msg?.type==="ERROR"){
         clearJoinTimers();status(msg.message||"The host could not add you to the table.");toast(msg.message||"Unable to join room");
-      }else if(msg?.type==="STATE"){
-        if(!Array.isArray(msg.players)||!msg.players.some(p=>p.id===localUid)){sendJoin();return}
-        gotState=true;clearJoinTimers();setNet("Connected to host");status("");receiveState(msg);
+      }else if(msg?.type==="STATE"||msg?.type==="SLOTS"){
+        if(msg.type==="STATE"){
+          if(!Array.isArray(msg.players)||!msg.players.some(p=>p.id===localUid)){sendJoin();return}
+          gotState=true;clearJoinTimers();setNet("Connected to host");status("");
+        }
+        receiveState(msg);
       }
     });
     hostConn.on("close",()=>{
