@@ -659,7 +659,7 @@ body[data-theme=kaiju]{
 <div class="zone"><div class="zone-title">Community cards · <span id="holdemStreet">Waiting for deal</span></div><div class="cards" id="communityCards"></div></div>
 <div class="zone"><div class="zone-title">Your hole cards</div><div class="cards" id="myHoleCards"></div></div>
 <div class="holdem-metrics"><div><span class="small muted">POT</span><strong id="holdemPot">0</strong></div><div><span class="small muted">TO CALL</span><strong id="holdemToCall">0</strong></div><div><span class="small muted">YOUR BET</span><strong id="holdemYourBet">0</strong></div></div>
-<div class="actions" id="holdemActions"><button id="holdemFold">Fold</button><button id="holdemCheckCall" class="primary">Check</button><button id="holdemRaise">Raise 20</button></div>
+<div class="actions" id="holdemActions"><button id="holdemFold">Fold</button><button id="holdemCheckCall" class="primary">Check</button><button id="holdemRaise">Raise 20</button><button id="holdemAllIn" class="primary">All In</button></div>
 <div class="small muted" id="holdemHint">Two private cards, five shared community cards. Best five-card hand wins.</div>
 </section>
 <section id="rouletteBoard" class="game-board hidden">
@@ -1120,8 +1120,10 @@ render=function(){
   $("holdemCheckCall").textContent=owe>0?"Call "+Math.min(owe,me?.chips||0):"Check";
   $("holdemRaise").disabled=!myTurn;
   $("holdemRaise").textContent="Raise +"+Math.max(10,holdem?.lastRaise||10);
+  $("holdemAllIn").disabled=!myTurn||(me?.chips||0)<=0;
+  $("holdemAllIn").textContent="All In · "+Math.max(0,me?.chips||0);
   $("holdemHint").textContent=phase==="ROUND_OVER"?(me?.holdemResult||"Hand complete")+(me?.holdemHandName?" · "+me.holdemHandName:""):
-   myTurn?"Your turn. Fold, check/call, or raise.":me?.folded?"You folded. Waiting for the hand to finish.":"Waiting for the other players.";
+   myTurn?"Your turn. Fold, check/call, raise, or move all-in.":me?.folded?"You folded. Waiting for the hand to finish.":"Waiting for the other players.";
   if(phase==="ROUND_OVER"&&me)setBanner(me.roundNet||0,(me.roundNet||0)>0?"+"+me.roundNet+" chips":(me.roundNet||0)<0?"−"+Math.abs(me.roundNet)+" chips":"No net change");
  }else{
   $("rouletteNumber").parentElement.classList.toggle("hidden",$("rouletteBetType").value!=="number");
@@ -1294,10 +1296,15 @@ function handleHoldemAction(id,action){
  if(action==="FOLD"){p.folded=true;p.acted=true}
  else if(action==="CHECK_CALL"){const owe=Math.max(0,holdem.currentBet-p.streetBet);if(owe>0)holdemPost(p,owe);p.acted=true}
  else if(action==="RAISE"){
-  const owe=Math.max(0,holdem.currentBet-p.streetBet),target=holdem.currentBet+Math.max(10,holdem.lastRaise);
+  const target=holdem.currentBet+Math.max(10,holdem.lastRaise);
   holdemPost(p,target-p.streetBet);
   if(p.streetBet>holdem.currentBet){holdem.lastRaise=p.streetBet-holdem.currentBet;holdem.currentBet=p.streetBet;players.forEach(q=>{if(q!==p&&!q.folded&&!q.allIn)q.acted=false})}
   p.acted=true;
+ }else if(action==="ALL_IN"){
+  const stack=Math.max(0,Math.floor(p.chips));if(stack<=0)return;
+  const previousBet=holdem.currentBet;
+  holdemPost(p,stack);p.allIn=true;p.acted=true;
+  if(p.streetBet>previousBet){const raiseBy=p.streetBet-previousBet;if(raiseBy>=holdem.lastRaise)holdem.lastRaise=raiseBy;holdem.currentBet=p.streetBet;players.forEach(q=>{if(q!==p&&!q.folded&&!q.allIn)q.acted=false})}
  }else return;
  holdemAfter(index);broadcast();
 }
@@ -1330,6 +1337,7 @@ $("create").onclick=createRoom;$("start").onclick=beginRound;$("next").onclick=s
 $("holdemFold").onclick=()=>sendAction("FOLD");
 $("holdemCheckCall").onclick=()=>sendAction("CHECK_CALL");
 $("holdemRaise").onclick=()=>sendAction("RAISE");
+$("holdemAllIn").onclick=()=>sendAction("ALL_IN");
 $("placeRouletteBet").onclick=()=>sendAction({kind:"ROULETTE_BET",betType:$("rouletteBetType").value,amount:Number($("rouletteAmount").value),number:Number($("rouletteNumber").value)});
 $("rouletteBetType").onchange=()=>{$("rouletteNumber").parentElement.classList.toggle("hidden",$("rouletteBetType").value!=="number")};
 $("cardThemeSelect").onchange=()=>{document.body.dataset.cardTheme=$("cardThemeSelect").value;localStorage.setItem("bj-card-theme",$("cardThemeSelect").value);render()};
