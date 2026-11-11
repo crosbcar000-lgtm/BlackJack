@@ -777,7 +777,7 @@ body.has-room #slotsDock{display:block}
 const $=id=>document.getElementById(id);let peer=null,host=false,hostConn=null,connections=new Map(),roomCode="",players=[],dealer=[],shoe=[],phase="LOBBY",turnPlayer=0,turnHand=0,roundMessage="Waiting for players…",roundNumber=0,localUid="",dealerRevealed=false,roomClosed=false;
 let chatMessages=[],celebration=null,lastCelebrationId="",fanFareAudio=null;
 const suits=["♠","♥","♦","♣"],ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
-const uid=()=>Math.random().toString(36).slice(2,11);const name=()=>($("name").value.trim().slice(0,18)||"Player");
+let uidSequence=0;const uid=()=>Math.random().toString(36).slice(2,11)||("u"+(++uidSequence).toString(36));const name=()=>($("name").value.trim().slice(0,18)||"Player");
 function toast(s){$("toast").textContent=s;$("toast").classList.remove("hidden");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.add("hidden"),3200)}
 function status(s){$("lobbyStatus").textContent=s}
 function deck(){const d=[];for(const s of suits)for(const r of ranks)d.push({s,r});for(let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]]}return d}
