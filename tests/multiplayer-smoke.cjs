@@ -604,11 +604,11 @@ const server = http.createServer((req, res) => {
       await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
       await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
     }
-    const preBankruptcySeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
+    const preBankruptcySeat = await host.locator(".seat").filter({ hasText: "big fat loser" }).textContent();
     if (!preBankruptcySeat.includes("-9950")) throw new Error("Guest should still be in the game at -9,950 chips: " + preBankruptcySeat);
     await host.evaluate(() => { Math.random = () => 0; });
     await host.locator("#next").click();
-    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && ![...document.querySelectorAll(".seat")].some(el => el.textContent.includes("CI Guest")), null, { timeout: 10000 });
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && ![...document.querySelectorAll(".seat")].some(el => el.textContent.includes("big fat loser")), null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelector("#lobbyStatus").textContent.includes("You hit -10,000 chips and were removed"), null, { timeout: 10000 });
     if (await guest.locator("#roomPanel").isVisible()) throw new Error("Bankrupt guest remained in the room after reaching -10,000 chips");
 
