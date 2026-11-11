@@ -58,6 +58,18 @@ body[data-card-theme=gold] .card.back{background:repeating-linear-gradient(45deg
 .holdem-metrics{display:flex;justify-content:center;gap:clamp(12px,4vw,34px);flex-wrap:wrap;text-align:center}
 .holdem-metrics>div{display:grid;gap:2px}
 .holdem-metrics strong{font-size:20px;color:var(--gold)}
+.holdem-hand-guide{width:min(100%,620px);margin:3px auto 0;text-align:left}
+.holdem-hand-guide>summary{display:inline-flex;align-items:center;gap:8px;cursor:pointer;list-style:none;border:1px solid color-mix(in srgb,var(--gold),transparent 48%);border-radius:999px;padding:7px 12px;background:color-mix(in srgb,var(--gold),transparent 93%);color:var(--gold);font-size:12px;font-weight:850;letter-spacing:.035em;user-select:none}
+.holdem-hand-guide>summary::-webkit-details-marker{display:none}
+.holdem-hand-guide>summary::after{content:"＋";font-size:13px}
+.holdem-hand-guide[open]>summary::after{content:"−"}
+.hand-guide-content{margin-top:9px;padding:11px;border:1px solid #ffffff20;border-radius:13px;background:#08130fdd;box-shadow:0 12px 26px #0004;max-height:260px;overflow:auto}
+.hand-guide-intro,.hand-guide-note{padding:0 3px}
+.hand-guide-list{list-style:none;counter-reset:handrank;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;margin:9px 0;padding:0}
+.hand-guide-list li{counter-increment:handrank;display:grid;grid-template-columns:22px minmax(0,1fr);column-gap:7px;align-items:start;padding:6px 7px;border-radius:8px;background:#ffffff08}
+.hand-guide-list li::before{content:counter(handrank);grid-row:span 2;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,var(--gold),transparent 83%);color:var(--gold);font-size:11px;font-weight:900}
+.hand-guide-list li strong{font-size:12px;line-height:1.35;color:var(--ink)}
+.hand-guide-list li span{grid-column:2;font-size:10px;line-height:1.35;color:var(--muted)}
 .roulette-wheel{width:112px;height:112px;border-radius:50%;margin:13px auto;display:grid;place-items:center;background:conic-gradient(#b5222a 0 9.73%,#171717 9.73% 19.46%,#b5222a 19.46% 29.19%,#171717 29.19% 38.92%,#b5222a 38.92% 48.65%,#171717 48.65% 58.38%,#b5222a 58.38% 68.11%,#171717 68.11% 77.84%,#b5222a 77.84% 87.57%,#147749 87.57% 90.27%,#171717 90.27% 100%);border:6px solid #d3ad61;box-shadow:0 0 0 4px #261c12,0 12px 25px #0006;position:relative}
 .roulette-wheel::after{content:"";position:absolute;inset:12px;border:1px dashed #fff9;border-radius:50%}
 .roulette-wheel span{z-index:1;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#111;color:white;border:2px solid #f1d88e;font-size:22px;font-weight:950}
@@ -669,7 +681,7 @@ body.has-room #slotsDock{display:block}
 #slotsDock.minimized #slotsTokenCount{display:none}
 #slotsDock.minimized #slotsHead strong{font-size:12px;white-space:nowrap}
 #slotsSpin{width:100%}
-@media(max-width:520px){#slotsDock{right:10px;bottom:10px;width:min(310px,calc(100vw - 20px))}.slot-reel{width:54px}}
+@media(max-width:520px){.hand-guide-list{grid-template-columns:1fr}.hand-guide-content{max-height:220px}#slotsDock{right:10px;bottom:10px;width:min(310px,calc(100vw - 20px))}.slot-reel{width:54px}}
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -694,6 +706,25 @@ body.has-room #slotsDock{display:block}
 <div class="holdem-metrics"><div><span class="small muted">POT</span><strong id="holdemPot">0</strong></div><div><span class="small muted">TO CALL</span><strong id="holdemToCall">0</strong></div><div><span class="small muted">YOUR BET</span><strong id="holdemYourBet">0</strong></div></div>
 <div class="actions" id="holdemActions"><button id="holdemFold">Fold</button><button id="holdemCheckCall" class="primary">Check</button><button id="holdemRaise">Raise 20</button><button id="holdemAllIn" class="primary">All In</button></div>
 <div class="small muted" id="holdemHint">Two private cards, five shared community cards. Best five-card hand wins.</div>
+<details class="holdem-hand-guide" id="holdemHandGuide">
+ <summary>♣ Hold’em hand rankings</summary>
+ <div class="hand-guide-content">
+  <div class="small muted hand-guide-intro">Best hand to lowest · Your best five cards count</div>
+  <ol class="hand-guide-list">
+   <li><strong>Royal Flush</strong><span>A-K-Q-J-10, all one suit</span></li>
+   <li><strong>Straight Flush</strong><span>Five consecutive ranks, all one suit</span></li>
+   <li><strong>Four of a Kind</strong><span>Four cards of the same rank</span></li>
+   <li><strong>Full House</strong><span>Three of a kind plus a pair</span></li>
+   <li><strong>Flush</strong><span>Any five cards in one suit</span></li>
+   <li><strong>Straight</strong><span>Five consecutive ranks, mixed suits</span></li>
+   <li><strong>Three of a Kind</strong><span>Three cards of the same rank</span></li>
+   <li><strong>Two Pair</strong><span>Two different pairs</span></li>
+   <li><strong>One Pair</strong><span>Two cards of the same rank</span></li>
+   <li><strong>High Card</strong><span>No made hand; highest card plays</span></li>
+  </ol>
+  <div class="small muted hand-guide-note">Aces can be high or low in a straight (A-2-3-4-5).</div>
+ </div>
+</details>
 </section>
 <section id="rouletteBoard" class="game-board hidden">
 <div class="zone"><div class="zone-title">European roulette · 0–36</div><div class="roulette-wheel" id="rouletteWheel"><span id="rouletteResult">?</span></div><div class="small muted" id="rouletteOutcome">Place one bet to join the spin.</div></div>
