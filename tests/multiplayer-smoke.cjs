@@ -411,24 +411,26 @@ const server = http.createServer((req, res) => {
     const greenHostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
     const greenGuestSeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
     if (!greenHostSeat.includes("Won 1800 chips") || !greenHostSeat.includes("2250")) throw new Error("Green zero payout should pay 35:1 plus returned stake: " + greenHostSeat);
+    await host.waitForFunction(() => document.querySelector("#toast").textContent.includes("GREEN ZERO"), null, { timeout: 5000 });
+    await guest.waitForFunction(() => document.querySelector("#toast").textContent.includes("GREEN ZERO"), null, { timeout: 5000 });
     if (!greenGuestSeat.includes("Lost 50 chips") || !greenGuestSeat.includes("450")) throw new Error("Green zero should beat a black bet: " + greenGuestSeat);
 
     // Ten more zero results drain the black bettor below zero. Next spin must still run.
-    for (let spin = 0; spin < 10; spin++) {
+    for (let spin = 0; spin < 19; spin++) {
       await host.evaluate(() => { Math.random = () => 0; });
       await host.locator("#next").click();
       await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
       await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER" && document.querySelector("#rouletteResult").textContent === "0", null, { timeout: 10000 });
     }
-    const debtSeat = await host.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
-    if (!debtSeat.includes("-50") || !debtSeat.includes("BROKE ALERT") || !debtSeat.includes("IOU 50 chips")) {
+    const debtSeat = await host.locator(".seat").filter({ hasText: "big fat loser" }).textContent();
+    if (!debtSeat.includes("-500") || !debtSeat.includes("BROKE ALERT") || !debtSeat.includes("IOU 500 chips")) {
       throw new Error("A player below zero should remain in the game and get the debt callout: " + debtSeat);
     }
-    const debtCard = host.locator(".seat.in-debt").filter({ hasText: "CI Guest" });
+    const debtCard = host.locator(".seat.in-debt").filter({ hasText: "big fat loser" });
     if (await debtCard.count() !== 1) throw new Error("Negative-balance player did not get the debt styling");
 
     if (errors.length) throw new Error("Browser console errors: " + errors.join(" | "));
-    console.log("PASS: lobby chat, instant next rounds, dealer flip, green roulette 35:1 payout, negative chip balances and debt callouts, 13 themes, card styles, Blackjack, and Texas Hold’em");
+    console.log("PASS: lobby chat, instant next rounds, dealer flip, green roulette 35:1 payout, negative chip balances, broke nickname, fanfares, 13 themes, card styles, Blackjack, and Texas Hold’em");
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
