@@ -462,22 +462,20 @@ const server = http.createServer((req, res) => {
     await guest.locator("#ready").click();
     await host.waitForFunction(() => !document.querySelector("#start").disabled, null, { timeout: 10000 });
     await host.locator("#start").click();
-    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
-    await guest.waitForFunction(() => document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
     for (const page of [host, guest]) {
-      const handsTab = page.locator("#holdemHandsToggle");
-      if (!(await handsTab.isVisible()) || !(await handsTab.textContent()).includes("Hands")) throw new Error("Hold’em Table hands control is missing");
-      if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Table hands should be visible by default");
-      if (await page.locator("#holdemHandsPanel .holdem-hand-row").count() !== 2) throw new Error("Table hands should show both players around the table");
+      await page.waitForFunction(() => document.querySelectorAll("#holdemSeatsLeft .seat-cards .card, #holdemSeatsRight .seat-cards .card").length === 4, null, { timeout: 10000 });
+      if (await page.locator("#holdemHandsToggle").count() !== 0) throw new Error("The Table Hands button should be removed");
+      if (await page.locator("#myHoleCards").count() !== 0) throw new Error("The duplicate Your hole cards display should be removed");
+      if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Player side seats should always be visible");
+      if (await page.locator("#holdemHandsPanel .holdem-hand-row").count() !== 2) throw new Error("Side seats should show both players around the table");
       const sideSeats = page.locator("#holdemSeatsLeft .seat, #holdemSeatsRight .seat");
       const sideNames = (await sideSeats.allTextContents()).join(" ");
       if (!sideNames.includes("CI Host") || !sideNames.includes("CI Guest")) throw new Error("Both actual player names should appear in the side seats: " + sideNames);
       if (await page.locator("#playerListSection").isVisible()) throw new Error("Hold’em should not duplicate the side seats in a separate player list");
       if (await page.locator("#holdemHandsPanel .card.back").count() !== 2 || await page.locator("#holdemHandsPanel .card:not(.back)").count() !== 2) throw new Error("Opponent hole cards must stay hidden before showdown");
-      await handsTab.click();
-      if (await page.locator("#holdemHandsPanel").isVisible()) throw new Error("Table hands toggle should collapse the side seats");
-      await handsTab.click();
-      if (!(await page.locator("#holdemHandsPanel").isVisible())) throw new Error("Table hands toggle should reopen the side seats");
+      const ownName = page === host ? "CI Host" : "CI Guest";
+      const ownSeat = sideSeats.filter({hasText:ownName});
+      if (await ownSeat.locator(".seat-cards .card:not(.back)").count() !== 2) throw new Error("A player's own hole cards should be visible in their side seat");
     }
     if (await guest.locator("#communityCards .card").count() !== 0) throw new Error("Community cards appeared before the pre-flop betting round");
     await guest.locator("#holdemCheckCall").click();
@@ -493,17 +491,17 @@ const server = http.createServer((req, res) => {
     await guest.locator("#holdemCheckCall").click();
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
-    if (await host.locator("#myHoleCards .card").count() !== 2 || await host.locator("#communityCards .card").count() !== 5) throw new Error("Hold’em showdown did not show two hole cards and five community cards");
+    if (await host.locator("#communityCards .card").count() !== 5) throw new Error("Hold’em showdown did not show the five community cards");
     for (const page of [host, guest]) {
-      if (await page.locator("#holdemHandsPanel .card:not(.back)").count() !== 4) throw new Error("Showdown tab should reveal both players’ hole cards");
+      if (await page.locator("#holdemHandsPanel .card:not(.back)").count() !== 4) throw new Error("Showdown should reveal both players’ hole cards at their seats");
       if (await page.locator("#holdemHandsPanel .holdem-hand-name").filter({hasText:"Hidden"}).count() !== 0) throw new Error("Showdown should not keep any player hand hidden");
       if ((await page.locator("#holdemHandsPanel .holdem-hand-name").allTextContents()).some(name => !name.trim())) throw new Error("Showdown should show each player’s hand name");
     }
     const holdSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
     if (!holdSeat.includes("Won") && !holdSeat.includes("Lost")) throw new Error("Hold’em player list did not show a showdown result: " + holdSeat);
     await host.locator("#next").click();
-    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2 && document.querySelectorAll("#communityCards .card").length === 0, null, { timeout: 10000 });
-    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#myHoleCards .card").length === 2, null, { timeout: 10000 });
+    await host.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#holdemSeatsLeft .seat-cards .card, #holdemSeatsRight .seat-cards .card").length === 4 && document.querySelectorAll("#communityCards .card").length === 0, null, { timeout: 10000 });
+    await guest.waitForFunction(() => document.querySelector("#phase").textContent === "PLAYING" && document.querySelectorAll("#holdemSeatsLeft .seat-cards .card, #holdemSeatsRight .seat-cards .card").length === 4, null, { timeout: 10000 });
     if (await host.locator("#holdemPot").textContent() !== "15") throw new Error("Next Hold’em hand did not deal immediately with fresh blinds");
     if (await host.locator("#holdemAllIn").count() !== 1 || await guest.locator("#holdemAllIn").count() !== 1) throw new Error("All In action is missing from Hold'em controls");
     await host.waitForFunction(() => document.querySelector("#holdemHint").textContent.includes("Your turn.") || document.querySelector("#holdemHint").textContent.includes("Waiting for the other players."), null, { timeout: 10000 });
