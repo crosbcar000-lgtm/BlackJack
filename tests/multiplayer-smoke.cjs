@@ -31,7 +31,7 @@ const server = http.createServer((req, res) => {
     const host = await browser.newPage();
     const guest = await browser.newPage();
     for (const page of [host, guest]) {
-      page.on("pageerror", error => errors.push(error.message));
+      page.on("pageerror", error => errors.push(error.stack || error.message));
       page.on("console", message => {
         if (message.type() === "error") errors.push(message.text());
       });
