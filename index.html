@@ -580,6 +580,16 @@ body[data-theme=kaiju]{
 .chat-form input{flex:1;min-width:0;min-height:42px;padding:9px 12px}
 .chat-form button{min-width:76px;min-height:42px;padding:8px 14px}
 @media(max-width:520px){.lobby-chat{padding:12px}.chat-form{gap:6px}.chat-form button{min-width:68px}}
+
+/* Blackjack dealer reveal: turn the hole card and dealer draws face-up in sequence. */
+.dealer-flip-scene{position:relative;display:block;flex:0 0 auto;perspective:950px;transform-origin:center center}
+.dealer-flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .82s cubic-bezier(.18,.72,.18,1);will-change:transform}
+.dealer-flip-scene.is-flipped .dealer-flip-inner{transform:rotateY(180deg)}
+.dealer-flip-scene .card{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;transform:none!important;transition:none!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important}
+.dealer-flip-scene .dealer-flip-face{transform:rotateY(180deg)!important}
+.dealer-flip-scene .dealer-flip-back{transform:rotateY(0deg)!important}
+.dealer-flip-scene:hover{transform:translateY(-3px) rotate(-1deg)}
+
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -868,6 +878,40 @@ $("settingsTab").onclick=()=>activateTab("settings");
 $("gameModeSelect").onchange=()=>updateRulesText($("gameModeSelect").value);
 
 const cardCounts={my:0,dealer:0,community:0,hole:0};
+let dealerRevealKey="";
+function animateDealerReveal(){
+ if(phase!=="ROUND_OVER")return;
+ const root=$("dealerCards"),key=roomCode+":"+roundNumber;
+ const shouldAnimate=dealerRevealKey!==key;
+ if(shouldAnimate)dealerRevealKey=key;
+ Array.from(root.children).forEach((front,index)=>{
+  if(index===0||!front.classList.contains("card"))return;
+  const width=Math.round(front.getBoundingClientRect().width)||55;
+  const height=Math.round(front.getBoundingClientRect().height)||79;
+  const face=front.cloneNode(true);
+  face.classList.remove("deal-in");
+  face.classList.add("dealer-flip-face");
+  const back=document.createElement("div");
+  back.className="card back dealer-flip-back";
+  back.setAttribute("aria-label","Face-down card");
+  const inner=document.createElement("div");
+  inner.className="dealer-flip-inner";
+  inner.append(face,back);
+  const scene=document.createElement("div");
+  scene.className="dealer-flip-scene";
+  scene.style.width=width+"px";
+  scene.style.height=height+"px";
+  scene.dataset.reveal=shouldAnimate?"animated":"complete";
+  scene.setAttribute("role","group");
+  scene.setAttribute("aria-label","Dealer revealed card");
+  scene.appendChild(inner);
+  if(!shouldAnimate)scene.classList.add("is-flipped");
+  front.replaceWith(scene);
+  if(shouldAnimate){
+   window.setTimeout(()=>scene.classList.add("is-flipped"),90+(index-1)*230);
+  }
+ });
+}
 const renderBlackjack=render,createBlackjackRoom=createRoom,beginBlackjackRound=beginRound,nextBlackjackRound=startNext,handleBlackjackAction=handleAction;
 function cardList(id,cards,backs){
  const el=$(id),old=cardCounts[id]||0;
@@ -976,7 +1020,7 @@ render=function(){
   if(m.length<cardCounts.my)cardCounts.my=0;if(d.length<cardCounts.dealer)cardCounts.dealer=0;
   for(let i=cardCounts.my;i<m.length;i++)m[i].classList.add("deal-in");
   for(let i=cardCounts.dealer;i<d.length;i++)d[i].classList.add("deal-in");
-  cardCounts.my=m.length;cardCounts.dealer=d.length;return;
+  cardCounts.my=m.length;cardCounts.dealer=d.length;animateDealerReveal();return;
  }
  $("gameStatus").textContent=roundMessage;
  $("hit").disabled=$("stand").disabled=$("double").disabled=$("split").disabled=true;

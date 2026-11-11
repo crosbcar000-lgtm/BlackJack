@@ -174,6 +174,25 @@ const server = http.createServer((req, res) => {
 
     await host.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
     await guest.waitForFunction(() => document.querySelector("#phase").textContent === "ROUND OVER", null, { timeout: 10000 });
+    // The dealer's hole card flips face-up on showdown for both players.
+    await host.waitForFunction(() => {
+      const card = document.querySelector("#dealerCards .dealer-flip-scene[data-reveal='animated']");
+      return card && card.classList.contains("is-flipped");
+    }, null, { timeout: 5000 });
+    await guest.waitForFunction(() => {
+      const card = document.querySelector("#dealerCards .dealer-flip-scene[data-reveal='animated']");
+      return card && card.classList.contains("is-flipped");
+    }, null, { timeout: 5000 });
+    for (const page of [host, guest]) {
+      const flip = await page.locator("#dealerCards .dealer-flip-scene").evaluate(el => ({
+        count: document.querySelectorAll("#dealerCards .dealer-flip-scene").length,
+        reveal: el.dataset.reveal,
+        duration: getComputedStyle(el.querySelector(".dealer-flip-inner")).transitionDuration
+      }));
+      if (flip.count !== 1 || flip.reveal !== "animated" || !flip.duration.includes("0.82s")) {
+        throw new Error("Dealer reveal did not use the flip animation: " + JSON.stringify(flip));
+      }
+    }
     const hostSeat = await host.locator(".seat").filter({ hasText: "CI Host" }).textContent();
     const guestSeat = await guest.locator(".seat").filter({ hasText: "CI Guest" }).textContent();
     const hostBanner = await host.locator("#resultBanner").textContent();
