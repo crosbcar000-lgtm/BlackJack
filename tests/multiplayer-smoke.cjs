@@ -193,6 +193,10 @@ const server = http.createServer((req, res) => {
     await starshine.evaluate(el => { el.disabled = false; el.click(); });
     await guest.waitForTimeout(300);
     if (await guest.locator("#slotsTokenCount").textContent() !== "105 tokens" || (await guest.locator(".seat").allTextContents()).some(text => text.includes("✦ CI Guest"))) throw new Error("Host accepted an underfunded flair purchase despite the increased shop price");
+    // The expanded arcade is an intentional overlay; hide it before checking the underlying chat controls.
+    await host.locator("#slotsClose").click();
+    await guest.locator("#slotsClose").click();
+    if (await host.locator("#slotsPanel").isVisible() || await guest.locator("#slotsPanel").isVisible()) throw new Error("Closing the floating slots panel should clear the game/chat area");
 
     // Lobby chat syncs in both directions and renders user text without HTML interpretation.
     await host.locator("#lobbyChatInput").fill("Welcome, team!");
