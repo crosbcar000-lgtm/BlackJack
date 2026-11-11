@@ -150,9 +150,9 @@ const server = http.createServer((req, res) => {
     if (await host.locator("#slotsPanel").isVisible() || !(await host.locator("#slotsToggle").isVisible())) throw new Error("Slots close/reopen control did not work");
     await host.locator("#slotsToggle").click();
     if (!(await host.locator("#slotsPanel").isVisible())) throw new Error("Slots mini-tab did not reopen");
-    const slotsBefore = await host.locator("#slotsTokenCount").textContent();
+    const slotsBefore = await guest.locator("#slotsTokenCount").textContent();
     await guest.locator("#slotsSpin").click();
-    await host.waitForFunction(before => document.querySelector("#slotsTokenCount").textContent !== before, slotsBefore, { timeout: 10000 });
+    await guest.waitForFunction(before => document.querySelector("#slotsTokenCount").textContent !== before, slotsBefore, { timeout: 10000 });
     const guestTokensAfterSpin = await guest.locator("#slotsTokenCount").textContent();
     if (Number(guestTokensAfterSpin.replace(/\D/g, "")) < 95) throw new Error("Slot spin did not deduct the five-token wager");
     await guest.locator('#slotsShop button[data-flair="✦"]').click();
