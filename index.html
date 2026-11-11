@@ -1028,7 +1028,8 @@ function animateDealerReveal(){
   }
  });
 }
-const renderBlackjack=render,createBlackjackRoom=createRoom,beginBlackjackRound=beginRound,nextBlackjackRound=startNext,handleBlackjackAction=handleAction;
+const renderBlackjack=render,createBlackjackRoom=createRoom,nextBlackjackRound=startNext,handleBlackjackAction=handleAction;
+let beginBlackjackRound=beginRound;
 function cardList(id,cards,backs){
  const el=$(id),old=cardCounts[id]||0;
  el.innerHTML=(cards||[]).map((c,i)=>cardHtml(c,backs?backs[i]:!c)).join("");
