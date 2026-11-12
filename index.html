@@ -797,7 +797,7 @@ body.has-room #slotsDock{display:block}
 .pip-card,.court-card{position:relative;isolation:isolate;overflow:hidden}
 .pip-card{background-color:var(--world-card-paper,#f3ead8)!important;background-image:var(--world-card-pattern)!important;border:3px solid var(--world-card-edge)!important;box-shadow:0 10px 18px #0008,0 2px 3px #0008,inset 0 0 0 1px #ffffffcc!important}
 .pip-card::before{content:"";position:absolute;inset:6px;border:1px solid color-mix(in srgb,var(--world-card-edge),transparent 35%);border-radius:4px;background-image:var(--world-card-frame);background-size:100% 100%;pointer-events:none;z-index:0;opacity:.75}
-.pip-card .pip-index,.pip-card .pip-center,.pip-card .pip-watermark,.pip-card .pip-value,.pip-card .pip-bottom{position:relative;z-index:1}
+.pip-card .pip-index,.pip-card .pip-center,.pip-card .pip-watermark,.pip-card .pip-value,.pip-card .pip-bottom{z-index:2}.pip-card .pip-index,.pip-card .pip-value,.pip-card .pip-bottom,.pip-card .pip-watermark{position:absolute}.pip-card .pip-center{position:relative;z-index:2}.pip-card .pip-watermark{z-index:0}
 .court-card{background-color:var(--world-card-paper)!important;background-image:var(--world-card-pattern)!important;border:3px solid var(--world-card-edge)!important;box-shadow:0 10px 18px #0008,0 2px 3px #0008,inset 0 0 0 1px #ffffffb0!important}
 .court-card::before{inset:5px!important;border:1px solid color-mix(in srgb,var(--world-card-edge),transparent 22%)!important;border-radius:4px!important;background-image:var(--world-card-frame)!important;background-size:100% 100%!important;opacity:.8!important}
 .court-card::after{inset:8px!important;border:1px solid color-mix(in srgb,var(--world-card-edge),transparent 70%)!important}
