@@ -1154,6 +1154,258 @@ button,input,select,textarea{font-size:15px}
  .theme-stage-decor .prop-b{right:5px!important;top:8px!important}
  .theme-stage-decor .prop-c{left:5px!important;bottom:8px!important}
 }
+
+/* Animated atmosphere layers sit behind cards and controls, never intercept input. */
+.theme-atmosphere{
+ position:absolute;inset:8px;z-index:0;overflow:hidden;pointer-events:none;
+ border-radius:inherit;contain:paint;isolation:isolate;opacity:.82;
+}
+.theme-atmosphere .ambient-layer{
+ position:absolute;inset:-18%;display:block;pointer-events:none;
+ background-repeat:repeat;background-position:0 0;will-change:transform,background-position,opacity;
+}
+.theme-atmosphere .ambient-one{
+ background-image:var(--atmo-one,radial-gradient(circle,#ffffff12 0 1px,transparent 2px));
+ background-size:var(--atmo-one-size,180px 160px);
+ animation:var(--atmo-motion-one,atmo-drift-one 28s ease-in-out infinite);
+}
+.theme-atmosphere .ambient-two{
+ background-image:var(--atmo-two,radial-gradient(ellipse,#ffffff08,transparent 65%));
+ background-size:var(--atmo-two-size,100% 100%);
+ animation:var(--atmo-motion-two,atmo-drift-two 36s ease-in-out infinite);
+}
+.theme-atmosphere .ambient-three{
+ background-image:var(--atmo-three,linear-gradient(110deg,transparent 48%,#ffffff06 50%,transparent 52%));
+ background-size:var(--atmo-three-size,260px 220px);
+ animation:var(--atmo-motion-three,atmo-drift-three 22s linear infinite);
+}
+@keyframes atmo-drift-one{
+ 0%,100%{transform:translate3d(-2%,-1%,0) scale(1);background-position:0 0}
+ 50%{transform:translate3d(2%,2%,0) scale(1.035);background-position:130px 80px}
+}
+@keyframes atmo-drift-two{
+ 0%,100%{transform:translate3d(2%,0,0) rotate(-2deg);opacity:.5}
+ 50%{transform:translate3d(-2%,-2%,0) rotate(2deg);opacity:.95}
+}
+@keyframes atmo-drift-three{
+ 0%{transform:translate3d(2%,-1%,0);background-position:0 0}
+ 100%{transform:translate3d(-2%,1%,0);background-position:320px -220px}
+}
+@keyframes atmo-ocean-roll{
+ 0%,100%{transform:translate3d(-2%,1%,0) scale(1);background-position:0 0}
+ 50%{transform:translate3d(2%,-2%,0) scale(1.04);background-position:150px 35px}
+}
+@keyframes atmo-ocean-glow{
+ 0%,100%{transform:translate3d(2%,0,0) scale(.98);opacity:.35}
+ 50%{transform:translate3d(-3%,-3%,0) scale(1.06);opacity:.85}
+}
+@keyframes atmo-orbit{
+ from{transform:rotate(0deg) scale(1)}
+ to{transform:rotate(360deg) scale(1)}
+}
+@keyframes atmo-pixel-scroll{
+ 0%{transform:translate3d(0,0,0);background-position:0 0}
+ 100%{transform:translate3d(-1.5%,1%,0);background-position:64px 64px}
+}
+@keyframes atmo-ember-rise{
+ 0%{transform:translate3d(1%,5%,0);opacity:.35}
+ 50%{transform:translate3d(-2%,-3%,0);opacity:.8}
+ 100%{transform:translate3d(1%,-9%,0);opacity:.25}
+}
+@keyframes atmo-spotlight{
+ 0%,100%{transform:translate3d(-16%,0,0) rotate(-8deg)}
+ 50%{transform:translate3d(16%,0,0) rotate(8deg)}
+}
+@keyframes atmo-electric-pulse{
+ 0%,100%{transform:translate3d(0,0,0);opacity:.22}
+ 45%{transform:translate3d(1%,-1%,0);opacity:.82}
+ 48%{opacity:.25}
+ 52%{opacity:.9}
+}
+@keyframes atmo-dust-drift{
+ 0%{transform:translate3d(3%,2%,0) rotate(0deg);background-position:0 0}
+ 100%{transform:translate3d(-5%,-2%,0) rotate(3deg);background-position:420px -100px}
+}
+@keyframes atmo-kaiju-pulse{
+ 0%,100%{transform:scale(.92);opacity:.2}
+ 50%{transform:scale(1.12);opacity:.68}
+}
+@keyframes atmo-sand-gust{
+ 0%,100%{transform:translate3d(4%,1%,0) skewY(1deg);opacity:.35}
+ 50%{transform:translate3d(-5%,-1%,0) skewY(-1deg);opacity:.8}
+}
+@keyframes atmo-crt-refresh{
+ 0%{transform:translateY(-18%);opacity:0}
+ 12%{opacity:.55}
+ 88%{opacity:.45}
+ 100%{transform:translateY(18%);opacity:0}
+}
+@keyframes atmo-meteor-a{
+ 0%{transform:translate3d(120%,-30%,0) rotate(-18deg);opacity:0}
+ 8%{opacity:1}
+ 72%{opacity:.9}
+ 100%{transform:translate3d(-160%,360%,0) rotate(-18deg);opacity:0}
+}
+@keyframes atmo-meteor-b{
+ 0%{transform:translate3d(145%,-20%,0) rotate(-22deg);opacity:0}
+ 10%{opacity:.9}
+ 76%{opacity:.75}
+ 100%{transform:translate3d(-145%,320%,0) rotate(-22deg);opacity:0}
+}
+.theme-atmosphere .ambient-one::before,.theme-atmosphere .ambient-one::after{
+ content:"";position:absolute;display:block;width:118px;height:2px;border-radius:99px;
+ background:linear-gradient(90deg,transparent,#bcecff 42%,#fff 53%,transparent);
+ box-shadow:0 0 8px #a8eaff,0 0 18px #64caff;
+}
+.theme-atmosphere .ambient-one::before{top:18%;right:-14%;animation:atmo-meteor-a 5.2s linear infinite}
+.theme-atmosphere .ambient-one::after{top:64%;right:-12%;width:76px;animation:atmo-meteor-b 7.1s 2.4s linear infinite}
+.theme-atmosphere .ambient-two::before{
+ content:"";position:absolute;top:40%;right:-10%;width:55px;height:1px;
+ background:linear-gradient(90deg,transparent,#fff,transparent);
+ box-shadow:0 0 9px #b9efff;animation:atmo-meteor-b 8.4s 4.2s linear infinite;
+}
+body[data-theme=royal]{
+ --atmo-one:radial-gradient(circle,#f6d98caa 0 1px,transparent 2px),radial-gradient(circle,#fff3c855 0 1px,transparent 2px);
+ --atmo-one-size:130px 110px,210px 180px;
+ --atmo-two:radial-gradient(ellipse at 50% 50%,#f0c86a24,transparent 65%),linear-gradient(125deg,transparent 44%,#f2d28d16 50%,transparent 56%);
+ --atmo-motion-one:atmo-drift-one 26s ease-in-out infinite;
+ --atmo-motion-two:atmo-drift-two 31s ease-in-out infinite;
+ --atmo-motion-three:atmo-drift-three 34s linear infinite;
+}
+body[data-theme=neon]{
+ --atmo-one:repeating-linear-gradient(0deg,#3cf4dc24 0 1px,transparent 1px 42px),repeating-linear-gradient(90deg,#e348b625 0 1px,transparent 1px 42px);
+ --atmo-two:linear-gradient(180deg,transparent 0 42%,#3cf4dc20 49%,#3cf4dc70 50%,#3cf4dc20 51%,transparent 58%);
+ --atmo-three:radial-gradient(circle,#ffffffcc 0 1px,transparent 2px);
+ --atmo-one-size:84px 84px;
+ --atmo-motion-one:atmo-pixel-scroll 7s steps(8) infinite;
+ --atmo-motion-two:atmo-spotlight 8s ease-in-out infinite;
+ --atmo-motion-three:atmo-drift-three 12s linear infinite;
+}
+body[data-theme=midnight]{
+ --atmo-one:repeating-radial-gradient(ellipse at 50% 115%,transparent 0 28px,#9deeff44 30px 32px,transparent 34px 58px);
+ --atmo-two:radial-gradient(ellipse at 15% 78%,#b6f4ff35,transparent 42%),radial-gradient(ellipse at 78% 64%,#5ac5e533,transparent 48%);
+ --atmo-three:radial-gradient(circle,#c6f4ff77 0 1px,transparent 2px);
+ --atmo-one-size:100% 150%;
+ --atmo-motion-one:atmo-ocean-roll 17s ease-in-out infinite;
+ --atmo-motion-two:atmo-ocean-glow 12s ease-in-out infinite;
+ --atmo-motion-three:atmo-drift-three 29s linear infinite;
+}
+body[data-theme=purple]{
+ --atmo-one:repeating-conic-gradient(from 0deg at 50% 50%,#d6a0ef18 0 6deg,transparent 7deg 30deg);
+ --atmo-two:radial-gradient(circle at 50% 50%,transparent 0 24%,#efc9ff25 24.5% 25%,transparent 25.5% 42%,#d6a0ef25 42.5% 43%,transparent 44%);
+ --atmo-three:radial-gradient(circle,#f7d9ff99 0 1px,transparent 2px);
+ --atmo-motion-one:atmo-orbit 50s linear infinite;
+ --atmo-motion-two:atmo-orbit 36s reverse linear infinite;
+ --atmo-motion-three:atmo-drift-three 24s linear infinite;
+}
+body[data-theme=arcade]{
+ --atmo-one:repeating-conic-gradient(#ffdc5424 0 25%,transparent 0 50%);
+ --atmo-two:radial-gradient(circle,#fff8b9bb 0 1px,transparent 2px);
+ --atmo-three:repeating-linear-gradient(90deg,transparent 0 36px,#3cf4dc20 37px 39px);
+ --atmo-one-size:26px 26px;
+ --atmo-motion-one:atmo-pixel-scroll 5s steps(7) infinite;
+ --atmo-motion-two:atmo-drift-one 16s linear infinite;
+ --atmo-motion-three:atmo-spotlight 9s ease-in-out infinite;
+}
+body[data-theme=starship]{
+ --atmo-one:radial-gradient(circle,#fff 0 1px,transparent 2px),radial-gradient(circle,#8bdfff 0 1px,transparent 2px),radial-gradient(circle,#fff9 0 1px,transparent 2px);
+ --atmo-one-size:96px 82px,145px 123px,210px 190px;
+ --atmo-two:radial-gradient(ellipse at 50% 50%,#5acbff18,transparent 62%);
+ --atmo-three:linear-gradient(115deg,transparent 48%,#a8e9ff30 50%,transparent 52%);
+ --atmo-motion-one:atmo-drift-three 13s linear infinite;
+ --atmo-motion-two:atmo-drift-two 18s ease-in-out infinite;
+ --atmo-motion-three:atmo-drift-three 8s linear infinite;
+}
+body[data-theme=dungeon]{
+ --atmo-one:radial-gradient(circle,#ffb45a99 0 1px,transparent 3px),radial-gradient(circle,#ffdc7a66 0 1px,transparent 2px);
+ --atmo-one-size:110px 140px,170px 180px;
+ --atmo-two:radial-gradient(ellipse at 50% 100%,#e17c3a24,transparent 56%);
+ --atmo-three:linear-gradient(0deg,transparent 55%,#b7ad8b0a 100%);
+ --atmo-motion-one:atmo-ember-rise 9s ease-in-out infinite;
+ --atmo-motion-two:atmo-ocean-glow 11s ease-in-out infinite;
+ --atmo-motion-three:atmo-drift-one 22s ease-in-out infinite;
+}
+body[data-theme=noir]{
+ --atmo-one:radial-gradient(ellipse at 50% 50%,#f3d69a1c,transparent 58%);
+ --atmo-two:linear-gradient(108deg,transparent 30%,#fff5d111 48%,#fff5d122 50%,#fff5d111 52%,transparent 70%);
+ --atmo-three:radial-gradient(circle,#f6e6c777 0 1px,transparent 2px);
+ --atmo-motion-one:atmo-spotlight 19s ease-in-out infinite;
+ --atmo-motion-two:atmo-spotlight 13s ease-in-out infinite reverse;
+ --atmo-motion-three:atmo-dust-drift 24s linear infinite;
+}
+body[data-theme=pixel]{
+ --atmo-one:repeating-conic-gradient(#f6d36b2c 0 25%,transparent 0 50%);
+ --atmo-two:repeating-linear-gradient(90deg,transparent 0 29px,#8be6bd28 30px 32px),repeating-linear-gradient(0deg,transparent 0 29px,#8be6bd28 30px 32px);
+ --atmo-three:radial-gradient(circle,#fff8ca88 0 1px,transparent 2px);
+ --atmo-one-size:22px 22px;
+ --atmo-motion-one:atmo-pixel-scroll 8s steps(6) infinite;
+ --atmo-motion-two:atmo-drift-two 19s steps(5) infinite;
+ --atmo-motion-three:atmo-drift-three 16s linear infinite;
+}
+body[data-theme=circuit]{
+ --atmo-one:repeating-linear-gradient(0deg,transparent 0 24px,#53f5d02b 25px 26px),repeating-linear-gradient(90deg,transparent 0 34px,#53f5d028 35px 36px);
+ --atmo-two:linear-gradient(90deg,transparent 0 20%,#53f5d022 48%,#53f5d0aa 50%,#53f5d022 52%,transparent 80%);
+ --atmo-three:radial-gradient(circle,#b1ffe9cc 0 1px,transparent 2px);
+ --atmo-one-size:70px 70px;
+ --atmo-motion-one:atmo-electric-pulse 5s ease-in-out infinite;
+ --atmo-motion-two:atmo-drift-three 6s linear infinite;
+ --atmo-motion-three:atmo-drift-one 18s linear infinite;
+}
+body[data-theme=spellbook]{
+ --atmo-one:repeating-conic-gradient(from 22deg at 50% 50%,#e6c27b20 0 4deg,transparent 5deg 22deg);
+ --atmo-two:radial-gradient(circle at 50% 50%,transparent 0 18%,#e6c27b20 18.5% 19%,transparent 19.5% 38%,#e6c27b20 38.5% 39%,transparent 40%);
+ --atmo-three:radial-gradient(circle,#ffe3a8bb 0 1px,transparent 2px);
+ --atmo-motion-one:atmo-orbit 62s linear infinite;
+ --atmo-motion-two:atmo-orbit 43s reverse linear infinite;
+ --atmo-motion-three:atmo-ember-rise 13s ease-in-out infinite;
+}
+body[data-theme=wasteland]{
+ --atmo-one:repeating-linear-gradient(166deg,transparent 0 34px,#e5a85e20 35px 37px,transparent 39px 68px);
+ --atmo-two:radial-gradient(ellipse at 22% 68%,#e9b87524,transparent 42%),radial-gradient(ellipse at 80% 38%,#c48c4a1b,transparent 45%);
+ --atmo-three:radial-gradient(circle,#efc27a88 0 1px,transparent 2px);
+ --atmo-motion-one:atmo-sand-gust 12s ease-in-out infinite;
+ --atmo-motion-two:atmo-dust-drift 22s linear infinite;
+ --atmo-motion-three:atmo-drift-three 18s linear infinite;
+}
+body[data-theme=kaiju]{
+ --atmo-one:repeating-radial-gradient(ellipse at 50% 55%,transparent 0 42px,#f2b75e25 44px 46px,transparent 48px 84px);
+ --atmo-two:radial-gradient(ellipse at 50% 80%,#e79b4b24,transparent 62%);
+ --atmo-three:radial-gradient(circle,#f5d9b277 0 1px,transparent 2px);
+ --atmo-motion-one:atmo-kaiju-pulse 10s ease-in-out infinite;
+ --atmo-motion-two:atmo-ocean-glow 16s ease-in-out infinite;
+ --atmo-motion-three:atmo-dust-drift 28s linear infinite;
+}
+body[data-theme=frontier]{
+ --atmo-one:repeating-linear-gradient(170deg,transparent 0 28px,#f5c37a18 29px 31px,transparent 34px 60px);
+ --atmo-two:radial-gradient(ellipse at 78% 20%,#f6c27b2c,transparent 38%),radial-gradient(ellipse at 15% 76%,#b8733b20,transparent 48%);
+ --atmo-three:radial-gradient(circle,#f4cc8c88 0 1px,transparent 2px);
+ --atmo-motion-one:atmo-sand-gust 16s ease-in-out infinite;
+ --atmo-motion-two:atmo-ocean-glow 21s ease-in-out infinite;
+ --atmo-motion-three:atmo-dust-drift 26s linear infinite;
+}
+body[data-theme=galactic]{
+ --atmo-one:radial-gradient(circle,#fff 0 1px,transparent 2px),radial-gradient(circle,#ffd990 0 1px,transparent 2px),radial-gradient(circle,#8dc9ff 0 1px,transparent 2px);
+ --atmo-one-size:88px 82px,130px 125px,180px 170px;
+ --atmo-two:radial-gradient(ellipse at 50% 50%,#559fff18,transparent 62%);
+ --atmo-three:linear-gradient(112deg,transparent 46%,#e1edff38 50%,transparent 54%);
+ --atmo-motion-one:atmo-drift-three 10s linear infinite;
+ --atmo-motion-two:atmo-drift-two 15s ease-in-out infinite;
+ --atmo-motion-three:atmo-drift-three 5.5s linear infinite;
+}
+body[data-theme=crt]{
+ --atmo-one:repeating-linear-gradient(0deg,#86f5a31d 0 1px,transparent 1px 4px);
+ --atmo-two:linear-gradient(180deg,transparent 0 44%,#86f5a31c 48%,#86f5a355 50%,#86f5a31c 52%,transparent 58%);
+ --atmo-three:radial-gradient(ellipse at 50% 50%,#86f5a312,transparent 70%);
+ --atmo-motion-one:atmo-drift-three 18s linear infinite;
+ --atmo-motion-two:atmo-crt-refresh 7s linear infinite;
+ --atmo-motion-three:atmo-ocean-glow 12s ease-in-out infinite;
+}
+@media(prefers-reduced-motion:reduce){
+ .theme-atmosphere .ambient-layer,.theme-atmosphere .ambient-layer::before,.theme-atmosphere .ambient-layer::after{
+  animation:none!important;transform:none!important;will-change:auto!important;
+ }
+}
+
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -1167,6 +1419,7 @@ button,input,select,textarea{font-size:15px}
 <section class="panel" id="lobby"><h2>Join the table</h2><p class="muted small">Pick a name. Create a room or join a friend's room code.</p><div class="stack"><div><label for="gameModeSelect">GAME MODE</label><select id="gameModeSelect"><option value="blackjack">Blackjack</option><option value="holdem">Texas Hold’em</option><option value="roulette">Roulette</option></select></div><div><label for="name">DISPLAY NAME</label><input id="name" maxlength="18" placeholder="Your name" autocomplete="nickname"></div><div class="row"><button class="primary" id="create">Create room</button><div class="field"><label for="joinCode">ROOM CODE</label><input id="joinCode" maxlength="6" placeholder="ABC123" style="text-transform:uppercase"></div><button id="join">Join room</button></div><div class="status" id="lobbyStatus" role="status"></div></div></section>
 <section class="panel hidden" id="roomPanel"><div class="row"><div><div class="muted small">ROOM CODE</div><div class="code" id="roomCode"></div></div><div class="row"><span class="pill" id="phase">LOBBY</span><button id="leave">Leave room</button></div></div><div class="divider"></div>
 <div class="table" id="gameTable">
+<div class="theme-atmosphere" aria-hidden="true"><span class="ambient-layer ambient-one"></span><span class="ambient-layer ambient-two"></span><span class="ambient-layer ambient-three"></span></div>
 <div class="theme-stage-decor" aria-hidden="true">
  <span class="stage-prop prop-a"><i></i><b></b></span>
  <span class="stage-prop prop-b"><i></i><b></b></span>
