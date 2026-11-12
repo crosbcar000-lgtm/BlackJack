@@ -142,6 +142,9 @@ const server = http.createServer((req, res) => {
       if ((theme === "starship" || theme === "galactic") && atmosphere.meteor !== "atmo-meteor-a") {
         throw new Error("Space themes should have racing shooting stars: " + theme + ": " + JSON.stringify(atmosphere));
       }
+      if (theme !== "starship" && theme !== "galactic" && atmosphere.meteor !== "none") {
+        throw new Error("Shooting stars should be reserved for space themes: " + theme + ": " + atmosphere.meteor);
+      }
       atmosphereLooks.add(atmosphere.looks.join("|") + "|" + atmosphere.animations.join("|") + "|" + atmosphere.durations.join("|"));
       const cardTextures = await host.evaluate(theme => {
         const front = document.createElement("div");
