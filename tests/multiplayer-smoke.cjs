@@ -82,6 +82,7 @@ const server = http.createServer((req, res) => {
     const frontCardLooks = new Set();
     const backCardLooks = new Set();
     const propLooks = new Set();
+    const atmosphereLooks = new Set();
     for (const theme of themeNames) {
       const button = host.locator('.theme-grid button[data-theme="' + theme + '"]');
       if (await button.count() !== 1) throw new Error("Missing theme option: " + theme);
@@ -120,6 +121,28 @@ const server = http.createServer((req, res) => {
         throw new Error("Theme props should render as loose physical objects, not labeled tiles: " + theme + ": " + JSON.stringify(stage.items));
       }
       propLooks.add(stage.icons.join("|") + "|" + stage.labels.join("|"));
+      const atmosphere = await host.locator("#gameTable .theme-atmosphere").evaluate(el => {
+        const layers = [...el.querySelectorAll(".ambient-layer")];
+        return {
+          count:layers.length,
+          looks:layers.map(layer => getComputedStyle(layer).backgroundImage),
+          animations:layers.map(layer => getComputedStyle(layer).animationName),
+          durations:layers.map(layer => getComputedStyle(layer).animationDuration),
+          meteor:getComputedStyle(el.querySelector(".ambient-one"), "::before").animationName
+        };
+      });
+      if (atmosphere.count !== 3 || atmosphere.looks.some(x => !x || x === "none") ||
+          atmosphere.animations.some(x => !x || x === "none") ||
+          atmosphere.durations.some(x => !x || x === "0s")) {
+        throw new Error("Animated screen textures are missing for " + theme + ": " + JSON.stringify(atmosphere));
+      }
+      if (theme === "midnight" && atmosphere.animations[0] !== "atmo-ocean-roll") {
+        throw new Error("Deep Sea theme should animate its ocean waves: " + JSON.stringify(atmosphere));
+      }
+      if ((theme === "starship" || theme === "galactic") && atmosphere.meteor !== "atmo-meteor-a") {
+        throw new Error("Space themes should have racing shooting stars: " + theme + ": " + JSON.stringify(atmosphere));
+      }
+      atmosphereLooks.add(atmosphere.looks.join("|") + "|" + atmosphere.animations.join("|") + "|" + atmosphere.durations.join("|"));
       const cardTextures = await host.evaluate(theme => {
         const front = document.createElement("div");
         front.className = "card pip-card";
@@ -151,6 +174,11 @@ const server = http.createServer((req, res) => {
     if (tableLooks.size !== themeNames.length) throw new Error("Some themes share the same table appearance; expected 16 unique looks, got " + tableLooks.size);
     if (previewLooks.size !== themeNames.length) throw new Error("Live board preview did not show 16 distinct theme appearances; got " + previewLooks.size);
     if (propLooks.size !== themeNames.length) throw new Error("Each theme should have its own three stage props; got " + propLooks.size + " distinct prop sets");
+    if (atmosphereLooks.size !== themeNames.length) throw new Error("All 16 themes should have unique animated screen textures; got " + atmosphereLooks.size);
+    await host.emulateMedia({reducedMotion:"reduce"});
+    const reducedAtmosphere = await host.locator("#gameTable .theme-atmosphere .ambient-layer").evaluateAll(els => els.map(el => getComputedStyle(el).animationName));
+    if (reducedAtmosphere.some(x => x !== "none")) throw new Error("Animated theme textures must stop when reduced motion is enabled: " + JSON.stringify(reducedAtmosphere));
+    await host.emulateMedia({reducedMotion:"no-preference"});
     if (frontCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct face-card textures; got " + frontCardLooks.size);
     if (backCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct card-back textures; got " + backCardLooks.size);
     const desktopPicker = await host.locator(".theme-grid").evaluate(el => ({
