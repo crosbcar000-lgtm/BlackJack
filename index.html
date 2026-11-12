@@ -1392,6 +1392,16 @@ body[data-theme=galactic]{
  --atmo-motion-two:atmo-drift-two 15s ease-in-out infinite;
  --atmo-motion-three:atmo-drift-three 5.5s linear infinite;
 }
+/* Meteor trails are reserved for the two space environments. */
+.theme-atmosphere .ambient-one::before,.theme-atmosphere .ambient-one::after,.theme-atmosphere .ambient-two::before{
+ animation:none;opacity:0;
+}
+body[data-theme=starship] .theme-atmosphere .ambient-one::before{animation:atmo-meteor-a 5.2s linear infinite;opacity:1}
+body[data-theme=starship] .theme-atmosphere .ambient-one::after{animation:atmo-meteor-b 7.1s 2.4s linear infinite;opacity:1}
+body[data-theme=starship] .theme-atmosphere .ambient-two::before{animation:atmo-meteor-b 8.4s 4.2s linear infinite;opacity:1}
+body[data-theme=galactic] .theme-atmosphere .ambient-one::before{animation:atmo-meteor-a 2.9s linear infinite;opacity:1}
+body[data-theme=galactic] .theme-atmosphere .ambient-one::after{animation:atmo-meteor-b 4.3s 1.1s linear infinite;opacity:1}
+body[data-theme=galactic] .theme-atmosphere .ambient-two::before{animation:atmo-meteor-b 5.2s 2.2s linear infinite;opacity:1}
 body[data-theme=crt]{
  --atmo-one:repeating-linear-gradient(0deg,#86f5a31d 0 1px,transparent 1px 4px);
  --atmo-two:linear-gradient(180deg,transparent 0 44%,#86f5a31c 48%,#86f5a355 50%,#86f5a31c 52%,transparent 58%);
