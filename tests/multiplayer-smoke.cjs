@@ -79,6 +79,9 @@ const server = http.createServer((req, res) => {
     const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju", "frontier", "galactic", "crt"];
     const tableLooks = new Set();
     const previewLooks = new Set();
+    const frontCardLooks = new Set();
+    const backCardLooks = new Set();
+    const propLooks = new Set();
     for (const theme of themeNames) {
       const button = host.locator('.theme-grid button[data-theme="' + theme + '"]');
       if (await button.count() !== 1) throw new Error("Missing theme option: " + theme);
@@ -94,6 +97,37 @@ const server = http.createServer((req, res) => {
       if (selected !== "true") throw new Error("Theme button did not become selected: " + theme);
       if (!look || look.includes("none")) throw new Error("Table texture did not render for theme: " + theme);
       tableLooks.add(look);
+      const stage = await host.locator("#gameTable .theme-stage-decor").evaluate(el => {
+        const props = [...el.querySelectorAll(".stage-prop")];
+        return {
+          count: props.length,
+          icons: props.map(p => getComputedStyle(p.querySelector("i"), "::before").content),
+          labels: props.map(p => getComputedStyle(p.querySelector("b"), "::before").content)
+        };
+      });
+      if (stage.count !== 3 || stage.icons.some(x => !x || x === "none" || x === "normal") ||
+          stage.labels.some(x => !x || x === "none" || x === "normal")) {
+        throw new Error("Theme props are missing for " + theme + ": " + JSON.stringify(stage));
+      }
+      propLooks.add(stage.icons.join("|") + "|" + stage.labels.join("|"));
+      const cardTextures = await host.evaluate(theme => {
+        const front = document.createElement("div");
+        front.className = "card pip-card";
+        front.dataset.faceTheme = theme;
+        document.body.appendChild(front);
+        const frontStyle = getComputedStyle(front);
+        const frontLook = frontStyle.backgroundImage + "|" + frontStyle.borderTopColor;
+        front.remove();
+        const back = document.querySelector("#themePreviewBoard .card.back");
+        const backStyle = getComputedStyle(back);
+        return { front: frontLook, back: backStyle.backgroundImage + "|" + backStyle.borderTopColor };
+      }, theme);
+      if (!cardTextures.front || cardTextures.front.includes("none") ||
+          !cardTextures.back || cardTextures.back.includes("none")) {
+        throw new Error("Card texture is missing for " + theme + ": " + JSON.stringify(cardTextures));
+      }
+      frontCardLooks.add(cardTextures.front);
+      backCardLooks.add(cardTextures.back);
       const preview = await host.locator("#themePreviewBoard").evaluate(el => ({
         theme:el.dataset.previewTheme,visible:!!el.getClientRects().length,
         border:getComputedStyle(el).borderTopColor,image:getComputedStyle(el).backgroundImage,
@@ -106,6 +140,9 @@ const server = http.createServer((req, res) => {
     }
     if (tableLooks.size !== themeNames.length) throw new Error("Some themes share the same table appearance; expected 16 unique looks, got " + tableLooks.size);
     if (previewLooks.size !== themeNames.length) throw new Error("Live board preview did not show 16 distinct theme appearances; got " + previewLooks.size);
+    if (propLooks.size !== themeNames.length) throw new Error("Each theme should have its own three stage props; got " + propLooks.size + " distinct prop sets");
+    if (frontCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct face-card textures; got " + frontCardLooks.size);
+    if (backCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct card-back textures; got " + backCardLooks.size);
     await host.locator('.theme-grid button[data-theme="royal"]').click();
     await host.locator("#cardThemeSelect").selectOption("classic");
     if (await host.locator("body").getAttribute("data-card-theme") !== "classic") throw new Error("Independent card theme did not apply");
