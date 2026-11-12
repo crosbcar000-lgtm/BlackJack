@@ -747,6 +747,305 @@ body.has-room #slotsDock{display:block}
 #slotsDock.minimized #slotsHead strong{font-size:12px;white-space:nowrap}
 #slotsSpin{width:100%}
 @media(max-width:520px){.hand-guide-list{grid-template-columns:1fr}.hand-guide-content{max-height:220px}#slotsDock{right:10px;bottom:10px;width:min(310px,calc(100vw - 20px));height:min(500px,82svh)}.slot-reel{width:54px}}
+
+/* FULL THEME WORLDS: layered materials, physical table rails, custom decks and set dressing. */
+#gameTable{
+ position:relative;isolation:isolate;overflow:hidden;
+ border:var(--world-rail-width,12px) var(--world-rail-style,ridge) var(--world-rail)!important;
+ border-radius:var(--world-table-radius,32px)!important;
+ background-color:var(--world-felt,#153d30)!important;
+ background-image:var(--world-table-top),var(--world-table-inlay),radial-gradient(ellipse at 50% 44%,color-mix(in srgb,var(--world-felt),white 7%),var(--world-felt) 48%,#050b0a 120%)!important;
+ background-size:100% 100%,100% 100%,100% 100%!important;
+ box-shadow:inset 0 0 0 3px var(--world-inset),inset 0 0 35px #0009,0 20px 50px #0009,0 0 0 1px #ffffff18!important;
+}
+#gameTable::before{
+ inset:10px!important;border:3px var(--world-inset-style,double) var(--world-inset)!important;
+ border-radius:var(--world-inset-radius,22px)!important;
+ background-image:var(--world-frame-pattern)!important;background-size:var(--world-frame-size,100% 100%)!important;
+ opacity:.95!important;mix-blend-mode:normal!important;
+}
+#gameTable::after{
+ content:"";position:absolute;z-index:-1;pointer-events:none;
+ width:78%;height:68%;left:11%;top:16%;transform:none;
+ background-image:var(--world-center-art)!important;background-size:100% 100%!important;
+ opacity:.9!important;
+}
+.theme-stage-decor{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.theme-stage-decor .stage-prop{
+ position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+ width:76px;height:68px;padding:5px 3px;border:1px solid color-mix(in srgb,var(--world-rail),transparent 30%);
+ border-radius:var(--world-prop-radius,12px);
+ background:linear-gradient(145deg,#ffffff18,#00000020),var(--world-prop-surface,#081a12);
+ box-shadow:inset 0 0 0 2px #ffffff10,0 6px 18px #0006;
+ color:var(--world-prop-ink,#fff);opacity:.87;
+}
+.theme-stage-decor .prop-a{left:clamp(8px,2vw,22px);top:clamp(12px,2vh,24px)}
+.theme-stage-decor .prop-b{right:clamp(8px,2vw,22px);top:clamp(12px,2vh,24px)}
+.theme-stage-decor .prop-c{right:clamp(8px,2vw,22px);bottom:clamp(12px,2vh,24px)}
+.theme-stage-decor i{font-style:normal;font-size:27px;line-height:1;color:var(--world-prop-icon,var(--gold));text-shadow:0 2px 9px #0008}
+.theme-stage-decor i::before{content:var(--prop-a-icon,"✦")}
+.theme-stage-decor .prop-b i::before{content:var(--prop-b-icon,"◈")}
+.theme-stage-decor .prop-c i::before{content:var(--prop-c-icon,"◇")}
+.theme-stage-decor b{font-size:7px;line-height:1.1;font-weight:950;letter-spacing:.12em;color:var(--world-prop-ink,#fff);text-shadow:0 1px 5px #000}
+.theme-stage-decor .prop-a b::before{content:var(--prop-a-label,"DETAIL")}
+.theme-stage-decor .prop-b b::before{content:var(--prop-b-label,"ORNAMENT")}
+.theme-stage-decor .prop-c b::before{content:var(--prop-c-label,"SET DRESSING")}
+#gameTable>.game-board,#gameTable>.holdem-hand-guide{position:relative;z-index:1}
+#gameTable .zone-title{color:var(--world-label,#ffffffd5);text-shadow:0 2px 7px #0009;letter-spacing:.24em}
+#gameTable .zone{filter:drop-shadow(0 2px 4px #0004)}
+#gameTable .cards{position:relative;z-index:2}
+.pip-card,.court-card{position:relative;isolation:isolate;overflow:hidden}
+.pip-card{background-color:var(--world-card-paper,#f3ead8)!important;background-image:var(--world-card-pattern)!important;border:3px solid var(--world-card-edge)!important;box-shadow:0 10px 18px #0008,0 2px 3px #0008,inset 0 0 0 1px #ffffffcc!important}
+.pip-card::before{content:"";position:absolute;inset:6px;border:1px solid color-mix(in srgb,var(--world-card-edge),transparent 35%);border-radius:4px;background-image:var(--world-card-frame);background-size:100% 100%;pointer-events:none;z-index:0;opacity:.75}
+.pip-card .pip-index,.pip-card .pip-center,.pip-card .pip-watermark,.pip-card .pip-value,.pip-card .pip-bottom{position:relative;z-index:1}
+.court-card{background-color:var(--world-card-paper)!important;background-image:var(--world-card-pattern)!important;border:3px solid var(--world-card-edge)!important;box-shadow:0 10px 18px #0008,0 2px 3px #0008,inset 0 0 0 1px #ffffffb0!important}
+.court-card::before{inset:5px!important;border:1px solid color-mix(in srgb,var(--world-card-edge),transparent 22%)!important;border-radius:4px!important;background-image:var(--world-card-frame)!important;background-size:100% 100%!important;opacity:.8!important}
+.court-card::after{inset:8px!important;border:1px solid color-mix(in srgb,var(--world-card-edge),transparent 70%)!important}
+.court-art{filter:drop-shadow(0 2px 2px #0004) contrast(1.08)}
+body[data-card-theme=match] .card.back{
+ background-color:var(--world-felt)!important;background-image:var(--world-card-back)!important;
+ background-size:100% 100%!important;border:4px solid var(--world-card-edge)!important;
+ box-shadow:0 10px 18px #0008,inset 0 0 0 2px #ffffff65!important;
+}
+body[data-card-theme=match] .card.back::before{content:var(--world-card-back-symbol,"✦");font-family:Georgia,serif;font-size:34px;color:var(--world-card-edge);text-shadow:0 2px 6px #0008}
+body[data-card-theme=match] .card.back::after{inset:5px;border:1px solid color-mix(in srgb,var(--world-card-edge),white 28%);border-radius:4px}
+#themePreviewBoard{border-color:var(--world-rail)!important;background-color:var(--world-felt)!important;background-image:var(--world-table-top),var(--world-table-inlay),radial-gradient(ellipse at 50% 44%,color-mix(in srgb,var(--world-felt),white 7%),var(--world-felt) 48%,#050b0a 120%)!important;box-shadow:inset 0 0 0 3px var(--world-inset),inset 0 0 25px #0008,0 10px 22px #0007!important;border-radius:var(--world-table-radius)!important}
+#themePreviewBoard::before{border-color:var(--world-inset)!important;background-image:var(--world-frame-pattern)!important}
+#themePreviewBoard::after{background-image:var(--world-center-art)!important;opacity:.7}
+.theme-grid button{border-color:color-mix(in srgb,var(--theme-swatch,var(--gold)),transparent 45%);background-image:linear-gradient(145deg,#ffffff18,#00000020),var(--theme-swatch-pattern,none);box-shadow:inset 0 0 0 1px #ffffff12,0 4px 10px #0004}
+.theme-grid button[aria-pressed=true]{box-shadow:inset 0 0 0 2px var(--gold),0 0 18px color-mix(in srgb,var(--gold),transparent 70%)}
+@media(max-width:560px){
+ .theme-stage-decor .stage-prop{width:49px;height:48px;padding:3px;opacity:.53;border-radius:8px}
+ .theme-stage-decor i{font-size:19px}.theme-stage-decor b{font-size:5px;letter-spacing:.05em}
+ .theme-stage-decor .prop-a{left:5px;top:7px}.theme-stage-decor .prop-b{right:5px;top:7px}.theme-stage-decor .prop-c{right:5px;bottom:7px}
+ #gameTable::before{inset:6px!important}
+}
+@media(prefers-reduced-motion:reduce){.theme-stage-decor .stage-prop{transition:none!important}}
+
+body[data-theme=royal]{
+ --world-rail:#c49a4e;--world-rail-width:14px;--world-rail-style:double;--world-table-radius:52px;
+ --world-inset:#ecd49a;--world-inset-radius:calc(52px - 12px);--world-inset-style:double;
+ --world-felt:#164d3b;--world-table-top:repeating-linear-gradient(45deg,#f4d68b16 0 2px,transparent 2px 15px),radial-gradient(ellipse at 50% 48%,#277451 0,#12412f 72%);--world-table-inlay:radial-gradient(ellipse at 50% 50%,transparent 0 25%,#e8c77b20 25.4% 25.8%,transparent 26.2% 39%,#e8c77b19 39.4% 39.8%,transparent 40.2%),repeating-linear-gradient(45deg,transparent 0 25px,#e8c77b12 26px 27px,transparent 28px 52px);--world-center-art:radial-gradient(ellipse,#f2d38b18,transparent 68%);
+ --world-frame-pattern:radial-gradient(ellipse at 50% 50%,transparent 0 25%,#e8c77b20 25.4% 25.8%,transparent 26.2% 39%,#e8c77b19 39.4% 39.8%,transparent 40.2%),repeating-linear-gradient(45deg,transparent 0 25px,#e8c77b12 26px 27px,transparent 28px 52px);--world-card-back:repeating-conic-gradient(#174b39 0 25%,#c59b4e 0 26%,#174b39 0 50%) 0/16px 16px,linear-gradient(145deg,#245c45,#102c24);--world-card-back-symbol:"♛";
+ --world-card-paper:linear-gradient(145deg,#fff7df,#e9d8ad);--world-card-pattern:repeating-linear-gradient(45deg,#b78a3b12 0 1px,transparent 1px 6px),radial-gradient(circle at 50% 50%,#fffdf0,#efe3c7);--world-card-frame:radial-gradient(circle at center,#b78a3b25 0 1px,transparent 2px),repeating-linear-gradient(45deg,#b78a3b12 0 1px,transparent 1px 7px);
+ --world-card-edge:#b78a3b;--world-prop-surface:#164d3b;--world-prop-ink:#fff;--world-prop-icon:#ecd49a;
+ --prop-a-icon:"♛";--prop-a-label:"CROWN";
+ --prop-b-icon:"♜";--prop-b-label:"CREST";
+ --prop-c-icon:"✦";--prop-c-label:"VAULT";
+ }
+.pip-card[data-face-theme="royal"],.court-card[data-face-theme="royal"]{
+ --world-card-paper:linear-gradient(145deg,#fff7df,#e9d8ad);--world-card-pattern:repeating-linear-gradient(45deg,#b78a3b12 0 1px,transparent 1px 6px),radial-gradient(circle at 50% 50%,#fffdf0,#efe3c7);--world-card-frame:radial-gradient(circle at center,#b78a3b25 0 1px,transparent 2px),repeating-linear-gradient(45deg,#b78a3b12 0 1px,transparent 1px 7px);--world-card-edge:#b78a3b;
+ }
+body[data-theme=neon]{
+ --world-rail:#3cf4dc;--world-rail-width:8px;--world-rail-style:solid;--world-table-radius:18px;
+ --world-inset:#e348b6;--world-inset-radius:calc(18px - 12px);--world-inset-style:double;
+ --world-felt:#19153c;--world-table-top:repeating-linear-gradient(0deg,transparent 0 14px,#3cf4dc29 15px 16px,transparent 17px 31px),repeating-linear-gradient(90deg,transparent 0 14px,#e348b629 15px 16px,transparent 17px 31px),linear-gradient(135deg,#29225e,#11112f);--world-table-inlay:repeating-linear-gradient(0deg,transparent 0 28px,#3cf4dc42 29px 30px,transparent 31px 56px),repeating-linear-gradient(90deg,transparent 0 28px,#e348b638 29px 30px,transparent 31px 56px);--world-center-art:radial-gradient(ellipse,#e348b62b,transparent 70%);
+ --world-frame-pattern:repeating-linear-gradient(0deg,transparent 0 28px,#3cf4dc42 29px 30px,transparent 31px 56px),repeating-linear-gradient(90deg,transparent 0 28px,#e348b638 29px 30px,transparent 31px 56px);--world-card-back:repeating-linear-gradient(0deg,#111235 0 5px,#3cf4dc 5px 7px,#111235 7px 12px),repeating-linear-gradient(90deg,transparent 0 10px,#e348b7 10px 12px);--world-card-back-symbol:"⌁";
+ --world-card-paper:linear-gradient(145deg,#ecfffc,#c7f1e9);--world-card-pattern:repeating-linear-gradient(0deg,#3cf4dc22 0 1px,transparent 1px 5px),repeating-linear-gradient(90deg,#e348b61c 0 1px,transparent 1px 7px),linear-gradient(145deg,#edfffc,#c9e9e7);--world-card-frame:repeating-linear-gradient(0deg,#3cf4dc22 0 1px,transparent 1px 5px),repeating-linear-gradient(90deg,#e348b622 0 1px,transparent 1px 5px);
+ --world-card-edge:#e348b6;--world-prop-surface:#19153c;--world-prop-ink:#fff;--world-prop-icon:#e348b6;
+ --prop-a-icon:"⌘";--prop-a-label:"GRID";
+ --prop-b-icon:"⚡";--prop-b-label:"PULSE";
+ --prop-c-icon:"◈";--prop-c-label:"HOLO";
+ }
+.pip-card[data-face-theme="neon"],.court-card[data-face-theme="neon"]{
+ --world-card-paper:linear-gradient(145deg,#ecfffc,#c7f1e9);--world-card-pattern:repeating-linear-gradient(0deg,#3cf4dc22 0 1px,transparent 1px 5px),repeating-linear-gradient(90deg,#e348b61c 0 1px,transparent 1px 7px),linear-gradient(145deg,#edfffc,#c9e9e7);--world-card-frame:repeating-linear-gradient(0deg,#3cf4dc22 0 1px,transparent 1px 5px),repeating-linear-gradient(90deg,#e348b622 0 1px,transparent 1px 5px);--world-card-edge:#e348b6;
+ }
+body[data-theme=midnight]{
+ --world-rail:#6a9bd1;--world-rail-width:14px;--world-rail-style:groove;--world-table-radius:58px;
+ --world-inset:#9bd5fa;--world-inset-radius:calc(58px - 12px);--world-inset-style:double;
+ --world-felt:#123c60;--world-table-top:repeating-linear-gradient(0deg,transparent 0 17px,#9bd5fa19 18px 19px,transparent 20px 36px),radial-gradient(ellipse at 50% 46%,#245e84,#0b2948 78%);--world-table-inlay:repeating-radial-gradient(ellipse at 50% 100%,transparent 0 13px,#9bd5fa24 14px 15px,transparent 16px 27px);--world-center-art:radial-gradient(ellipse,#9bd5fa20,transparent 70%);
+ --world-frame-pattern:repeating-radial-gradient(ellipse at 50% 100%,transparent 0 13px,#9bd5fa24 14px 15px,transparent 16px 27px);--world-card-back:repeating-radial-gradient(circle at 50% 50%,#d6edff00 0 5px,#83b7ed 6px 7px,#0d3155 8px 12px),linear-gradient(145deg,#153d66,#071d34);--world-card-back-symbol:"◉";
+ --world-card-paper:linear-gradient(145deg,#f7fcff,#d8e8f6);--world-card-pattern:repeating-linear-gradient(0deg,#6a9bd118 0 1px,transparent 1px 7px),linear-gradient(145deg,#f5fbff,#d8e7f4);--world-card-frame:repeating-radial-gradient(ellipse at 50% 50%,#6a9bd11b 0 1px,transparent 2px 7px);
+ --world-card-edge:#6a9bd1;--world-prop-surface:#123c60;--world-prop-ink:#fff;--world-prop-icon:#9bd5fa;
+ --prop-a-icon:"◉";--prop-a-label:"PEARL";
+ --prop-b-icon:"♆";--prop-b-label:"TIDE";
+ --prop-c-icon:"✧";--prop-c-label:"ABYSS";
+ }
+.pip-card[data-face-theme="midnight"],.court-card[data-face-theme="midnight"]{
+ --world-card-paper:linear-gradient(145deg,#f7fcff,#d8e8f6);--world-card-pattern:repeating-linear-gradient(0deg,#6a9bd118 0 1px,transparent 1px 7px),linear-gradient(145deg,#f5fbff,#d8e7f4);--world-card-frame:repeating-radial-gradient(ellipse at 50% 50%,#6a9bd11b 0 1px,transparent 2px 7px);--world-card-edge:#6a9bd1;
+ }
+body[data-theme=purple]{
+ --world-rail:#b783d1;--world-rail-width:12px;--world-rail-style:double;--world-table-radius:38px;
+ --world-inset:#e1b4f5;--world-inset-radius:calc(38px - 12px);--world-inset-style:double;
+ --world-felt:#412550;--world-table-top:repeating-conic-gradient(from 10deg at 50% 50%,#e1b4f512 0 8deg,transparent 9deg 18deg),radial-gradient(ellipse at 50% 45%,#68417e,#281739 78%);--world-table-inlay:radial-gradient(circle at 50% 50%,transparent 0 20%,#e1b4f52e 20.5% 21%,transparent 21.5% 38%,#e1b4f51b 38.5% 39%,transparent 39.5%),repeating-conic-gradient(#e1b4f510 0 5deg,transparent 6deg 15deg);--world-center-art:radial-gradient(ellipse,#e1b4f52a,transparent 68%);
+ --world-frame-pattern:radial-gradient(circle at 50% 50%,transparent 0 20%,#e1b4f52e 20.5% 21%,transparent 21.5% 38%,#e1b4f51b 38.5% 39%,transparent 39.5%),repeating-conic-gradient(#e1b4f510 0 5deg,transparent 6deg 15deg);--world-card-back:repeating-conic-gradient(from 45deg,#392449 0 12.5%,#d6a0ef 12.5% 13.5%,#392449 13.5% 25%) 0/20px 20px;--world-card-back-symbol:"✧";
+ --world-card-paper:linear-gradient(145deg,#fff8ff,#ead8f2);--world-card-pattern:repeating-conic-gradient(#b783d112 0 6deg,transparent 7deg 18deg),linear-gradient(145deg,#fff8ff,#ead8f2);--world-card-frame:radial-gradient(circle at 50% 50%,#b783d133 0 1px,transparent 2px),repeating-conic-gradient(#b783d10f 0 4deg,transparent 5deg 15deg);
+ --world-card-edge:#b783d1;--world-prop-surface:#412550;--world-prop-ink:#fff;--world-prop-icon:#e1b4f5;
+ --prop-a-icon:"✧";--prop-a-label:"CRYSTAL";
+ --prop-b-icon:"◇";--prop-b-label:"RUNE";
+ --prop-c-icon:"☾";--prop-c-label:"MOON";
+ }
+.pip-card[data-face-theme="purple"],.court-card[data-face-theme="purple"]{
+ --world-card-paper:linear-gradient(145deg,#fff8ff,#ead8f2);--world-card-pattern:repeating-conic-gradient(#b783d112 0 6deg,transparent 7deg 18deg),linear-gradient(145deg,#fff8ff,#ead8f2);--world-card-frame:radial-gradient(circle at 50% 50%,#b783d133 0 1px,transparent 2px),repeating-conic-gradient(#b783d10f 0 4deg,transparent 5deg 15deg);--world-card-edge:#b783d1;
+ }
+body[data-theme=arcade]{
+ --world-rail:#f05b9c;--world-rail-width:12px;--world-rail-style:outset;--world-table-radius:8px;
+ --world-inset:#ffdc54;--world-inset-radius:calc(8px - 12px);--world-inset-style:double;
+ --world-felt:#1d285d;--world-table-top:repeating-conic-gradient(#ffffff12 0 25%,transparent 0 50%) 0/18px 18px,repeating-linear-gradient(0deg,#ffffff12 0 1px,transparent 1px 9px),linear-gradient(135deg,#293c79,#10183f);--world-table-inlay:repeating-linear-gradient(0deg,transparent 0 9px,#ffdc5438 10px 11px,transparent 12px 19px),repeating-linear-gradient(90deg,transparent 0 9px,#46f5e43a 10px 11px,transparent 12px 19px);--world-center-art:radial-gradient(ellipse,#ffdc5422,transparent 70%);
+ --world-frame-pattern:repeating-linear-gradient(0deg,transparent 0 9px,#ffdc5438 10px 11px,transparent 12px 19px),repeating-linear-gradient(90deg,transparent 0 9px,#46f5e43a 10px 11px,transparent 12px 19px);--world-card-back:repeating-conic-gradient(#ffdc54 0 25%,#f05b9c 0 50%) 0/16px 16px,repeating-linear-gradient(45deg,#171438aa,#171438aa);--world-card-back-symbol:"▦";
+ --world-card-paper:repeating-conic-gradient(#fff3d7 0 25%,#ecdcc0 0 50%) 0/11px 11px;--world-card-pattern:repeating-conic-gradient(#f05b9c13 0 25%,transparent 0 50%) 0/10px 10px,linear-gradient(145deg,#fff5da,#e9d6b3);--world-card-frame:repeating-conic-gradient(#f05b9c22 0 25%,transparent 0 50%) 0/8px 8px;
+ --world-card-edge:#f05b9c;--world-prop-surface:#1d285d;--world-prop-ink:#fff;--world-prop-icon:#ffdc54;
+ --prop-a-icon:"▦";--prop-a-label:"CABINET";
+ --prop-b-icon:"★";--prop-b-label:"BONUS";
+ --prop-c-icon:"◫";--prop-c-label:"PIXEL";
+ }
+.pip-card[data-face-theme="arcade"],.court-card[data-face-theme="arcade"]{
+ --world-card-paper:repeating-conic-gradient(#fff3d7 0 25%,#ecdcc0 0 50%) 0/11px 11px;--world-card-pattern:repeating-conic-gradient(#f05b9c13 0 25%,transparent 0 50%) 0/10px 10px,linear-gradient(145deg,#fff5da,#e9d6b3);--world-card-frame:repeating-conic-gradient(#f05b9c22 0 25%,transparent 0 50%) 0/8px 8px;--world-card-edge:#f05b9c;
+ }
+body[data-theme=starship]{
+ --world-rail:#65d8d0;--world-rail-width:11px;--world-rail-style:ridge;--world-table-radius:25px;
+ --world-inset:#a0f0ea;--world-inset-radius:calc(25px - 12px);--world-inset-style:double;
+ --world-felt:#0c3548;--world-table-top:radial-gradient(circle at 12% 20%,#ffffff 0 1px,transparent 2px),radial-gradient(circle at 72% 30%,#79e6e1 0 1px,transparent 2px),radial-gradient(circle at 85% 78%,#ffffff 0 1px,transparent 2px),radial-gradient(circle at 29% 84%,#79e6e1 0 1px,transparent 2px),linear-gradient(145deg,#15516a,#071a2b);--world-table-inlay:radial-gradient(circle at 50% 50%,transparent 0 28%,#65d8d02a 28.5% 29%,transparent 29.5% 48%,#65d8d020 48.5% 49%,transparent 49.5%),linear-gradient(90deg,transparent 49%,#65d8d01a 50%,transparent 51%);--world-center-art:radial-gradient(ellipse,#79e6e129,transparent 70%);
+ --world-frame-pattern:radial-gradient(circle at 50% 50%,transparent 0 28%,#65d8d02a 28.5% 29%,transparent 29.5% 48%,#65d8d020 48.5% 49%,transparent 49.5%),linear-gradient(90deg,transparent 49%,#65d8d01a 50%,transparent 51%);--world-card-back:radial-gradient(circle,#efffff 0 1px,transparent 2px),repeating-radial-gradient(circle,#0c2d48 0 5px,#65d8d0 6px 7px,#0c2d48 8px 14px);--world-card-back-symbol:"✦";
+ --world-card-paper:radial-gradient(circle at 50% 50%,#ffffff10 0 1px,transparent 2px),linear-gradient(145deg,#f5ffff,#d7eff0);--world-card-pattern:radial-gradient(circle,#65d8d026 0 1px,transparent 2px),linear-gradient(145deg,#f5ffff,#d7eff0);--world-card-frame:radial-gradient(circle,#65d8d04a 0 1px,transparent 2px);
+ --world-card-edge:#65d8d0;--world-prop-surface:#0c3548;--world-prop-ink:#fff;--world-prop-icon:#a0f0ea;
+ --prop-a-icon:"✦";--prop-a-label:"ORBIT";
+ --prop-b-icon:"◉";--prop-b-label:"PLANET";
+ --prop-c-icon:"⌁";--prop-c-label:"DOCK";
+ }
+.pip-card[data-face-theme="starship"],.court-card[data-face-theme="starship"]{
+ --world-card-paper:radial-gradient(circle at 50% 50%,#ffffff10 0 1px,transparent 2px),linear-gradient(145deg,#f5ffff,#d7eff0);--world-card-pattern:radial-gradient(circle,#65d8d026 0 1px,transparent 2px),linear-gradient(145deg,#f5ffff,#d7eff0);--world-card-frame:radial-gradient(circle,#65d8d04a 0 1px,transparent 2px);--world-card-edge:#65d8d0;
+ }
+body[data-theme=dungeon]{
+ --world-rail:#9b805d;--world-rail-width:15px;--world-rail-style:ridge;--world-table-radius:28px;
+ --world-inset:#d8b678;--world-inset-radius:calc(28px - 12px);--world-inset-style:double;
+ --world-felt:#263d30;--world-table-top:repeating-linear-gradient(0deg,transparent 0 30px,#0a130e50 31px 34px,transparent 35px 62px),repeating-linear-gradient(90deg,transparent 0 43px,#0a130e45 44px 47px,transparent 48px 90px),linear-gradient(145deg,#455a44,#1c2c22);--world-table-inlay:repeating-linear-gradient(0deg,transparent 0 31px,#d8b67820 32px 33px,transparent 34px 63px),repeating-linear-gradient(90deg,transparent 0 47px,#d8b67820 48px 49px,transparent 50px 96px);--world-center-art:radial-gradient(ellipse,#d8b67818,transparent 68%);
+ --world-frame-pattern:repeating-linear-gradient(0deg,transparent 0 31px,#d8b67820 32px 33px,transparent 34px 63px),repeating-linear-gradient(90deg,transparent 0 47px,#d8b67820 48px 49px,transparent 50px 96px);--world-card-back:repeating-linear-gradient(45deg,#354638 0 5px,#9b805d 5px 7px,#1c2b23 7px 12px),linear-gradient(#314935,#18271f);--world-card-back-symbol:"⚒";
+ --world-card-paper:linear-gradient(145deg,#f2ead8,#d6c4a5);--world-card-pattern:repeating-linear-gradient(0deg,#9b805d18 0 2px,transparent 2px 7px),linear-gradient(145deg,#f2ead8,#d6c4a5);--world-card-frame:repeating-linear-gradient(0deg,#9b805d25 0 2px,transparent 2px 7px);
+ --world-card-edge:#9b805d;--world-prop-surface:#263d30;--world-prop-ink:#fff;--world-prop-icon:#d8b678;
+ --prop-a-icon:"⚒";--prop-a-label:"ANVIL";
+ --prop-b-icon:"♜";--prop-b-label:"KEEP";
+ --prop-c-icon:"†";--prop-c-label:"TORCH";
+ }
+.pip-card[data-face-theme="dungeon"],.court-card[data-face-theme="dungeon"]{
+ --world-card-paper:linear-gradient(145deg,#f2ead8,#d6c4a5);--world-card-pattern:repeating-linear-gradient(0deg,#9b805d18 0 2px,transparent 2px 7px),linear-gradient(145deg,#f2ead8,#d6c4a5);--world-card-frame:repeating-linear-gradient(0deg,#9b805d25 0 2px,transparent 2px 7px);--world-card-edge:#9b805d;
+ }
+body[data-theme=noir]{
+ --world-rail:#d7b16d;--world-rail-width:12px;--world-rail-style:double;--world-table-radius:4px;
+ --world-inset:#d7b16d;--world-inset-radius:calc(4px - 12px);--world-inset-style:double;
+ --world-felt:#25242a;--world-table-top:repeating-linear-gradient(90deg,transparent 0 24px,#d7b16d18 25px 26px,transparent 27px 50px),linear-gradient(145deg,#555057,#19191f 75%);--world-table-inlay:linear-gradient(0deg,transparent 0 20%,#d7b16d24 20.3% 20.7%,transparent 21% 79%,#d7b16d24 79.3% 79.7%,transparent 80%),repeating-linear-gradient(45deg,transparent 0 42px,#ffffff0a 43px 44px,transparent 45px 86px);--world-center-art:radial-gradient(ellipse,#d7b16d19,transparent 70%);
+ --world-frame-pattern:linear-gradient(0deg,transparent 0 20%,#d7b16d24 20.3% 20.7%,transparent 21% 79%,#d7b16d24 79.3% 79.7%,transparent 80%),repeating-linear-gradient(45deg,transparent 0 42px,#ffffff0a 43px 44px,transparent 45px 86px);--world-card-back:repeating-linear-gradient(45deg,#17171c 0 5px,#d7b16d 5px 6px,#17171c 6px 12px),linear-gradient(#2b292f,#111115);--world-card-back-symbol:"◈";
+ --world-card-paper:repeating-linear-gradient(45deg,#f8f3e8 0 8px,#e9dfce 8px 9px);--world-card-pattern:repeating-linear-gradient(45deg,#b7955f13 0 1px,transparent 1px 7px),repeating-linear-gradient(90deg,#ffffff0b 0 1px,transparent 1px 10px),linear-gradient(145deg,#f8f3e8,#e9dfce);--world-card-frame:repeating-linear-gradient(45deg,#b7955f25 0 1px,transparent 1px 5px);
+ --world-card-edge:#b7955f;--world-prop-surface:#25242a;--world-prop-ink:#fff;--world-prop-icon:#d7b16d;
+ --prop-a-icon:"◈";--prop-a-label:"SPOTLIGHT";
+ --prop-b-icon:"▤";--prop-b-label:"FILM";
+ --prop-c-icon:"✦";--prop-c-label:"DECO";
+ }
+.pip-card[data-face-theme="noir"],.court-card[data-face-theme="noir"]{
+ --world-card-paper:repeating-linear-gradient(45deg,#f8f3e8 0 8px,#e9dfce 8px 9px);--world-card-pattern:repeating-linear-gradient(45deg,#b7955f13 0 1px,transparent 1px 7px),repeating-linear-gradient(90deg,#ffffff0b 0 1px,transparent 1px 10px),linear-gradient(145deg,#f8f3e8,#e9dfce);--world-card-frame:repeating-linear-gradient(45deg,#b7955f25 0 1px,transparent 1px 5px);--world-card-edge:#b7955f;
+ }
+body[data-theme=pixel]{
+ --world-rail:#e3bc55;--world-rail-width:12px;--world-rail-style:outset;--world-table-radius:4px;
+ --world-inset:#f6d36b;--world-inset-radius:calc(4px - 12px);--world-inset-style:double;
+ --world-felt:#1b4a3d;--world-table-top:repeating-conic-gradient(#ffffff13 0 25%,transparent 0 50%) 0/20px 20px,linear-gradient(145deg,#34765d,#102e2b);--world-table-inlay:repeating-linear-gradient(0deg,transparent 0 39px,#f6d36b35 40px 42px,transparent 43px 80px),repeating-linear-gradient(90deg,transparent 0 39px,#f6d36b35 40px 42px,transparent 43px 80px);--world-center-art:radial-gradient(ellipse,#f6d36b17,transparent 70%);
+ --world-frame-pattern:repeating-linear-gradient(0deg,transparent 0 39px,#f6d36b35 40px 42px,transparent 43px 80px),repeating-linear-gradient(90deg,transparent 0 39px,#f6d36b35 40px 42px,transparent 43px 80px);--world-card-back:repeating-conic-gradient(#224b3b 0 25%,#e4bd67 0 50%) 0/13px 13px;--world-card-back-symbol:"◆";
+ --world-card-paper:repeating-conic-gradient(#f1f3d8 0 25%,#e1e8c6 0 50%) 0/10px 10px;--world-card-pattern:repeating-conic-gradient(#d9e6c713 0 25%,transparent 0 50%) 0/8px 8px,linear-gradient(#f1f3d8,#d8e6c8);--world-card-frame:repeating-conic-gradient(#e3bc5530 0 25%,transparent 0 50%) 0/7px 7px;
+ --world-card-edge:#e3bc55;--world-prop-surface:#1b4a3d;--world-prop-ink:#fff;--world-prop-icon:#f6d36b;
+ --prop-a-icon:"▦";--prop-a-label:"BLOCKS";
+ --prop-b-icon:"◆";--prop-b-label:"GEM";
+ --prop-c-icon:"★";--prop-c-label:"QUEST";
+ }
+.pip-card[data-face-theme="pixel"],.court-card[data-face-theme="pixel"]{
+ --world-card-paper:repeating-conic-gradient(#f1f3d8 0 25%,#e1e8c6 0 50%) 0/10px 10px;--world-card-pattern:repeating-conic-gradient(#d9e6c713 0 25%,transparent 0 50%) 0/8px 8px,linear-gradient(#f1f3d8,#d8e6c8);--world-card-frame:repeating-conic-gradient(#e3bc5530 0 25%,transparent 0 50%) 0/7px 7px;--world-card-edge:#e3bc55;
+ }
+body[data-theme=circuit]{
+ --world-rail:#42cbb1;--world-rail-width:8px;--world-rail-style:solid;--world-table-radius:14px;
+ --world-inset:#53f5d0;--world-inset-radius:calc(14px - 12px);--world-inset-style:double;
+ --world-felt:#0d4144;--world-table-top:repeating-linear-gradient(90deg,transparent 0 24px,#53f5d02d 25px 26px,transparent 27px 50px),repeating-linear-gradient(0deg,transparent 0 24px,#53f5d02d 25px 26px,transparent 27px 50px),linear-gradient(145deg,#17615c,#06272e);--world-table-inlay:radial-gradient(circle at 25px 25px,#53f5d077 0 2px,transparent 3px),repeating-linear-gradient(90deg,transparent 0 49px,#53f5d026 50px 51px,transparent 52px 100px),repeating-linear-gradient(0deg,transparent 0 49px,#53f5d026 50px 51px,transparent 52px 100px);--world-center-art:radial-gradient(ellipse,#53f5d023,transparent 70%);
+ --world-frame-pattern:radial-gradient(circle at 25px 25px,#53f5d077 0 2px,transparent 3px),repeating-linear-gradient(90deg,transparent 0 49px,#53f5d026 50px 51px,transparent 52px 100px),repeating-linear-gradient(0deg,transparent 0 49px,#53f5d026 50px 51px,transparent 52px 100px);--world-card-back:linear-gradient(90deg,transparent 46%,#42cbb1 47% 53%,transparent 54%),linear-gradient(0deg,#092d35 46%,#53f5d0 47% 53%,#104b4d 54%);--world-card-back-symbol:"⌘";
+ --world-card-paper:linear-gradient(90deg,transparent 48%,#42cbb116 49% 51%,transparent 52%),linear-gradient(0deg,#f3fffa,#d9f0e7);--world-card-pattern:linear-gradient(90deg,transparent 48%,#42cbb124 49% 51%,transparent 52%),linear-gradient(0deg,#f3fffa,#d9f0e7);--world-card-frame:radial-gradient(circle at 50% 50%,#42cbb13e 0 1px,transparent 2px),repeating-linear-gradient(0deg,#42cbb11b 0 1px,transparent 1px 5px);
+ --world-card-edge:#42cbb1;--world-prop-surface:#0d4144;--world-prop-ink:#fff;--world-prop-icon:#53f5d0;
+ --prop-a-icon:"⌘";--prop-a-label:"CHIP";
+ --prop-b-icon:"⌁";--prop-b-label:"TRACE";
+ --prop-c-icon:"⚡";--prop-c-label:"POWER";
+ }
+.pip-card[data-face-theme="circuit"],.court-card[data-face-theme="circuit"]{
+ --world-card-paper:linear-gradient(90deg,transparent 48%,#42cbb116 49% 51%,transparent 52%),linear-gradient(0deg,#f3fffa,#d9f0e7);--world-card-pattern:linear-gradient(90deg,transparent 48%,#42cbb124 49% 51%,transparent 52%),linear-gradient(0deg,#f3fffa,#d9f0e7);--world-card-frame:radial-gradient(circle at 50% 50%,#42cbb13e 0 1px,transparent 2px),repeating-linear-gradient(0deg,#42cbb11b 0 1px,transparent 1px 5px);--world-card-edge:#42cbb1;
+ }
+body[data-theme=spellbook]{
+ --world-rail:#d7b36f;--world-rail-width:13px;--world-rail-style:double;--world-table-radius:42px;
+ --world-inset:#e6c27b;--world-inset-radius:calc(42px - 12px);--world-inset-style:double;
+ --world-felt:#33213f;--world-table-top:repeating-conic-gradient(from 17deg at 50% 50%,#e6c27b12 0 4deg,transparent 5deg 13deg),radial-gradient(ellipse at 50% 46%,#624674,#21152b 78%);--world-table-inlay:radial-gradient(circle at 50% 50%,transparent 0 18%,#e6c27b29 18.5% 19%,transparent 19.5% 37%,#e6c27b1e 37.5% 38%,transparent 38.5%),repeating-conic-gradient(#e6c27b12 0 3deg,transparent 4deg 12deg);--world-center-art:radial-gradient(ellipse,#e6c27b23,transparent 70%);
+ --world-frame-pattern:radial-gradient(circle at 50% 50%,transparent 0 18%,#e6c27b29 18.5% 19%,transparent 19.5% 37%,#e6c27b1e 37.5% 38%,transparent 38.5%),repeating-conic-gradient(#e6c27b12 0 3deg,transparent 4deg 12deg);--world-card-back:repeating-conic-gradient(from 15deg,#281a37 0 8deg,#e6c27b 9deg 10deg,#281a37 11deg 20deg),radial-gradient(circle,#3c2850,#1a1124);--world-card-back-symbol:"✧";
+ --world-card-paper:linear-gradient(145deg,#fff8e8,#ead8b9);--world-card-pattern:repeating-linear-gradient(0deg,#d7b36f19 0 1px,transparent 1px 6px),radial-gradient(circle at 50% 50%,#fff9ea,#ead8b9);--world-card-frame:radial-gradient(circle at 50% 50%,#d7b36f26 0 1px,transparent 2px),repeating-conic-gradient(#d7b36f11 0 3deg,transparent 4deg 12deg);
+ --world-card-edge:#d7b36f;--world-prop-surface:#33213f;--world-prop-ink:#fff;--world-prop-icon:#e6c27b;
+ --prop-a-icon:"✧";--prop-a-label:"SPELL";
+ --prop-b-icon:"☾";--prop-b-label:"MOON";
+ --prop-c-icon:"◇";--prop-c-label:"SIGIL";
+ }
+.pip-card[data-face-theme="spellbook"],.court-card[data-face-theme="spellbook"]{
+ --world-card-paper:linear-gradient(145deg,#fff8e8,#ead8b9);--world-card-pattern:repeating-linear-gradient(0deg,#d7b36f19 0 1px,transparent 1px 6px),radial-gradient(circle at 50% 50%,#fff9ea,#ead8b9);--world-card-frame:radial-gradient(circle at 50% 50%,#d7b36f26 0 1px,transparent 2px),repeating-conic-gradient(#d7b36f11 0 3deg,transparent 4deg 12deg);--world-card-edge:#d7b36f;
+ }
+body[data-theme=wasteland]{
+ --world-rail:#c1844d;--world-rail-width:15px;--world-rail-style:groove;--world-table-radius:13px;
+ --world-inset:#e5a85e;--world-inset-radius:calc(13px - 12px);--world-inset-style:double;
+ --world-felt:#48402a;--world-table-top:repeating-linear-gradient(24deg,transparent 0 13px,#120e0b3a 14px 17px,transparent 18px 32px),repeating-linear-gradient(154deg,#f0c27b0a 0 1px,transparent 2px 19px),linear-gradient(145deg,#746341,#282419);--world-table-inlay:repeating-linear-gradient(31deg,transparent 0 28px,#e5a85e22 29px 31px,transparent 32px 58px),radial-gradient(ellipse,transparent 40%,#0908063b 100%);--world-center-art:radial-gradient(ellipse,#e5a85e17,transparent 68%);
+ --world-frame-pattern:repeating-linear-gradient(31deg,transparent 0 28px,#e5a85e22 29px 31px,transparent 32px 58px),radial-gradient(ellipse,transparent 40%,#0908063b 100%);--world-card-back:repeating-linear-gradient(32deg,#302b20 0 8px,#c1844d 9px 10px,#302b20 11px 20px),linear-gradient(#665139,#211e17);--world-card-back-symbol:"⚙";
+ --world-card-paper:linear-gradient(145deg,#f5e8cf,#d8bf96);--world-card-pattern:repeating-linear-gradient(32deg,#9a71481a 0 2px,transparent 3px 8px),linear-gradient(145deg,#f5e8cf,#d8bf96);--world-card-frame:repeating-linear-gradient(32deg,#9a714832 0 2px,transparent 3px 7px);
+ --world-card-edge:#c1844d;--world-prop-surface:#48402a;--world-prop-ink:#fff;--world-prop-icon:#e5a85e;
+ --prop-a-icon:"⚙";--prop-a-label:"GEAR";
+ --prop-b-icon:"☢";--prop-b-label:"SCRAP";
+ --prop-c-icon:"⌁";--prop-c-label:"DUST";
+ }
+.pip-card[data-face-theme="wasteland"],.court-card[data-face-theme="wasteland"]{
+ --world-card-paper:linear-gradient(145deg,#f5e8cf,#d8bf96);--world-card-pattern:repeating-linear-gradient(32deg,#9a71481a 0 2px,transparent 3px 8px),linear-gradient(145deg,#f5e8cf,#d8bf96);--world-card-frame:repeating-linear-gradient(32deg,#9a714832 0 2px,transparent 3px 7px);--world-card-edge:#c1844d;
+ }
+body[data-theme=kaiju]{
+ --world-rail:#7f9e65;--world-rail-width:15px;--world-rail-style:ridge;--world-table-radius:44px;
+ --world-inset:#a2ca8b;--world-inset-radius:calc(44px - 12px);--world-inset-style:double;
+ --world-felt:#233d38;--world-table-top:radial-gradient(ellipse at 18% 22%,#a2ca8b28 0 3px,transparent 4px 20px),radial-gradient(ellipse at 78% 72%,#a2ca8b20 0 4px,transparent 5px 26px),repeating-linear-gradient(115deg,transparent 0 28px,#0003 29px 31px,transparent 32px 58px),linear-gradient(145deg,#426b55,#12272c);--world-table-inlay:repeating-radial-gradient(ellipse at 50% 100%,transparent 0 10px,#a2ca8b25 11px 12px,transparent 13px 22px),radial-gradient(ellipse,transparent 35%,#a2ca8b1c 35.5% 36%,transparent 36.5%);--world-center-art:radial-gradient(ellipse,#a2ca8b22,transparent 68%);
+ --world-frame-pattern:repeating-radial-gradient(ellipse at 50% 100%,transparent 0 10px,#a2ca8b25 11px 12px,transparent 13px 22px),radial-gradient(ellipse,transparent 35%,#a2ca8b1c 35.5% 36%,transparent 36.5%);--world-card-back:repeating-radial-gradient(ellipse at 50% 100%,#192e31 0 6px,#a2ca8b 7px 8px,#31514c 9px 16px);--world-card-back-symbol:"◉";
+ --world-card-paper:repeating-radial-gradient(ellipse at 50% 100%,#e5edcf 0 8px,#cfdfc0 9px 12px);--world-card-pattern:repeating-radial-gradient(ellipse at 50% 100%,#7f9e651b 0 5px,transparent 6px 12px),repeating-linear-gradient(115deg,#ffffff09 0 1px,transparent 1px 8px);--world-card-frame:repeating-radial-gradient(ellipse at 50% 100%,#7f9e652a 0 2px,transparent 3px 7px);
+ --world-card-edge:#7f9e65;--world-prop-surface:#233d38;--world-prop-ink:#fff;--world-prop-icon:#a2ca8b;
+ --prop-a-icon:"◉";--prop-a-label:"SCALE";
+ --prop-b-icon:"〰";--prop-b-label:"ROAR";
+ --prop-c-icon:"✦";--prop-c-label:"CLAW";
+ }
+.pip-card[data-face-theme="kaiju"],.court-card[data-face-theme="kaiju"]{
+ --world-card-paper:repeating-radial-gradient(ellipse at 50% 100%,#e5edcf 0 8px,#cfdfc0 9px 12px);--world-card-pattern:repeating-radial-gradient(ellipse at 50% 100%,#7f9e651b 0 5px,transparent 6px 12px),repeating-linear-gradient(115deg,#ffffff09 0 1px,transparent 1px 8px);--world-card-frame:repeating-radial-gradient(ellipse at 50% 100%,#7f9e652a 0 2px,transparent 3px 7px);--world-card-edge:#7f9e65;
+ }
+body[data-theme=frontier]{
+ --world-rail:#a76a3d;--world-rail-width:15px;--world-rail-style:ridge;--world-table-radius:22px;
+ --world-inset:#dfb27b;--world-inset-radius:calc(22px - 12px);--world-inset-style:double;
+ --world-felt:#583c2b;--world-table-top:repeating-linear-gradient(90deg,#e1b47a16 0 2px,transparent 2px 52px),repeating-linear-gradient(0deg,#160f0b20 0 1px,transparent 1px 38px),linear-gradient(145deg,#78583a,#39271d 76%);--world-table-inlay:repeating-linear-gradient(90deg,transparent 0 72px,#e5bd7a1d 73px 75px,transparent 76px 148px),radial-gradient(ellipse,transparent 0 45%,#21160f55 46% 47%,transparent 48%);--world-center-art:radial-gradient(ellipse,#e5bd7a16,transparent 68%);
+ --world-frame-pattern:repeating-linear-gradient(90deg,transparent 0 72px,#e5bd7a1d 73px 75px,transparent 76px 148px),radial-gradient(ellipse,transparent 0 45%,#21160f55 46% 47%,transparent 48%);--world-card-back:repeating-linear-gradient(32deg,#4a2e20 0 7px,#b77b49 8px 9px,#4a2e20 10px 17px),radial-gradient(circle,#72482c,#2e1c14);--world-card-back-symbol:"✶";
+ --world-card-paper:linear-gradient(145deg,#f2e4cb,#d8bd96);--world-card-pattern:repeating-linear-gradient(34deg,#9b6a3c20 0 2px,transparent 3px 8px),repeating-linear-gradient(145deg,#ffffff0c 0 1px,transparent 1px 6px),linear-gradient(145deg,#f2e4cb,#d8bd96);--world-card-frame:repeating-linear-gradient(34deg,#9b6a3c30 0 2px,transparent 3px 8px);
+ --world-card-edge:#b77b49;--world-prop-surface:#583c2b;--world-prop-ink:#fff;--world-prop-icon:#dfb27b;
+ --prop-a-icon:"✶";--prop-a-label:"SHERIFF";
+ --prop-b-icon:"▣";--prop-b-label:"LANTERN";
+ --prop-c-icon:"♜";--prop-c-label:"SALOON";
+ }
+.pip-card[data-face-theme="frontier"],.court-card[data-face-theme="frontier"]{
+ --world-card-paper:linear-gradient(145deg,#f2e4cb,#d8bd96);--world-card-pattern:repeating-linear-gradient(34deg,#9b6a3c20 0 2px,transparent 3px 8px),repeating-linear-gradient(145deg,#ffffff0c 0 1px,transparent 1px 6px),linear-gradient(145deg,#f2e4cb,#d8bd96);--world-card-frame:repeating-linear-gradient(34deg,#9b6a3c30 0 2px,transparent 3px 8px);--world-card-edge:#b77b49;
+ }
+body[data-theme=galactic]{
+ --world-rail:#759cc2;--world-rail-width:12px;--world-rail-style:double;--world-table-radius:26px;
+ --world-inset:#edc16c;--world-inset-radius:calc(26px - 12px);--world-inset-style:double;
+ --world-felt:#0c2543;--world-table-top:radial-gradient(circle at 12% 18%,#fff 0 1px,transparent 2px),radial-gradient(circle at 68% 35%,#b8dfff 0 1px,transparent 2px),radial-gradient(circle at 88% 76%,#fff 0 1px,transparent 2px),radial-gradient(circle at 32% 82%,#b8dfff 0 1px,transparent 2px),linear-gradient(145deg,#244b6a,#061426);--world-table-inlay:radial-gradient(circle at 50% 50%,transparent 0 23%,#edc16c27 23.5% 24%,transparent 24.5% 44%,#82bce31a 44.5% 45%,transparent 45.5%),linear-gradient(135deg,transparent 45%,#82bce315 46% 47%,transparent 48%);--world-center-art:radial-gradient(ellipse,#82bce321,transparent 70%);
+ --world-frame-pattern:radial-gradient(circle at 50% 50%,transparent 0 23%,#edc16c27 23.5% 24%,transparent 24.5% 44%,#82bce31a 44.5% 45%,transparent 45.5%),linear-gradient(135deg,transparent 45%,#82bce315 46% 47%,transparent 48%);--world-card-back:radial-gradient(circle,#ffffff 0 1px,transparent 2px),repeating-conic-gradient(#142d4a 0 25%,#edc16c 25.5% 26.5%,#142d4a 27% 50%) 0/16px 16px;--world-card-back-symbol:"✦";
+ --world-card-paper:radial-gradient(circle at 50% 50%,#9dc8e51a 0 1px,transparent 2px),linear-gradient(145deg,#f4f8fc,#d7e4f1);--world-card-pattern:radial-gradient(circle,#759cc230 0 1px,transparent 2px),linear-gradient(145deg,#f4f8fc,#d7e4f1);--world-card-frame:radial-gradient(circle,#759cc23d 0 1px,transparent 2px),repeating-linear-gradient(135deg,#759cc218 0 1px,transparent 1px 7px);
+ --world-card-edge:#759cc2;--world-prop-surface:#0c2543;--world-prop-ink:#fff;--world-prop-icon:#edc16c;
+ --prop-a-icon:"✦";--prop-a-label:"HOLOCRON";
+ --prop-b-icon:"◉";--prop-b-label:"OUTER RIM";
+ --prop-c-icon:"⚔";--prop-c-label:"SABER";
+ }
+.pip-card[data-face-theme="galactic"],.court-card[data-face-theme="galactic"]{
+ --world-card-paper:radial-gradient(circle at 50% 50%,#9dc8e51a 0 1px,transparent 2px),linear-gradient(145deg,#f4f8fc,#d7e4f1);--world-card-pattern:radial-gradient(circle,#759cc230 0 1px,transparent 2px),linear-gradient(145deg,#f4f8fc,#d7e4f1);--world-card-frame:radial-gradient(circle,#759cc23d 0 1px,transparent 2px),repeating-linear-gradient(135deg,#759cc218 0 1px,transparent 1px 7px);--world-card-edge:#759cc2;
+ }
+body[data-theme=crt]{
+ --world-rail:#58b976;--world-rail-width:10px;--world-rail-style:solid;--world-table-radius:13px;
+ --world-inset:#84f5a2;--world-inset-radius:calc(13px - 12px);--world-inset-style:double;
+ --world-felt:#0b2717;--world-table-top:repeating-linear-gradient(0deg,#79f69c19 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,#79f69c09 0 1px,transparent 1px 6px),radial-gradient(ellipse at 50% 45%,#1c5633,#06170e 78%);--world-table-inlay:repeating-linear-gradient(0deg,transparent 0 3px,#78fa9b2c 4px 5px,transparent 6px 8px),radial-gradient(ellipse,transparent 0 42%,#0008 100%);--world-center-art:radial-gradient(ellipse,#8df6a526,transparent 65%),radial-gradient(ellipse,transparent 44%,#0009 100%);
+ --world-frame-pattern:repeating-linear-gradient(0deg,transparent 0 3px,#78fa9b2c 4px 5px,transparent 6px 8px),radial-gradient(ellipse,transparent 0 42%,#0008 100%);--world-card-back:repeating-linear-gradient(0deg,#081d10 0 3px,#69d987 3px 4px,#0b2816 4px 7px),linear-gradient(90deg,#0b1c10,#14351f);--world-card-back-symbol:"▣";
+ --world-card-paper:repeating-linear-gradient(0deg,#e4f5d8 0 4px,#cce9c8 4px 5px),linear-gradient(145deg,#e4f5d8,#cce9c8);--world-card-pattern:repeating-linear-gradient(0deg,#49b96a28 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,#49b96a0d 0 1px,transparent 1px 7px),linear-gradient(145deg,#e4f5d8,#cce9c8);--world-card-frame:repeating-linear-gradient(0deg,#58b97632 0 1px,transparent 1px 4px);
+ --world-card-edge:#58b976;--world-prop-surface:#0b2717;--world-prop-ink:#fff;--world-prop-icon:#84f5a2;
+ --prop-a-icon:"▣";--prop-a-label:"TUBE";
+ --prop-b-icon:"◉";--prop-b-label:"DIAL";
+ --prop-c-icon:"〰";--prop-c-label:"SCANLINE";
+ }
+.pip-card[data-face-theme="crt"],.court-card[data-face-theme="crt"]{
+ --world-card-paper:repeating-linear-gradient(0deg,#e4f5d8 0 4px,#cce9c8 4px 5px),linear-gradient(145deg,#e4f5d8,#cce9c8);--world-card-pattern:repeating-linear-gradient(0deg,#49b96a28 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,#49b96a0d 0 1px,transparent 1px 7px),linear-gradient(145deg,#e4f5d8,#cce9c8);--world-card-frame:repeating-linear-gradient(0deg,#58b97632 0 1px,transparent 1px 4px);--world-card-edge:#58b976;
+ }
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -760,6 +1059,11 @@ body.has-room #slotsDock{display:block}
 <section class="panel" id="lobby"><h2>Join the table</h2><p class="muted small">Pick a name. Create a room or join a friend's room code.</p><div class="stack"><div><label for="gameModeSelect">GAME MODE</label><select id="gameModeSelect"><option value="blackjack">Blackjack</option><option value="holdem">Texas Hold’em</option><option value="roulette">Roulette</option></select></div><div><label for="name">DISPLAY NAME</label><input id="name" maxlength="18" placeholder="Your name" autocomplete="nickname"></div><div class="row"><button class="primary" id="create">Create room</button><div class="field"><label for="joinCode">ROOM CODE</label><input id="joinCode" maxlength="6" placeholder="ABC123" style="text-transform:uppercase"></div><button id="join">Join room</button></div><div class="status" id="lobbyStatus" role="status"></div></div></section>
 <section class="panel hidden" id="roomPanel"><div class="row"><div><div class="muted small">ROOM CODE</div><div class="code" id="roomCode"></div></div><div class="row"><span class="pill" id="phase">LOBBY</span><button id="leave">Leave room</button></div></div><div class="divider"></div>
 <div class="table" id="gameTable">
+<div class="theme-stage-decor" aria-hidden="true">
+ <span class="stage-prop prop-a"><i></i><b></b></span>
+ <span class="stage-prop prop-b"><i></i><b></b></span>
+ <span class="stage-prop prop-c"><i></i><b></b></span>
+</div>
 <section id="blackjackBoard" class="game-board">
 <div class="zone"><div class="zone-title">Dealer</div><div class="cards" id="dealerCards"></div><div class="total" id="dealerTotal"></div></div>
 <div class="zone"><div class="zone-title">Current hand</div><div class="cards" id="myCards"></div><div class="total" id="myTotal"></div><div class="small muted" id="handLabel"></div></div>
