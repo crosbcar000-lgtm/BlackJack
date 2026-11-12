@@ -80,6 +80,8 @@ const server = http.createServer((req, res) => {
     const tableLooks = new Set();
     const previewLooks = new Set();
     const frontCardLooks = new Set();
+    const pipEngravingLooks = new Set();
+    const courtEngravingLooks = new Set();
     const backCardLooks = new Set();
     const propLooks = new Set();
     const atmosphereLooks = new Set();
@@ -150,20 +152,42 @@ const server = http.createServer((req, res) => {
         const front = document.createElement("div");
         front.className = "card pip-card";
         front.dataset.faceTheme = theme;
+        front.innerHTML = '<span class="face-engraving" aria-hidden="true"></span>';
         document.body.appendChild(front);
         const frontStyle = getComputedStyle(front);
+        const frontLayer = getComputedStyle(front.querySelector(".face-engraving"));
         const frontLook = frontStyle.backgroundImage + "|" + frontStyle.borderTopColor;
-        front.remove();
+        const pipEngraving = frontLayer.backgroundImage + "|" + frontLayer.backgroundSize;
+        const court = document.createElement("div");
+        court.className = "card court-card";
+        court.dataset.faceTheme = theme;
+        court.innerHTML = '<span class="face-engraving court-engraving" aria-hidden="true"></span>';
+        document.body.appendChild(court);
+        const courtLayer = getComputedStyle(court.querySelector(".court-engraving"));
+        const courtEngraving = courtLayer.backgroundImage + "|" + courtLayer.backgroundSize;
+        const courtBorder = getComputedStyle(court).borderTopStyle + "|" + getComputedStyle(court).borderRadius;
+        front.remove();court.remove();
         const back = document.querySelector("#themePreviewBoard .card.back");
         const backStyle = getComputedStyle(back);
-        return { front: frontLook, back: backStyle.backgroundImage + "|" + backStyle.borderTopColor };
+        const previewFaces = [...document.querySelectorAll("#themePreviewBoard .pip-card,#themePreviewBoard .court-card")].map(card => ({
+          theme:card.dataset.faceTheme,hasEngraving:!!card.querySelector(".face-engraving")
+        }));
+        return {front:frontLook,back:backStyle.backgroundImage+"|"+backStyle.borderTopColor,
+          pipEngraving,courtEngraving,courtBorder,previewFaces};
       }, theme);
       if (!cardTextures.front || cardTextures.front.includes("none") ||
-          !cardTextures.back || cardTextures.back.includes("none")) {
-        throw new Error("Card texture is missing for " + theme + ": " + JSON.stringify(cardTextures));
+          !cardTextures.back || cardTextures.back.includes("none") ||
+          !cardTextures.pipEngraving || cardTextures.pipEngraving.includes("none") ||
+          !cardTextures.courtEngraving || cardTextures.courtEngraving.includes("none")) {
+        throw new Error("Card face texture is missing for " + theme + ": " + JSON.stringify(cardTextures));
+      }
+      if (cardTextures.previewFaces.length !== 3 || cardTextures.previewFaces.some(x => x.theme !== theme || !x.hasEngraving)) {
+        throw new Error("Live table preview should use themed pip and court faces: " + theme + ": " + JSON.stringify(cardTextures.previewFaces));
       }
       frontCardLooks.add(cardTextures.front);
       backCardLooks.add(cardTextures.back);
+      pipEngravingLooks.add(cardTextures.pipEngraving);
+      courtEngravingLooks.add(cardTextures.courtEngraving);
       const preview = await host.locator("#themePreviewBoard").evaluate(el => ({
         theme:el.dataset.previewTheme,visible:!!el.getClientRects().length,
         border:getComputedStyle(el).borderTopColor,image:getComputedStyle(el).backgroundImage,
@@ -184,6 +208,8 @@ const server = http.createServer((req, res) => {
     await host.emulateMedia({reducedMotion:"no-preference"});
     if (frontCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct face-card textures; got " + frontCardLooks.size);
     if (backCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct card-back textures; got " + backCardLooks.size);
+    if (pipEngravingLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct pip-card face engravings; got " + pipEngravingLooks.size);
+    if (courtEngravingLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct court-card face engravings; got " + courtEngravingLooks.size);
     const desktopPicker = await host.locator(".theme-grid").evaluate(el => ({
       count:el.children.length,
       columns:getComputedStyle(el).gridTemplateColumns.split(" ").length,
