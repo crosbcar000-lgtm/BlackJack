@@ -1416,6 +1416,108 @@ body[data-theme=crt]{
  }
 }
 
+
+/* The face of every deck gets its own engraved material and ornamental language. */
+.face-engraving{
+ position:absolute;pointer-events:none;display:block;
+ background-image:var(--face-engraving,radial-gradient(circle,#00000012 0 1px,transparent 2px));
+ background-size:var(--face-engraving-size,100% 100%);
+ background-position:center;background-repeat:repeat;
+}
+.pip-card>.face-engraving{
+ z-index:0;inset:7px;border-radius:var(--face-radius,6px);
+ opacity:var(--face-engraving-opacity,.58);mix-blend-mode:multiply;
+}
+.court-card>.court-engraving{
+ z-index:2;inset:17px 7px 14px;border-radius:3px;
+ opacity:var(--face-portrait-engraving-opacity,.22);mix-blend-mode:multiply;
+}
+.pip-card[data-face-theme]{
+ border:var(--face-border,3px solid var(--world-card-edge))!important;
+ border-radius:var(--face-radius,8px)!important;
+}
+.court-card[data-face-theme]{
+ border:var(--face-border,3px solid var(--world-card-edge))!important;
+ border-radius:var(--face-radius,8px)!important;
+}
+.pip-card .pip-index,.pip-card .pip-value,.pip-card .pip-bottom{z-index:3}
+.pip-card .pip-center{z-index:2;filter:drop-shadow(0 1px 1px #ffffffa0)}
+.court-card .court-index,.court-card .court-name,.court-card .court-bottom{z-index:3}
+.court-card .court-art{z-index:1}
+.pip-card[data-face-theme=royal],.court-card[data-face-theme=royal]{
+ --face-border:3px double #b78a3b;--face-radius:10px;--face-engraving-opacity:.62;
+ --face-engraving:repeating-linear-gradient(45deg,#b78a3b2a 0 1px,transparent 1px 7px),repeating-linear-gradient(-45deg,#b78a3b18 0 1px,transparent 1px 9px),radial-gradient(circle at 50% 50%,transparent 0 24%,#b78a3b3b 24.5% 25%,transparent 26% 43%,#b78a3b28 43.5% 44%,transparent 45%);
+}
+.pip-card[data-face-theme=neon],.court-card[data-face-theme=neon]{
+ --face-border:2px solid #e348b6;--face-radius:4px;--face-engraving-opacity:.72;
+ --face-engraving:repeating-linear-gradient(0deg,transparent 0 9px,#24bfae3b 10px 11px,transparent 12px 20px),repeating-linear-gradient(90deg,transparent 0 9px,#e348b63c 10px 11px,transparent 12px 20px),linear-gradient(135deg,transparent 45%,#3cf4dc30 49% 51%,transparent 55%);
+}
+.pip-card[data-face-theme=midnight],.court-card[data-face-theme=midnight]{
+ --face-border:3px double #6a9bd1;--face-radius:12px;--face-engraving-opacity:.7;
+ --face-engraving:repeating-radial-gradient(ellipse at 50% 105%,transparent 0 9px,#4b91c43b 10px 11px,transparent 12px 19px),radial-gradient(circle at 18% 30%,#4c9dc444 0 1px,transparent 2px),radial-gradient(circle at 78% 60%,#4c9dc444 0 1px,transparent 2px);
+}
+.pip-card[data-face-theme=purple],.court-card[data-face-theme=purple]{
+ --face-border:3px double #b783d1;--face-radius:12px;--face-engraving-opacity:.7;
+ --face-engraving:repeating-conic-gradient(from 12deg at 50% 50%,#a56fc22a 0 5deg,transparent 6deg 22deg),radial-gradient(circle at 50% 50%,transparent 0 19%,#a56fc244 20% 20.5%,transparent 21% 38%,#a56fc233 39% 39.5%,transparent 40%);
+}
+.pip-card[data-face-theme=arcade],.court-card[data-face-theme=arcade]{
+ --face-border:3px outset #f05b9c;--face-radius:3px;--face-engraving-opacity:.7;
+ --face-engraving:repeating-conic-gradient(#ec70a52c 0 25%,transparent 0 50%),linear-gradient(90deg,transparent 48%,#44318d30 49% 51%,transparent 52%);
+ --face-engraving-size:12px 12px,100% 100%;
+}
+.pip-card[data-face-theme=starship],.court-card[data-face-theme=starship]{
+ --face-border:3px ridge #65d8d0;--face-radius:5px;--face-engraving-opacity:.72;
+ --face-engraving:radial-gradient(circle at 50% 50%,transparent 0 20%,#398da33b 20.5% 21%,transparent 22% 37%,#398da32d 37.5% 38%,transparent 39%),radial-gradient(circle,#3286a888 0 1px,transparent 2px);
+ --face-engraving-size:100% 100%,15px 17px;
+}
+.pip-card[data-face-theme=dungeon],.court-card[data-face-theme=dungeon]{
+ --face-border:3px ridge #9b805d;--face-radius:5px;--face-engraving-opacity:.68;
+ --face-engraving:repeating-linear-gradient(0deg,transparent 0 12px,#7763452e 13px 14px,transparent 15px 25px),repeating-linear-gradient(90deg,transparent 0 17px,#77634528 18px 19px,transparent 20px 36px),linear-gradient(135deg,transparent 48%,#6e59402c 49% 50%,transparent 51%);
+}
+.pip-card[data-face-theme=noir],.court-card[data-face-theme=noir]{
+ --face-border:4px double #b7955f;--face-radius:2px;--face-engraving-opacity:.64;
+ --face-engraving:repeating-conic-gradient(from 0deg at 50% 8%,#ae8d5d27 0 3deg,transparent 4deg 14deg),linear-gradient(90deg,transparent 15%,#92744d20 16% 17%,transparent 18% 82%,#92744d20 83% 84%,transparent 85%);
+}
+.pip-card[data-face-theme=pixel],.court-card[data-face-theme=pixel]{
+ --face-border:3px solid #e3bc55;--face-radius:1px;--face-engraving-opacity:.72;
+ --face-engraving:repeating-conic-gradient(#98ac7030 0 25%,transparent 0 50%),linear-gradient(90deg,transparent 48%,#536d5930 49% 51%,transparent 52%);
+ --face-engraving-size:10px 10px,100% 100%;
+}
+.pip-card[data-face-theme=circuit],.court-card[data-face-theme=circuit]{
+ --face-border:2px solid #42cbb1;--face-radius:4px;--face-engraving-opacity:.7;
+ --face-engraving:linear-gradient(90deg,transparent 45%,#42a99c45 46% 49%,transparent 50%),linear-gradient(0deg,transparent 45%,#42a99c45 46% 49%,transparent 50%),radial-gradient(circle at 50% 50%,#42a99c66 0 2px,transparent 3px);
+ --face-engraving-size:18px 18px,18px 18px,36px 36px;
+}
+.pip-card[data-face-theme=spellbook],.court-card[data-face-theme=spellbook]{
+ --face-border:3px double #d7b36f;--face-radius:10px;--face-engraving-opacity:.7;
+ --face-engraving:repeating-radial-gradient(circle at 50% 50%,transparent 0 7px,#ad8ac13b 8px 9px,transparent 10px 15px),radial-gradient(circle at 50% 50%,#9f75be55 0 1px,transparent 2px),radial-gradient(circle at 18% 18%,#9f75be55 0 1px,transparent 2px);
+}
+.pip-card[data-face-theme=wasteland],.court-card[data-face-theme=wasteland]{
+ --face-border:3px dashed #c1844d;--face-radius:4px;--face-engraving-opacity:.68;
+ --face-engraving:linear-gradient(42deg,transparent 0 42%,#a56a3c36 43% 44%,transparent 45%),linear-gradient(132deg,transparent 0 44%,#a56a3c31 45% 46%,transparent 47%),repeating-linear-gradient(12deg,transparent 0 18px,#a56a3c1d 19px 20px,transparent 21px 33px);
+}
+.pip-card[data-face-theme=kaiju],.court-card[data-face-theme=kaiju]{
+ --face-border:4px ridge #7f9e65;--face-radius:12px;--face-engraving-opacity:.7;
+ --face-engraving:repeating-radial-gradient(ellipse at 50% 100%,#718e5b30 0 3px,transparent 4px 9px),repeating-linear-gradient(75deg,transparent 0 11px,#718e5b20 12px 13px,transparent 14px 25px);
+}
+.pip-card[data-face-theme=frontier],.court-card[data-face-theme=frontier]{
+ --face-border:3px ridge #bd7848;--face-radius:5px;--face-engraving-opacity:.66;
+ --face-engraving:repeating-linear-gradient(0deg,#a16a4221 0 1px,transparent 2px 6px),repeating-linear-gradient(90deg,transparent 0 22px,#a16a4221 23px 24px,transparent 25px 46px),radial-gradient(circle at 50% 50%,transparent 0 21%,#bd78482c 22% 23%,transparent 24%);
+}
+.pip-card[data-face-theme=galactic],.court-card[data-face-theme=galactic]{
+ --face-border:3px double #739fc1;--face-radius:7px;--face-engraving-opacity:.7;
+ --face-engraving:radial-gradient(circle at 15% 18%,#4c81b7aa 0 1px,transparent 2px),radial-gradient(circle at 72% 24%,#4c81b788 0 1px,transparent 2px),radial-gradient(circle at 44% 76%,#4c81b799 0 1px,transparent 2px),linear-gradient(125deg,transparent 45%,#e4b55d34 48% 49%,transparent 52%),radial-gradient(circle at 50% 50%,transparent 0 27%,#4c81b72b 28% 28.5%,transparent 29%);
+}
+.pip-card[data-face-theme=crt],.court-card[data-face-theme=crt]{
+ --face-border:3px solid #4d9d65;--face-radius:4px;--face-engraving-opacity:.72;--face-portrait-engraving-opacity:.15;
+ --face-engraving:repeating-linear-gradient(0deg,#469c5b32 0 1px,transparent 2px 4px),repeating-linear-gradient(90deg,transparent 0 17px,#469c5b14 18px 19px,transparent 20px 30px),linear-gradient(145deg,transparent 20%,#ffffff18 50%,transparent 78%);
+}
+.court-card[data-face-theme=noir] .court-engraving{mix-blend-mode:multiply;opacity:.16}
+.court-card[data-face-theme=neon] .court-engraving,.court-card[data-face-theme=circuit] .court-engraving{mix-blend-mode:screen;opacity:.22}
+.theme-preview-board .face-engraving{inset:5px}
+.theme-preview-board .court-card .court-engraving{inset:12px 4px 8px}
+.theme-preview-board .court-card .court-art{height:calc(100% - 20px)}
+
 </style></head>
 <body data-theme="royal"><div class="wrap">
 <header class="top"><div class="brand"><span class="mark">♠</span>TABLE NIGHT <span class="muted small">/ FRIENDS TABLE</span></div><div class="row"><span class="pill" id="netState">Multiplayer ready</span><button id="slotsToggle" type="button" class="hidden">🎰 Slots · Tokens</button><button id="copyInvite" disabled>Copy invite</button></div></header>
@@ -1626,13 +1728,13 @@ function faceCardHtml(c){
   :'<path d="M17 29q-2-14 13-17 15 2 14 17l-6-8-8-4-8 8z" fill="'+p.ink+'"/>';
  const beard=rank==="K"?'<path d="M20 39q10 8 20 0l-2 14-8 8-8-8z" fill="'+p.ink+'"/><path d="M25 48l5 5 5-5" fill="none" stroke="'+p.accent+'" stroke-width="1.4"/>':"";
  const art='<svg class="court-art" viewBox="0 0 60 70" aria-hidden="true"><rect x="1" y="1" width="58" height="68" rx="7" fill="'+p.bg+'" stroke="'+p.accent+'" stroke-width="1.3"/>'+courtOrnament(p.motif,p)+'<path d="M5 68q2-21 18-24l7 5 7-5q16 3 18 24z" fill="'+p.shade+'" stroke="'+p.accent+'" stroke-width="1.4"/><path d="M17 54l13 8 13-8 6 14H11z" fill="'+p.ink+'"/><path d="M25 43v9l5 5 5-5v-9" fill="#d8a47e" stroke="#805840" stroke-width="1"/><path d="M16 31q-2-13 14-16 16 3 14 16l-3 11q-5 9-11 9t-11-9z" fill="#edc09b" stroke="#805840" stroke-width="1.1"/>'+hair+'<path d="M21 33q3-2 6 0m6 0q3-2 6 0" stroke="'+p.ink+'" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="25" cy="34" r="1.3" fill="#28201d"/><circle cx="35" cy="34" r="1.3" fill="#28201d"/><path d="M30 35l-2 6h4m-7 3q5 4 10 0" stroke="#965f4d" stroke-width="1.2" fill="none" stroke-linecap="round"/>'+beard+crown+'<path d="M18 57l12 7 12-7" fill="none" stroke="'+p.accent+'" stroke-width="2"/><text x="30" y="64" text-anchor="middle" font-size="10" font-weight="900" fill="'+suitColor+'">'+c.s+'</text></svg>';
- return '<div class="card court-card '+(["♥","♦"].includes(c.s)?"red":"")+'" data-rank="'+rank+'" data-face-theme="'+theme+'" aria-label="'+({J:"Jack",Q:"Queen",K:"King"}[rank])+' of '+({"♠":"spades","♥":"hearts","♦":"diamonds","♣":"clubs"}[c.s])+'" style="--court-bg:'+p.bg+';--court-ink:'+p.ink+';--court-accent:'+p.accent+';--court-shade:'+p.shade+'"><span class="court-index"><b>'+rank+'</b><i>'+c.s+'</i></span>'+art+'<span class="court-name">'+role+'</span><span class="court-bottom">'+rank+' '+c.s+'</span></div>';
+ return '<div class="card court-card '+(["♥","♦"].includes(c.s)?"red":"")+'" data-rank="'+rank+'" data-face-theme="'+theme+'" aria-label="'+({J:"Jack",Q:"Queen",K:"King"}[rank])+' of '+({"♠":"spades","♥":"hearts","♦":"diamonds","♣":"clubs"}[c.s])+'" style="--court-bg:'+p.bg+';--court-ink:'+p.ink+';--court-accent:'+p.accent+';--court-shade:'+p.shade+'"><span class="court-index"><b>'+rank+'</b><i>'+c.s+'</i></span>'+art+'<span class="face-engraving court-engraving" aria-hidden="true"></span><span class="court-name">'+role+'</span><span class="court-bottom">'+rank+' '+c.s+'</span></div>';
 }
 function cardHtml(c,back=false){
  if(back)return '<div class="card back" aria-label="Face-down card"></div>';
  if(["J","Q","K"].includes(c.r))return faceCardHtml(c);
  const tone=pipColor(c.s),theme=activeFaceTheme(),value=c.r==="A"?"ACE":c.r;
- return '<div class="card pip-card '+(["♥","♦"].includes(c.s)?"red":"")+'" data-rank="'+c.r+'" data-face-theme="'+theme+'" style="--pip-ink:'+tone+'"><span class="pip-index"><b>'+c.r+'</b><i>'+c.s+'</i></span><span class="pip-watermark">'+c.s+'</span><span class="pip-center">'+c.s+'</span><span class="pip-value">'+value+'</span><span class="pip-bottom">'+c.r+' '+c.s+'</span></div>';
+ return '<div class="card pip-card '+(["♥","♦"].includes(c.s)?"red":"")+'" data-rank="'+c.r+'" data-face-theme="'+theme+'" style="--pip-ink:'+tone+'"><span class="face-engraving" aria-hidden="true"></span><span class="pip-index"><b>'+c.r+'</b><i>'+c.s+'</i></span><span class="pip-watermark">'+c.s+'</span><span class="pip-center">'+c.s+'</span><span class="pip-value">'+value+'</span><span class="pip-bottom">'+c.r+' '+c.s+'</span></div>';
 }
 function publicState(forId){return {type:"STATE",code:roomCode,hostId:players[0]?.id,phase,players:players.map(p=>({id:p.id,name:p.name,chips:p.chips,tokens:p.tokens??0,flair:p.flair||"",slotMessage:p.slotMessage||"",slotReels:p.slotReels||["🍒","⭐","💎"],ready:p.ready,done:p.done,hands:p.hands.map((h,i)=>({cards:h.cards,bet:h.bet,done:h.done,result:h.result})),activeHand:p.activeHand})),dealer:dealer.map((c,i)=>phase==="PLAYING"&&i===1?null:c),dealerHidden:phase==="PLAYING",turnPlayer,turnHand,message:roundMessage,roundNumber,forId}}
 function sendTo(conn,msg){try{if(conn&&conn.open)conn.send(msg)}catch(e){console.warn(e)}}
@@ -1777,7 +1879,12 @@ $("create").onclick=createRoom;$("join").onclick=joinRoom;$("ready").onclick=rea
 $("copyInvite").onclick=async()=>{const url=location.origin+location.pathname+"?room="+roomCode;try{await navigator.clipboard.writeText("Join my Blackjack room: "+url+" — Code: "+roomCode);toast("Invite link and code copied")}catch{toast("Room code: "+roomCode)}};
 function updateThemePreview(){
  const preview=$("themePreviewBoard"),label=$("themePreviewLabel"),theme=document.body.dataset.theme||"royal";
- if(preview)preview.dataset.previewTheme=theme;
+ if(preview){
+  preview.dataset.previewTheme=theme;
+  const rows=preview.querySelectorAll(".theme-preview-cards");
+  if(rows[0])rows[0].innerHTML='<div class="card back" aria-hidden="true"></div>'+cardHtml({r:"K",s:"♥"});
+  if(rows[1])rows[1].innerHTML=cardHtml({r:"A",s:"♠"})+cardHtml({r:"10",s:"♦"});
+ }
  const selected=document.querySelector('.theme-grid button[data-theme="'+theme+'"]');
  if(label)label.textContent="Previewing "+(selected?selected.textContent.trim().replace(/\s+/g," "):theme);
 }
@@ -2229,7 +2336,7 @@ $("holdemRaise").onclick=()=>sendAction("RAISE");
 $("holdemAllIn").onclick=()=>sendAction("ALL_IN");
 $("placeRouletteBet").onclick=()=>sendAction({kind:"ROULETTE_BET",betType:$("rouletteBetType").value,amount:Number($("rouletteAmount").value),number:Number($("rouletteNumber").value)});
 $("rouletteBetType").onchange=()=>{$("rouletteNumber").parentElement.classList.toggle("hidden",$("rouletteBetType").value!=="number")};
-$("cardThemeSelect").onchange=()=>{document.body.dataset.cardTheme=$("cardThemeSelect").value;localStorage.setItem("bj-card-theme",$("cardThemeSelect").value);render()};
+$("cardThemeSelect").onchange=()=>{document.body.dataset.cardTheme=$("cardThemeSelect").value;localStorage.setItem("bj-card-theme",$("cardThemeSelect").value);updateThemePreview();render()};
 document.body.dataset.cardTheme=localStorage.getItem("bj-card-theme")||"match";
 $("cardThemeSelect").value=document.body.dataset.cardTheme;$("rouletteNumber").parentElement.classList.add("hidden");
 
