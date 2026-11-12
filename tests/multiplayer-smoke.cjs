@@ -102,12 +102,22 @@ const server = http.createServer((req, res) => {
         return {
           count: props.length,
           icons: props.map(p => getComputedStyle(p.querySelector("i"), "::before").content),
-          labels: props.map(p => getComputedStyle(p.querySelector("b"), "::before").content)
+          labels: props.map(p => getComputedStyle(p.querySelector("b"), "::before").content),
+          items: props.map(p => ({
+            fontSize: parseFloat(getComputedStyle(p.querySelector("i")).fontSize),
+            tileBackground: getComputedStyle(p).backgroundColor,
+            tileBorder: getComputedStyle(p).borderTopStyle,
+            itemShadow: getComputedStyle(p, "::before").backgroundImage
+          }))
         };
       });
       if (stage.count !== 3 || stage.icons.some(x => !x || x === "none" || x === "normal") ||
           stage.labels.some(x => !x || x === "none" || x === "normal")) {
         throw new Error("Theme props are missing for " + theme + ": " + JSON.stringify(stage));
+      }
+      if (stage.items.some(x => x.fontSize < 35 || x.tileBackground !== "rgba(0, 0, 0, 0)" ||
+          x.tileBorder !== "none" || !x.itemShadow.includes("gradient"))) {
+        throw new Error("Theme props should render as loose physical objects, not labeled tiles: " + theme + ": " + JSON.stringify(stage.items));
       }
       propLooks.add(stage.icons.join("|") + "|" + stage.labels.join("|"));
       const cardTextures = await host.evaluate(theme => {
@@ -143,6 +153,26 @@ const server = http.createServer((req, res) => {
     if (propLooks.size !== themeNames.length) throw new Error("Each theme should have its own three stage props; got " + propLooks.size + " distinct prop sets");
     if (frontCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct face-card textures; got " + frontCardLooks.size);
     if (backCardLooks.size !== themeNames.length) throw new Error("All 16 themes should have distinct card-back textures; got " + backCardLooks.size);
+    const desktopPicker = await host.locator(".theme-grid").evaluate(el => ({
+      count:el.children.length,
+      columns:getComputedStyle(el).gridTemplateColumns.split(" ").length,
+      rows:getComputedStyle(el).gridTemplateRows.split(" ").length
+    }));
+    if (desktopPicker.count !== 16 || desktopPicker.columns !== 4 || desktopPicker.rows !== 4) {
+      throw new Error("Theme selector should be an exact 4 by 4 grid: " + JSON.stringify(desktopPicker));
+    }
+    const readableType = await host.evaluate(() => ({
+      body:parseFloat(getComputedStyle(document.body).fontSize),
+      small:parseFloat(getComputedStyle(document.querySelector(".rules")).fontSize),
+      label:parseFloat(getComputedStyle(document.querySelector("label")).fontSize)
+    }));
+    if (readableType.body < 16 || readableType.small < 13 || readableType.label < 12) {
+      throw new Error("Interface typography should use the improved readable type scale: " + JSON.stringify(readableType));
+    }
+    await host.setViewportSize({width:375,height:812});
+    const mobilePicker = await host.locator(".theme-grid").evaluate(el => getComputedStyle(el).gridTemplateColumns.split(" ").length);
+    if (mobilePicker !== 2) throw new Error("Theme selector should remain readable in a two-column mobile layout");
+    await host.setViewportSize({width:1280,height:900});
     await host.locator('.theme-grid button[data-theme="royal"]').click();
     await host.locator("#cardThemeSelect").selectOption("classic");
     if (await host.locator("body").getAttribute("data-card-theme") !== "classic") throw new Error("Independent card theme did not apply");
