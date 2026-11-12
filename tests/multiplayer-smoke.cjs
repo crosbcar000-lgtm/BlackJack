@@ -76,7 +76,7 @@ const server = http.createServer((req, res) => {
     if (!(await host.locator("#settingsView").isVisible()) || await host.locator("#gameView").isVisible()) throw new Error("Settings tab did not replace the Game view");
 
     // Verify every theme selects correctly and changes the actual table texture.
-    const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju"];
+    const themeNames = ["royal", "neon", "midnight", "purple", "arcade", "starship", "dungeon", "noir", "pixel", "circuit", "spellbook", "wasteland", "kaiju", "frontier", "galactic", "crt"];
     const tableLooks = new Set();
     const previewLooks = new Set();
     for (const theme of themeNames) {
@@ -104,8 +104,8 @@ const server = http.createServer((req, res) => {
       const saved = await host.evaluate(() => localStorage.getItem("bj-theme"));
       if (saved !== theme) throw new Error("Theme was not saved on this device: " + theme);
     }
-    if (tableLooks.size !== themeNames.length) throw new Error("Some themes share the same table appearance; expected 13 unique looks, got " + tableLooks.size);
-    if (previewLooks.size !== themeNames.length) throw new Error("Live board preview did not show 13 distinct theme appearances; got " + previewLooks.size);
+    if (tableLooks.size !== themeNames.length) throw new Error("Some themes share the same table appearance; expected 16 unique looks, got " + tableLooks.size);
+    if (previewLooks.size !== themeNames.length) throw new Error("Live board preview did not show 16 distinct theme appearances; got " + previewLooks.size);
     await host.locator('.theme-grid button[data-theme="royal"]').click();
     await host.locator("#cardThemeSelect").selectOption("classic");
     if (await host.locator("body").getAttribute("data-card-theme") !== "classic") throw new Error("Independent card theme did not apply");
